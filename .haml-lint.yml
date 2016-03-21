@@ -1,0 +1,16 @@
+linters:
+  LineLength:
+    max: 150
+  UnnecessaryInterpolation:
+    enabled: false
+  HtmlAttributes:
+    enabled: false
+  RuboCop:
+    enabled: true
+    # These cops are incredibly noisy when it comes to HAML templates, so we
+    # ignore them.
+    ignored_cops:
+      - Style/SingleLineBlockParams
+      - Style/SpaceBeforeBlockBraces
+      - Style/TrailingComma
+      - Style/SpaceInsideBlockBraces

@@ -1,0 +1,12 @@
+#!/bin/bash
+
+if [ -f '.env' ]; then
+  source .env
+fi
+
+if [ -n "$DATABASE_URL" ]; then
+  echo "Using... ${DATABASE_URL}"
+  sequel -r './app.rb'  -E -L log/console-db.log $DATABASE_URL
+else
+  echo "No DATABASE_URL environment -- cannot connect"
+fi
