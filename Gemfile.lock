@@ -38,6 +38,7 @@ GEM
       mime-types (>= 1.16, < 3.0)
       netrc (~> 0.7)
     round_robin_tournament (0.0.1)
+    rrschedule (0.3.4)
     sendgrid-ruby (1.1.6)
       faraday (~> 0.9)
       mimemagic
@@ -88,6 +89,7 @@ DEPENDENCIES
   puma
   rest-client
   round_robin_tournament
+  rrschedule
   sendgrid-ruby
   sequel
   sequel_enum

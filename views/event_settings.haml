@@ -1,16 +1,22 @@
+- groups_assigned = @event.teams.select { |t| t.group_id.nil? }
 %ul.nav.nav-tabs{ role: 'tablist' }
   %li.active{ role: 'presentation' }
     %a{ data: { toggle: 'tab' }, role: 'tab', href: '#settings' } Settings
   %li{ role: 'presentation' }
     %a{ data: { toggle: 'tab' }, role: 'tab', href: '#group' }
-      - unless @event.teams.select { |t| t.group_id.nil? }.empty?
+      - unless groups_assigned.empty?
         %i.fa.fa-exclamation
       Group Assignment
-  %li{ role: 'presentation' }
-    -# %a{ href: url("/event/#{@event.id}/teams") } Teams
-    %a{ data: { toggle: 'tab' }, role: 'tab', href: '#teams' } Teams
-  %li{ role: 'presentation' }
-    %a{ data: { toggle: 'tab' }, role: 'tab', href: '#schedule' } Schedule
+  %li{ role: 'presentation', class: groups_assigned.empty? ? '' : 'disabled' }
+    %a{ data: { toggle: 'tab' }, role: 'tab', href: '#teams' }
+      Teams
+      - unless groups_assigned.empty?
+        %i.fa.fa-ban
+  %li{ role: 'presentation', class: groups_assigned.empty? ? '' : 'disabled' }
+    %a{ data: { toggle: 'tab' }, role: 'tab', href: '#schedule' }
+      Schedule
+      - unless groups_assigned.empty?
+        %i.fa.fa-ban
 
 .tab-content
   .tab-pane.active#settings
@@ -76,7 +82,7 @@
   .tab-pane#schedule{ role: 'tabpanel' }
     =partial(:event_schedule)
 
-%a.btn.btn-success{ href: url("/event/#{@event.id}/schedule") } Start Event
+%a.btn.btn-success{ href: url("/event/#{@event.id}/start") } Start Event
 %a.btn.btn-danger{ href: url("/event/#{@event.id}/delete") } Delete Event!
 
 %script{ src: '/bower_components/dragula/dist/dragula.min.js' }
@@ -107,6 +113,8 @@
         if ( $('#group_1 li').length == $('#group_2 li').length ) {
           $('#save_groups').removeAttr('disabled');
           $('.fa-exclamation').hide();
+          $('li.disabled').removeClass('disabled')
+          $('.fa-ban').hide();
         }
       }
     });

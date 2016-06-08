@@ -26,8 +26,16 @@ class Team < Sequel::Model(:teams)
   many_to_one :event
   one_to_one :group
 
+  def roster_size
+    self.event.roster_size
+  end
+
   def roster
     self.players.fullname
+  end
+
+  def seed(seed)
+    self.players_dataset.where(seed: seed).first
   end
 
   def group

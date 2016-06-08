@@ -53,6 +53,58 @@ class App < Sinatra::Base
     redirect to("/event/#{params[:id]}/")
   end
 
+  get_or_post '/event/:event_id/start/?' do
+    @event = Event[params[:event_id]]
+    @schedule = RRSchedule::Schedule.new(
+      teams: @event.groups.map { |group| @event.teams_dataset.where(group_id: group.id).map(:name) },
+      rules: [
+        RRSchedule::Rule.new(
+          wday: 6,
+          gt: [
+            "09:00AM",
+            "11:00AM",
+            "01:00PM",
+            "03:00PM",
+          ],
+          ps: [
+            "Unitty Farm",
+          ],
+        ),
+      ],
+      start_date: Date.parse("2016/05/21"),
+      cycles: 2,
+      shuffle: false,
+    )
+
+    @schedule.generate
+
+    puts @schedule.rounds.collect{ |r| r.to_s }
+
+    # create db objects based on schedule
+    @schedule.gamedays.each_with_index do |gd, matchnum|
+      gd.games.each do |g|
+        match = @event.add_match(
+          desc: "Match #{matchnum + 1}",
+          match_num: matchnum + 1,
+          group_id: @event.teams_dataset.where(name: g.team_a.to_s).first.group_id,
+          team_a: @event.teams_dataset.where(name: g.team_a.to_s).first.id,
+          team_b: @event.teams_dataset.where(name: g.team_b.to_s).first.id,
+        )
+        match_id = match.id
+        [ 'open1', 'open2', 'open3', 'open4', 'master1', 'master2', 'grandmaster', 'woman', 'amateur' ].each do |seed|
+          @event.add_game(
+            seed: seed,
+            player_id_1: @event.teams_dataset.where(name: g.team_a.to_s).first.seed(seed).id,
+            player_id_2: @event.teams_dataset.where(name: g.team_b.to_s).first.seed(seed).id,
+            match_id: match_id,
+          )
+        end
+      end
+    end
+
+    haml :set_schedule
+  end
+
   get '/event/:event_id/teams/?' do
     haml :teams
   end

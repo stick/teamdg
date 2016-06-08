@@ -13,6 +13,9 @@ unless DB.table_exists? (:matches)
     String      :desc
     Integer     :match_num
     foreign_key :winner, :teams, :on_delete => :cascade, :null => true
+    foreign_key :team_a, :teams, :on_delete => :cascade, :null => false
+    foreign_key :team_b, :teams, :on_delete => :cascade, :null => false
+    foreign_key :group_id, :groups, :on_delete => :cascade, :null => false
     Integer     :wins, :default => 0, :null => false
     Integer     :losses, :default => 0, :null => false
     Integer     :ties, :default => 0, :null => false

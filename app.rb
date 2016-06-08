@@ -18,6 +18,7 @@ require 'logger'
 require 'rest-client'
 require 'ostruct'
 require 'round_robin_tournament'
+require 'rrschedule'
 
 require_relative 'helpers/init'
 require_relative 'models/init'
