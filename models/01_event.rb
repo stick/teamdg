@@ -17,7 +17,7 @@ unless DB.table_exists? (:events)
     Integer     :group_number, :default => 1, :null => false
     Integer     :group_advance, :default => 1, :null => false
     Integer     :num_teams, :null => false
-    Integer     :num_players, :null => false
+    Integer     :roster_size, :null => false
     Integer     :matchpoints, :null => false, :default => 3
     Integer     :tiepoints, :null => false, :default => 1
     String      :semis, :null => false, :default => 'xgrouppoints'

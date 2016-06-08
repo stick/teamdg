@@ -27,7 +27,7 @@ class App < Sinatra::Base
       group_number: params[:event_group_num].to_i,
       group_advance: params[:event_group_advance].to_i,
       num_teams: params[:num_teams].to_i,
-      num_players: params[:num_players].to_i
+      roster_size: params[:roster_size].to_i
     )
     redirect to("/event/#{e.id}/setup")
   end

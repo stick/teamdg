@@ -14,7 +14,6 @@ unless DB.table_exists? (:teams)
     String      :captain
     Bignum      :mobile_number
     String      :email_address
-    Integer     :roster_size, :null => false, :default => 9
     foreign_key :event_id, :events, :on_delete => :cascade, :null => false
     foreign_key :group_id, :groups, :on_delete => :cascade
     unique      [:name, :event_id]
