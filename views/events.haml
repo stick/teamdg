@@ -1,0 +1,3 @@
+.list-group
+  - Event.all.each do |event|
+    %a.list-group-item{ href: url("/event/#{event.id}") }= event.name

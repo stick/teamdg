@@ -1,0 +1,72 @@
+.col-md-4
+  .panel.panel-default
+    %table.table.table-condensed
+      %thead
+        %tr
+          %th{ colspan: 8 }= @team.name
+      %tbody
+        %tr
+          %th Division
+          %td
+            %span#division= @team.group
+        %tr
+          %th Captain
+          %td
+            %span.edit_team#captain= @team.captain.nil? ? '<i class="fa fa-edit"></i>' : @team.captain
+            %input.form-control.edit_team.hidden#captain
+        %tr
+          %th Email
+          %td
+            %span.edit_team#email_address= @team.email_address.nil? ? '<i class="fa fa-edit"></i>' : @team.email_address
+            %input.form-control.edit_team.hidden#email_address
+        %tr
+          %th Mobile
+          %td
+            %span.edit_team#mobile_number= @team.mobile_number.nil? ? '<i class="fa fa-edit"></i>' : @team.mobile_number
+            %input.form-control.edit_team.hidden#mobile_number
+
+- seeds = [ 'open1', 'open2', 'open3', 'open4', 'master1', 'master2', 'grandmaster', 'woman', 'amateur' ]
+
+.row
+%h4 Roster
+%table.table
+  %thead
+    %tr
+      %th Seed
+      %th Player <small>(click to edit)</small>
+  %tbody
+    - seeds.each_with_index do |seed, index|
+      %tr
+        %td #{seed.capitalize}
+        %td
+          - player = Player[team_id: @team.id, seed: seed].nil? ? nil : Player[team_id: @team.id, seed: seed].name
+          %span.change_name#span{ id: seed, data: { seed: seed } } #{player}
+          %input.form-control.seed_name#input{ id: seed, name: seed, data: { seed: seed }, class: player.nil? ? '' : 'hidden' }
+
+:javascript
+  $('.seed_name').change(function(e) {
+    console.log(this);
+    var new_name = $(this).val();
+    $.post('/player/update', { seed: this.dataset.seed, team_id: #{@team.id}, name: new_name });
+    $(this).addClass('hidden');
+    $('#span_' + this.dataset.seed).removeClass('hidden').html(new_name);
+  });
+
+  $('.change_name').click(function(e) {
+    console.log(this);
+    $(this).addClass('hidden');
+    $('#input_' + this.dataset.seed).removeClass('hidden').focus();
+  });
+
+  $('.edit_team').click(function(e) {
+    $('span#' + $(this).attr('id')).addClass('hidden');
+    $('input#' + $(this).attr('id')).removeClass('hidden').focus();
+  });
+
+  $('.edit_team').change(function(e) {
+    console.log(this);
+    var myid = $(this).attr('id');
+    $('input#' + myid).addClass('hidden');
+    $.post("/team/#{@team.id}/settings/update", { team_id: #{@team.id}, setting: myid, value: $(this).val() });
+    $('span#' + $(this).attr('id')).removeClass('hidden').html($(this).val());
+  });

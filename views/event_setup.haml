@@ -1,0 +1,15 @@
+%pre
+  - @e.columns.each do |c|
+    #{c} -- #{@e[c]}<br>
+
+
+%form.form-horizontal{ method: 'POST' }
+  - num_teams = @e.num_teams || 1
+  - (1..num_teams).each do |tn|
+    .form-group
+      %label.col-sm-2.control-label{ for: "team_#{tn}" } Team #{tn}:
+      .col-sm-4
+        %input.form-control#team{ placeholder: 'Team name', type: 'text', name: "team_name[]" }
+  %button.btn.btn-primary{ type: 'submit' } Add Teams
+
+

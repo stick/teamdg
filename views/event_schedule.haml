@@ -1,0 +1,28 @@
+- teams_per_group = @event.num_teams / @event.group_number
+- rounds_per_set = teams_per_group - 1
+- sets = 2
+- total_rounds = rounds_per_set * sets
+
+%table.table.table-bordered
+  %thead
+    %tr
+      %th
+      - @event.groups.each do |group|
+        %th{ colspan: 2 } #{group.name}
+  %tbody
+    - (1..rounds_per_set).each_with_index do |match_num, index|
+      %tr
+        %th Match #{match_num}
+        - @event.groups.each do |group|
+          - schedule = RoundRobinTournament.schedule(@event.teams_dataset.where(group_id: group.id).map(:name))
+          - unless schedule[index].nil?
+            - schedule[index].each do |rounds|
+              %td #{rounds.first} <small><strong><em>vs</em></strong></small> #{rounds.last}
+    - (rounds_per_set + 1..total_rounds).each_with_index do |match_num, index|
+      %tr
+        %th Match #{match_num}
+        - @event.groups.each do |group|
+          - schedule = RoundRobinTournament.schedule(@event.teams_dataset.where(group_id: group.id).map(:name)).reverse
+          - unless schedule[index].nil?
+            - schedule[index].each do |rounds|
+              %td #{rounds.first} <small><strong><em>vs</em></strong></small> #{rounds.last}

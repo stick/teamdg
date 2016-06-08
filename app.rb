@@ -17,6 +17,7 @@ require 'haml'
 require 'logger'
 require 'rest-client'
 require 'ostruct'
+require 'round_robin_tournament'
 
 require_relative 'helpers/init'
 require_relative 'models/init'

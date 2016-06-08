@@ -1,0 +1,3 @@
+.list-group
+  - Team.where(event_id: params[:event_id]).each do |team|
+    %a.list-group-item{ href: url("/team/#{team.id}") }= team.name

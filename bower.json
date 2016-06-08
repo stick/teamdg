@@ -13,7 +13,9 @@
     "html5shiv": "latest",
     "respond": "latest",
     "bootstrapvalidator": "latest",
-    "bootstrap-editable": "latest"
+    "bootstrap3-ie10-viewport-bug-workaround": "latest",
+    "bootstrap-editable": "latest",
+    "dragula": "latest"
   },
   "private": true,
   "authors": [

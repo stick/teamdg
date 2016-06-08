@@ -1,0 +1,65 @@
+%h1.page-header Create new event
+
+%form.form-horizontal{ method: 'POST' }
+  .form-group
+    %label.col-sm-2.control-label{ for: 'event_name' } Name:
+    .col-sm-10
+      %input.form-control#event_name{ placeholder: 'Team DG Challenge', type: 'text', name: 'event_name' }
+  .form-group
+    %label.col-sm-2.control-label{ for: 'event_type' } Type:
+    .col-sm-10
+      .radio
+        %label
+          %input#event_type_1{ type: 'radio', name: 'event_type', value: 'single_stage' }
+          Single Stage
+      .radio
+        %label
+          %input#event_type_2{ type: 'radio', name: 'event_type', value: 'two_stage', checked: true }
+          Two Stage
+  .form-group
+    %label.col-sm-2.control-label{ for: 'event_format1' } Stage One Format:
+    .col-sm-10
+      .radio
+        %label
+          %input#event_format1_1{ type: 'radio', name: 'event_format1', value: 'round_robin_1' }
+          Single Round Robin
+      .radio
+        %label
+          %input#event_format1_2{ type: 'radio', name: 'event_format1', value: 'round_robin_2', checked: true }
+          Double Round Robin
+  .form-group
+    %label.col-sm-2.control-label{ for: 'num_teams' } Number of teams:
+    .col-sm-10
+      %input.form-control#num_teams{ placeholder: '8', type: 'number', name: 'num_teams', value: 8 }
+  .form-group
+    %label.col-sm-2.control-label{ for: 'num_players' } Number of players per team:
+    .col-sm-10
+      %input.form-control#num_players{ placeholder: '9', type: 'number', name: 'num_players', value: 9 }
+  .form-group
+    %label.col-sm-2.control-label{ for: 'event_group_num' } Number of groups:
+    .col-sm-10
+      %select.form-control{ name: 'event_group_num' }
+        %option 1
+        %option{ selected: true } 2
+        %option{ disabled: true } 3
+        %option{ disabled: true } 4
+  .form-group
+    %label.col-sm-2.control-label{ for: 'event_group_advance' } Teams advancing from each group:
+    .col-sm-10
+      %select.form-control{ name: 'event_group_advance' }
+        %option 1
+        %option{ selected: true } 2
+        %option{ disabled: true } 3
+        %option{ disabled: true } 4
+  .form-group
+    %label.col-sm-2.control-label{ for: 'event_format2' } Stage Two Format:
+    .col-sm-10
+      .radio
+        %label
+          %input#event_format2_1{ type: 'radio', name: 'event_format2', value: 'elimination_1', checked: true }
+          Single Elimination
+      .radio
+        %label
+          %input#event_format2_1{ type: 'radio', name: 'event_format2', value: 'elimination_2' }
+          Double Elimination
+  %button.btn.btn-primary{ type: 'submit' } Create event
