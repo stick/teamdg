@@ -14,16 +14,14 @@ unless DB.table_exists? (:players)
     Bignum      :mobile_number
     String      :email_address
     String      :seed, :null => false
-    Integer     :team_id, :null => false
+    foreign_key :team_id, :teams, :on_delete => :cascade, :null => false
     #unique      [:first_name, :last_name, :email_address]
   end
 end
 
 class Player < Sequel::Model(:players)
-  # plugin :enum
-  # enum :seed, [ :open1, :open2, :open3, :open4, :masters1, :masters2, :grandmasters, :woman, :amateur ]
 
-  one_to_one :team
+  many_to_one :team
 
   def fullname
     return "#{self.first_name} #{self.last_name}"
@@ -36,7 +34,7 @@ class Player < Sequel::Model(:players)
   def validate
     super
     validates_presence [:name]
-    validates_includes [ 'open1', 'open2', 'open3', 'open4', 'master1', 'master2', 'grandmaster', 'woman', 'amateur' ], :seed
+    validates_includes self.team.event.team_seeds, :seed
   end
 end
 

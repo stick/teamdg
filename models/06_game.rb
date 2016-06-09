@@ -35,7 +35,7 @@ class Game < Sequel::Model(:games)
 
   def validate
     super
-    validates_includes [ 'open1', 'open2', 'open3', 'open4', 'master1', 'master2', 'grandmaster', 'woman', 'amateur' ], :seed
+    validates_includes self.team.event.team_seeds, :seed
   end
 end
 

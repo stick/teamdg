@@ -1,3 +1,8 @@
+%ol.breadcrumb
+  %li
+    %a{ href: url("/event/#{@event.id}") } #{@event.name.upcase}
+  %li.active Teams
+
 .list-group
-  - Team.where(event_id: params[:event_id]).each do |team|
+  - @event.teams.each do |team|
     %a.list-group-item{ href: url("/team/#{team.id}") }= team.name

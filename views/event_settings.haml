@@ -1,152 +1,66 @@
 - groups_assigned = @event.teams.select { |t| t.group_id.nil? }
 %ul.nav.nav-tabs{ role: 'tablist' }
   %li.active{ role: 'presentation' }
-    %a{ data: { toggle: 'tab' }, role: 'tab', href: '#settings' } Settings
+    %a{ href: url('#') }
+      Settings
   %li{ role: 'presentation' }
-    %a{ data: { toggle: 'tab' }, role: 'tab', href: '#group' }
+    %a{ href: url("/event/#{@event.id}/groups") }
       - unless groups_assigned.empty?
-        %i.fa.fa-exclamation
+        %i.fa.fa-exclamation-triangle.text-danger
       Group Assignment
   %li{ role: 'presentation', class: groups_assigned.empty? ? '' : 'disabled' }
     %a{ data: { toggle: 'tab' }, role: 'tab', href: '#teams' }
-      Teams
-      - unless groups_assigned.empty?
-        %i.fa.fa-ban
-  %li{ role: 'presentation', class: groups_assigned.empty? ? '' : 'disabled' }
-    %a{ data: { toggle: 'tab' }, role: 'tab', href: '#schedule' }
-      Schedule
+      Teams and Rosters
       - unless groups_assigned.empty?
         %i.fa.fa-ban
 
-.tab-content
-  .tab-pane.active#settings
-    %p Finalize the settings for your event, then click 'Set Schedule' when finished.
-    %form.form.form-horizontal{ method: 'POST' }
-      .form-group
-        %label.col-sm-2.control-label Points for a win:
-        .col-sm-10
-          %label.radio-inline
-            %input.matchpoints{ name: 'matchpoints', type: 'radio', value: 1, checked: @event.matchpoints == 1 ? true : false} 1
-          %label.radio-inline
-            %input.matchpoints{ name: 'matchpoints', type: 'radio', value: 2, checked: @event.matchpoints == 2 ? true : false} 2
-          %label.radio-inline
-            %input.matchpoints{ name: 'matchpoints', type: 'radio', value: 3, checked: @event.matchpoints == 3 ? true : false } 3
-      .form-group
-        %label.col-sm-2.control-label Points for a tie:
-        .col-sm-10
-          %label.radio-inline
-            %input.tiepoints{ name: 'tiepoints', type: 'radio', value: 0, checked: @event.tiepoints == 0 ? true: false } 0
-          %label.radio-inline
-            %input.tiepoints{ name: 'tiepoints', type: 'radio', value: 1, checked: @event.tiepoints == 1 ? true: false } 1
-      .form-group
-        %label.col-sm-2.control-label Who plays in the Semifinals?
-        .col-sm-10
-          %label.radio-inline
-            %input.semis{ name: 'semis', type: 'radio', value: 'xgrouppoints', checked: @event.semis == 'xgrouppoints' ? true : false } Cross group by points
-          %label.radio-inline
-            %input.semis{ name: 'semis', type: 'radio', value: 'grouppoints', checked: @event.semis == 'grouppoints' ? true : false } Same group by points.
-          %label.radio-inline
-            %input.semis{ name: 'semis', type: 'radio', value: 'points', checked: @event.semis == 'points' ? true : false } Pure Points
-
-  .tab-pane#teams{ role: 'tabpanel' }
-    = partial(:teams)
-  .tab-pane#group{ role: 'tabpanel' }
-    .row
-      %h6 Assign each team to a group.
-      .col-lg-4
-        .panel.panel-default
-          .panel-heading
-            %strong Available Teams
-          .panel-body
-            %ul.list-group.teamlist#available_teams
-              - @event.teams.each do |team|
-                - if team.group_id.nil?
-                  %li.list-group-item{ data: { name: team.name, id: team.id } }= team.name
-
-      - @event.groups.each do |group|
-        .col-lg-4
-          .panel.panel-default
-            .panel-heading
-              %span.change_group_name#spangroup{ id: group.id, data: { id: group.id, name: group.name } }
-                %strong #{group.name.capitalize}
-              %input.change_group_name#inputgroup{ hidden: true, id: group.id, placeholder: group.name, data: { id: group.id } }
-              %i.fa.fa-pencil-square-o
-              %span.badge.pull-right#groupsize{ id: group.id } #{group.size}
-            .panel-body
-              %ol.list-group.teamlist#group{ id: group.id, data: { id: group.id, name: group.name } }
-                - group.teams.each do |team|
-                  %li.list-group-item{ data: { name: team.name, id: team.id } }= team.name
-                - if group.teams.size < 1
-                  %li.list-group-item.holder Drag and drop team
-
-  .tab-pane#schedule{ role: 'tabpanel' }
-    =partial(:event_schedule)
+%p Finalize the settings for your event, then click 'Start Event' when finished.
+%form.form.form-horizontal{ method: 'POST', onsubmit: 'return false;' }
+  .form-group
+    %label.col-sm-2.control-label Points for a win:
+    .col-sm-10
+      %label.radio-inline
+        %input.matchpoints{ name: 'matchpoints', type: 'radio', value: 1, checked: @event.matchpoints == 1 ? true : false} 1
+      %label.radio-inline
+        %input.matchpoints{ name: 'matchpoints', type: 'radio', value: 2, checked: @event.matchpoints == 2 ? true : false} 2
+      %label.radio-inline
+        %input.matchpoints{ name: 'matchpoints', type: 'radio', value: 3, checked: @event.matchpoints == 3 ? true : false } 3
+  .form-group
+    %label.col-sm-2.control-label Points for a tie:
+    .col-sm-10
+      %label.radio-inline
+        %input.tiepoints{ name: 'tiepoints', type: 'radio', value: 0, checked: @event.tiepoints == 0 ? true: false } 0
+      %label.radio-inline
+        %input.tiepoints{ name: 'tiepoints', type: 'radio', value: 1, checked: @event.tiepoints == 1 ? true: false } 1
+  .form-group
+    %label.col-sm-2.control-label Semi Finalists:
+    .col-sm-10
+      %label.radio-inline
+        %input.semis{ name: 'semis', type: 'radio', value: 'xgrouppoints', checked: @event.semis == 'xgrouppoints' ? true : false } Cross group by points
+      %label.radio-inline
+        %input.semis{ name: 'semis', type: 'radio', value: 'grouppoints', checked: @event.semis == 'grouppoints' ? true : false } Same group by points.
+      %label.radio-inline
+        %input.semis{ name: 'semis', type: 'radio', value: 'points', checked: @event.semis == 'points' ? true : false } Pure Points
+      %i.fa.fa-question-circle.clickable
+  .form-group
+    %label.col-sm-2.control-label{ for: "group_advance" } Teams advancing from group stage:
+    .col-sm-2
+      %input.form-control#group_advance{ placeholder: '2', type: 'number', name: "group_advance", value: @event.group_advance }
 
 %a.btn.btn-success{ href: url("/event/#{@event.id}/start") } Start Event
 %a.btn.btn-danger{ href: url("/event/#{@event.id}/delete") } Delete Event!
 
-%script{ src: '/bower_components/dragula/dist/dragula.min.js' }
-%link{ href: '/bower_components/dragula/dist/dragula.min.css', rel: 'stylesheet' }
-
 :javascript
-  var drake = dragula(
-    {
-      isContainer: function(el) {
-        return el.classList.contains('teamlist');
-      }
-    }
-    ).on('drop', function(el, target, source, sibling) {
-      if (target == source) { return; }
-      // hide the placeholder element
-      $(target).children('.holder').hide();
-
-      // save each team when dropped
-      $.post('/team/' + el.dataset.id + '/update', { teamname: el.dataset.name, group_name: target.dataset.name, group_id: target.dataset.id });
-
-      var target_badge = Number($('#groupsize_' + target.dataset.id).html()) + 1;
-      var source_badge = Number($('#groupsize_' + source.dataset.id).html()) - 1;
-      $('#groupsize_' + target.dataset.id).html(target_badge);
-      $('#groupsize_' + source.dataset.id).html(source_badge);
-
-      // eanble save button when lists are equal and available is empty
-      if ( $('#available_teams li').length < 1 ) {
-        if ( $('#group_1 li').length == $('#group_2 li').length ) {
-          $('#save_groups').removeAttr('disabled');
-          $('.fa-exclamation').hide();
-          $('li.disabled').removeClass('disabled')
-          $('.fa-ban').hide();
-        }
-      }
-    });
-
-    $('span.change_group_name').click(function(e) {
-      console.log(this);
-      $(this).hide();
-      var input = $("#inputgroup_" + this.dataset.id)
-      input.show();
-      input.focus();
-      console.log('done click');
-    });
-
-    $('input.change_group_name').change(function(e) {
-      console.log('something changed', e);
-      console.log('this: ', this);
-      console.log('text: ', $(this).val());
-      var new_name = $(this).val();
-      // change name
-      var span = $('#spangroup_' + this.dataset.id)
-      span.html("<strong>" + new_name + "</strong>");
-      $.post("/group/" + this.dataset.id + "/update", { group_name: new_name });
-      span.show();
-      $(this).hide();
-    });
-
-    $('.matchpoints').change(function(e) {
-      $.post("/event/#{@event.id}/update", { update: 'matchpoints', value: $(this).val() });
-    });
-    $('.tiepoints').change(function(e) {
-      $.post("/event/#{@event.id}/update", { update: 'tiepoints', value: $(this).val() });
-    });
-    $('.semis').change(function(e) {
-      $.post("/event/#{@event.id}/update", { update: 'semis', value: $(this).val() });
-    });
+  $('.matchpoints').change(function(e) {
+    $.post("/event/#{@event.id}/update", { update: 'matchpoints', value: $(this).val() });
+  });
+  $('.tiepoints').change(function(e) {
+    $.post("/event/#{@event.id}/update", { update: 'tiepoints', value: $(this).val() });
+  });
+  $('.semis').change(function(e) {
+    $.post("/event/#{@event.id}/update", { update: 'semis', value: $(this).val() });
+  });
+  $('#group_advance').change(function(e) {
+    $.post("/event/#{@event.id}/update", { update: 'group_advance', value: $(this).val() });
+    $(this).blur();
+  });

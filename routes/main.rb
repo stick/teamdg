@@ -27,7 +27,8 @@ class App < Sinatra::Base
       group_number: params[:event_group_num].to_i,
       group_advance: params[:event_group_advance].to_i,
       num_teams: params[:num_teams].to_i,
-      roster_size: params[:roster_size].to_i
+      roster_size: params[:roster_size].to_i,
+      team_seeds: params[:team_seeds].split(/, /),
     )
     redirect to("/event/#{e.id}/setup")
   end
@@ -91,7 +92,7 @@ class App < Sinatra::Base
           team_b: @event.teams_dataset.where(name: g.team_b.to_s).first.id,
         )
         match_id = match.id
-        [ 'open1', 'open2', 'open3', 'open4', 'master1', 'master2', 'grandmaster', 'woman', 'amateur' ].each do |seed|
+        @event.team_seeds.each do |seed|
           @event.add_game(
             seed: seed,
             player_id_1: @event.teams_dataset.where(name: g.team_a.to_s).first.seed(seed).id,
@@ -106,7 +107,47 @@ class App < Sinatra::Base
   end
 
   get '/event/:event_id/teams/?' do
+    @event = Event[params[:event_id]]
     haml :teams
+  end
+
+  get '/event/:event_id/groups/?' do
+    @event = Event[params[:event_id]]
+    haml :group_assignment
+  end
+
+  get '/event/:event_id/assign_groups/ordered/?' do
+    @event = Event[params[:event_id]]
+    unassigned_teams = @event.teams_dataset.where(group_id: nil).all
+    teams_per_group = unassigned_teams.size / @event.group_number
+    split_teams = unassigned_teams.each_slice(teams_per_group).to_a
+    split_teams.each_with_index do |group, index|
+      group.each do |team|
+        egroup = @event.groups[index]
+        egroup.add_team(team)
+      end
+    end
+    redirect back
+  end
+
+  get '/event/:event_id/assign_groups/reset/?' do
+    @event = Event[params[:event_id]]
+    @event.teams.map{ |t| t.group_id = nil; t.save }
+    redirect back
+  end
+
+  get '/event/:event_id/assign_groups/shuffled/?' do
+    @event = Event[params[:event_id]]
+    unassigned_teams = @event.teams_dataset.where(group_id: nil).all.shuffle
+    teams_per_group = unassigned_teams.size / @event.group_number
+    split_teams = unassigned_teams.each_slice(teams_per_group).to_a
+    split_teams.each_with_index do |group, index|
+      group.each do |team|
+        egroup = @event.groups[index]
+        egroup.add_team(team)
+      end
+    end
+    redirect back
   end
 
   get '/event/:event_id/delete/?' do
@@ -157,7 +198,7 @@ class App < Sinatra::Base
   end
 
   post '/player/update/?' do
-    player = Player.where(seed: params[:seed], team_id: params[:team_id]).first
+    player = Player[seed: params[:seed], team_id: params[:team_id]]
     t = Team[params[:team_id]]
     if player.nil?
       t.add_player(name: params[:name], seed: params[:seed])

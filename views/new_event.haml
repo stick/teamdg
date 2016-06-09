@@ -5,54 +5,79 @@
     %label.col-sm-2.control-label{ for: 'event_name' } Name:
     .col-sm-10
       %input.form-control#event_name{ placeholder: 'Team DG Challenge', type: 'text', name: 'event_name' }
-  .form-group
-    %label.col-sm-2.control-label{ for: 'event_type' } Type:
+  .form-group#event_type
+    %label.col-sm-2.control-label{ for: 'event_type' }
+      Type:
+      %i.fa.fa-question-circle.fa-fw{ data: { container: 'body', toggle: 'popover', placement: 'top', title: 'Event Type',  content: 'One stage is played based on format.  Two stage lets you mix round-robin/elmination' } }
     .col-sm-10
       .radio
         %label
-          %input#event_type_1{ type: 'radio', name: 'event_type', value: 'single_stage' }
+          %input#event_type_1{ type: 'radio', name: 'event_type', value: 'single_stage', checked: true }
           Single Stage
       .radio
         %label
-          %input#event_type_2{ type: 'radio', name: 'event_type', value: 'two_stage', checked: true }
+          %input#event_type_2{ type: 'radio', name: 'event_type', value: 'two_stage', checked: false }
           Two Stage
-  .form-group
-    %label.col-sm-2.control-label{ for: 'event_format1' } Stage One Format:
+  .form-group#stage_1_options
+    %label.col-sm-2.control-label{ for: 'event_format1' }
+      Stage One Format:
+      %i.fa.fa-question-circle.fa-fw{ data: { container: 'body', toggle: 'popover', placement: 'top', title: 'Stage Format',  content: 'Single Elimination: out after 1 loss.<br>Double Elmination: out after 2 losses.<br>Round Robin - Each team plays each team in their group (at least once).' } }
     .col-sm-10
       .radio
         %label
-          %input#event_format1_1{ type: 'radio', name: 'event_format1', value: 'round_robin_1' }
-          Single Round Robin
+          %input#event_format1_elimination_1{ type: 'radio', name: 'event_format1', value: 'elmination_1' }
+          Single Elimination
       .radio
         %label
-          %input#event_format1_2{ type: 'radio', name: 'event_format1', value: 'round_robin_2', checked: true }
-          Double Round Robin
+          %input#event_format1_elimination_2{ type: 'radio', name: 'event_format1', value: 'elmination_2' }
+          Double Elimination
+      .radio
+        %label
+          %input#event_format1_round_robin{ type: 'radio', name: 'event_format1', value: 'round_robin_1' }
+          Round Robin
   .form-group
-    %label.col-sm-2.control-label{ for: 'num_teams' } Number of teams:
+    %label.col-sm-2.control-label{ for: 'num_teams' }
+      Teams:
+      %i.fa.fa-question-circle.fa-fw{ data: { container: 'body', toggle: 'popover', placement: 'top', title: 'Teams',  content: 'Number of teams in competition.' } }
     .col-sm-10
-      %input.form-control#num_teams{ placeholder: '8', type: 'number', name: 'num_teams', value: 8 }
+      %input.form-control#num_teams{ placeholder: '8', type: 'number', name: 'num_teams' }
   .form-group
-    %label.col-sm-2.control-label{ for: 'roster_size' } Number of players per team:
+    %label.col-sm-2.control-label{ for: 'roster_size' }
+      Players/Team
+      %i.fa.fa-question-circle.fa-fw{ data: { container: 'body', toggle: 'popover', placement: 'top', title: 'Player per Team',  content: 'Number of players per team.' } }
     .col-sm-10
-      %input.form-control#roster_size{ placeholder: '9', type: 'number', name: 'roster_size', value: 9 }
+      %input.form-control#roster_size{ placeholder: '9', type: 'number', name: 'roster_size' }
   .form-group
-    %label.col-sm-2.control-label{ for: 'event_group_num' } Number of groups:
+    %label.col-sm-2.control-label{ for: 'roster_size' }
+      Seeds
+      %i.fa.fa-question-circle.fa-fw{ data: { container: 'body', toggle: 'popover', placement: 'top', title: 'Seeds / Postions / Spots',  content: 'Seeds or positions on each team' } }
+    .col-sm-10
+      %input.form-control#roster_size{ placeholder: 'open1, open2, masters1, etc', type: 'text', name: 'team_seeds' }
+  .form-group#num_groups
+    %label.col-sm-2.control-label{ for: 'event_group_num' }
+      Groups:
+      %i.fa.fa-question-circle.fa-fw{ data: { container: 'body', toggle: 'popover', placement: 'top', title: 'Groups / Divisions',  content: 'Number of groups of teams.  Round Robin often splits these into divisions.  Must have at least 1.' } }
     .col-sm-10
       %select.form-control{ name: 'event_group_num' }
-        %option 1
-        %option{ selected: true } 2
+          %option{ selected: true } 1
+        %option 2
         %option{ disabled: true } 3
         %option{ disabled: true } 4
-  .form-group
-    %label.col-sm-2.control-label{ for: 'event_group_advance' } Teams advancing from each group:
+  .form-group#group_advance
+    %label.col-sm-2.control-label{ for: 'event_group_advance' }
+      Teams advancing:
+      %i.fa.fa-question-circle.fa-fw{ data: { container: 'body', toggle: 'popover', placement: 'top', title: 'Teams advancing from Group stage.',  content: 'For multistage events, how many teams out of each group will advance.' } }
     .col-sm-10
       %select.form-control{ name: 'event_group_advance' }
+        %option
         %option 1
-        %option{ selected: true } 2
+        %option 2
         %option{ disabled: true } 3
         %option{ disabled: true } 4
-  .form-group
-    %label.col-sm-2.control-label{ for: 'event_format2' } Stage Two Format:
+  .form-group#stage_2_options
+    %label.col-sm-2.control-label{ for: 'event_format2' }
+      Stage Two Format:
+      %i.fa.fa-question-circle.fa-fw{ data: { container: 'body', toggle: 'popover', placement: 'top', title: 'Stage Format',  content: 'Single Elimination: out after 1 loss.<br>Double Elmination: out after 2 losses.<br>Round Robin - Each team plays each team in their group (at least once).' } }
     .col-sm-10
       .radio
         %label
@@ -63,3 +88,25 @@
           %input#event_format2_1{ type: 'radio', name: 'event_format2', value: 'elimination_2' }
           Double Elimination
   %button.btn.btn-primary{ type: 'submit' } Create event
+
+:javascript
+  $(document).ready(function(){
+    $('[data-toggle="popover"]').popover({ 'trigger': 'hover', 'html': 'true' });
+
+    if ($('#event_type_1').is(':checked')) {
+      $('#stage_2_options').addClass('hidden');
+      $('#group_advance').addClass('hidden');
+    }
+
+    if ($('#event_format1_elimination_1').is(':checked') || $('#event_format1_elimination_2').is(':checked')) {
+    }
+  });
+
+  $('#event_type_1').click(function(e) {
+    $('#stage_2_options').addClass('hidden');
+    $('#group_advance').addClass('hidden');
+  });
+  $('#event_type_2').click(function(e) {
+    $('#stage_2_options').removeClass('hidden');
+    $('#group_advance').removeClass('hidden');
+  });

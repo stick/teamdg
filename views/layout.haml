@@ -49,16 +49,18 @@
       .row
         .col-sm-3.col-md-2.sidebar
           %ul.nav.nav-sidebar
-            %li.active
-              %a{ href: '#' }
-                Overview
-                %span.sr-only (current)
-            %li
-              %a{ href: url('/events/') } Events
-            %li
-              %a{ href: url('/teams/') } Teams
-            %li
-              %a{ href: url('/players/') } Players
+            - pp request.path_info
+            %li{ class: request.path_info == '/' ? 'active' : '' }
+              %a{ href: url('/') } Overview
+            %li{ class: request.path_info.include?('/events') ? 'active' : '' }
+              %a{ href: url('/events/') }
+                %i.fa.fa-calendar.fa-fw
+                %span Events
+                %span.badge.pull-right #{Event.all.count}
+            %li{ class: request.path_info.include?('/event/new') ? 'active' : '' }
+              %a{ href: url('/event/new') }
+                %i.fa.fa-plus.fa-fw
+                %span New Event
 
         .col-sm-9.col-sm-offset-3.col-md-10.col-md-offset-2.main
           #page= yield

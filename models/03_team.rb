@@ -39,12 +39,16 @@ class Team < Sequel::Model(:teams)
   end
 
   def group
-    Group[self.group_id].name
+    if self.group_id.nil?
+      nil
+    else
+      Group[self.group_id].name
+    end
   end
 
   def after_create
     super
-    [ 'open1', 'open2', 'open3', 'open4', 'master1', 'master2', 'grandmaster', 'woman', 'amateur' ].each do |seed|
+    self.event.team_seeds.each do |seed|
       self.add_player(seed: seed, name: seed)
     end
   end
