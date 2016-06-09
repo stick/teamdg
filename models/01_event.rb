@@ -19,6 +19,7 @@ unless DB.table_exists? (:events)
     Integer     :num_teams, :null => false
     Integer     :roster_size, :null => false
     Integer     :matchpoints, :null => false, :default => 3
+    Integer     :cycles
     Integer     :tiepoints, :null => false, :default => 1
     String      :semis, :null => false, :default => 'xgrouppoints'
     column      :team_seeds, 'text[]'

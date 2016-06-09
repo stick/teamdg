@@ -1,10 +1,11 @@
 %h1.page-header Create new event
 
-%form.form-horizontal{ method: 'POST' }
+%form.form-horizontal{ method: 'POST', data: { toggle: 'validator' } }
   .form-group
     %label.col-sm-2.control-label{ for: 'event_name' } Name:
     .col-sm-10
-      %input.form-control#event_name{ placeholder: 'Team DG Challenge', type: 'text', name: 'event_name' }
+      %input.form-control#event_name{ placeholder: 'Team DG Challenge', type: 'text', name: 'event_name', required: true }
+      .help-block.with-errors
   .form-group#event_type
     %label.col-sm-2.control-label{ for: 'event_type' }
       Type:
@@ -25,28 +26,34 @@
     .col-sm-10
       .radio
         %label
-          %input#event_format1_elimination_1{ type: 'radio', name: 'event_format1', value: 'elmination_1' }
+          %input#event_format1_elimination_1{ type: 'radio', name: 'event_format1', value: 'elmination_1', required: true }
           Single Elimination
       .radio
         %label
-          %input#event_format1_elimination_2{ type: 'radio', name: 'event_format1', value: 'elmination_2' }
+          %input#event_format1_elimination_2{ type: 'radio', name: 'event_format1', value: 'elmination_2', required: true }
           Double Elimination
       .radio
         %label
-          %input#event_format1_round_robin{ type: 'radio', name: 'event_format1', value: 'round_robin_1' }
+          %input#event_format1_round_robin{ type: 'radio', name: 'event_format1', value: 'round_robin', required: true }
           Round Robin
+  .form-group.hidden#num_cycles
+    %label.col-sm-2.control-label{ for: 'cycles' }
+      Rounds:
+      %i.fa.fa-question-circle.fa-fw{ data: { container: 'body', toggle: 'popover', placement: 'top', title: 'Round Robin Rounds',  content: 'Number of times each team plays each other team in round robin format.' } }
+    .col-sm-10
+      %input.form-control#cycles{ placeholder: '1', type: 'number', name: 'cycles', required: true }
   .form-group
     %label.col-sm-2.control-label{ for: 'num_teams' }
       Teams:
       %i.fa.fa-question-circle.fa-fw{ data: { container: 'body', toggle: 'popover', placement: 'top', title: 'Teams',  content: 'Number of teams in competition.' } }
     .col-sm-10
-      %input.form-control#num_teams{ placeholder: '8', type: 'number', name: 'num_teams' }
+      %input.form-control#num_teams{ placeholder: '8', type: 'number', name: 'num_teams', required: true }
   .form-group
     %label.col-sm-2.control-label{ for: 'roster_size' }
       Players/Team
       %i.fa.fa-question-circle.fa-fw{ data: { container: 'body', toggle: 'popover', placement: 'top', title: 'Player per Team',  content: 'Number of players per team.' } }
     .col-sm-10
-      %input.form-control#roster_size{ placeholder: '9', type: 'number', name: 'roster_size' }
+      %input.form-control#roster_size{ placeholder: '9', type: 'number', name: 'roster_size', required: true }
   .form-group
     %label.col-sm-2.control-label{ for: 'roster_size' }
       Seeds
@@ -58,8 +65,8 @@
       Groups:
       %i.fa.fa-question-circle.fa-fw{ data: { container: 'body', toggle: 'popover', placement: 'top', title: 'Groups / Divisions',  content: 'Number of groups of teams.  Round Robin often splits these into divisions.  Must have at least 1.' } }
     .col-sm-10
-      %select.form-control{ name: 'event_group_num' }
-          %option{ selected: true } 1
+      %select.form-control{ name: 'event_group_num', required: true }
+        %option{ selected: true } 1
         %option 2
         %option{ disabled: true } 3
         %option{ disabled: true } 4
@@ -68,7 +75,7 @@
       Teams advancing:
       %i.fa.fa-question-circle.fa-fw{ data: { container: 'body', toggle: 'popover', placement: 'top', title: 'Teams advancing from Group stage.',  content: 'For multistage events, how many teams out of each group will advance.' } }
     .col-sm-10
-      %select.form-control{ name: 'event_group_advance' }
+      %select.form-control{ name: 'event_group_advance', required: true }
         %option
         %option 1
         %option 2
@@ -98,6 +105,10 @@
       $('#group_advance').addClass('hidden');
     }
 
+    if ($('#event_format1_round_robin').is(':checked')) {
+      $('#num_cycles').removeClass('hidden');
+    }
+
     if ($('#event_format1_elimination_1').is(':checked') || $('#event_format1_elimination_2').is(':checked')) {
     }
   });
@@ -109,4 +120,7 @@
   $('#event_type_2').click(function(e) {
     $('#stage_2_options').removeClass('hidden');
     $('#group_advance').removeClass('hidden');
+  });
+  $('#event_format1_round_robin').click(function(e) {
+    $('#num_cycles').removeClass('hidden');
   });

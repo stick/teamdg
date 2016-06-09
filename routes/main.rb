@@ -29,6 +29,7 @@ class App < Sinatra::Base
       num_teams: params[:num_teams].to_i,
       roster_size: params[:roster_size].to_i,
       team_seeds: params[:team_seeds].split(/, /),
+      cycles: params[:cycles].to_i || nil,
     )
     redirect to("/event/#{e.id}/setup")
   end
@@ -197,9 +198,9 @@ class App < Sinatra::Base
     haml :event_schedule
   end
 
-  post '/player/update/?' do
-    player = Player[seed: params[:seed], team_id: params[:team_id]]
-    t = Team[params[:team_id]]
+  post '/player/:player_id/update/?' do
+    player = Player[params[:player_id]]
+    t = player.team
     if player.nil?
       t.add_player(name: params[:name], seed: params[:seed])
     else

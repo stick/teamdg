@@ -9,7 +9,7 @@
         %i.fa.fa-exclamation-triangle.text-danger
       Group Assignment
   %li{ role: 'presentation', class: groups_assigned.empty? ? '' : 'disabled' }
-    %a{ data: { toggle: 'tab' }, role: 'tab', href: '#teams' }
+    %a{ href: url("/event/#{@event.id}/teams") }
       Teams and Rosters
       - unless groups_assigned.empty?
         %i.fa.fa-ban
@@ -41,7 +41,7 @@
         %input.semis{ name: 'semis', type: 'radio', value: 'grouppoints', checked: @event.semis == 'grouppoints' ? true : false } Same group by points.
       %label.radio-inline
         %input.semis{ name: 'semis', type: 'radio', value: 'points', checked: @event.semis == 'points' ? true : false } Pure Points
-      %i.fa.fa-question-circle.clickable
+      %i.fa.fa-question-circle.clickable{ data: { container: 'body', toggle: 'popover', placement: 'left', title: 'Group Points',  content: 'How group play affects the semifinals.  "Cross group by points" will have the top finisher from one group play the second finisher from the second group (only supported for 2 groups) and vice versa.  "Same group by points" will have the top finisher in the group play the second place team.  "Pure points" will build the semifinals based on points regardless of the group/division.' } }
   .form-group
     %label.col-sm-2.control-label{ for: "group_advance" } Teams advancing from group stage:
     .col-sm-2
@@ -51,6 +51,10 @@
 %a.btn.btn-danger{ href: url("/event/#{@event.id}/delete") } Delete Event!
 
 :javascript
+  $(document).ready(function(){
+    $('[data-toggle="popover"]').popover({ 'trigger': 'hover', 'html': 'true' });
+  });
+
   $('.matchpoints').change(function(e) {
     $.post("/event/#{@event.id}/update", { update: 'matchpoints', value: $(this).val() });
   });

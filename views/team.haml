@@ -56,21 +56,20 @@
       %th Seed
       %th Player <small>(click to edit)</small>
   %tbody
-    - @team.event.team_seeds.each_with_index do |seed, index|
+    - @team.players.sort{ |x,y| x.id <=> y.id }.each do |player|
       %tr
-        %td #{seed.capitalize}
+        %td #{player.seed.capitalize}
         %td
-          - player = Player[team_id: @team.id, seed: seed].nil? ? nil : Player[team_id: @team.id, seed: seed].name
-          %span.edit_seed.clickable#span{ id: seed, data: { seed: seed } }
-            #{player}
+          %span.edit_seed.clickable#span{ id: player.seed, data: { seed: player.seed, playerid: player.id } }
+            #{player.name}
             %small
               %i.fa.fa-pencil.pull-right
-          %input.form-control.edit_seed#input{ id: seed, name: seed, data: { seed: seed }, class: player.nil? ? '' : 'hidden' }
+          %input.form-control.edit_seed#input{ id: player.seed, name: player.seed, data: { seed: player.seed, playerid: player.id }, class: player.nil? ? '' : 'hidden' }
 
 :javascript
   $('.edit_seed').change(function(e) {
     var new_name = $(this).val();
-    $.post('/player/update', { seed: this.dataset.seed, team_id: #{@team.id}, name: new_name });
+    $.post('/player/' + this.dataset.playerid + '/update', { seed: this.dataset.seed, team_id: #{@team.id}, name: new_name });
     $(this).addClass('hidden');
     $('#span_' + this.dataset.seed).removeClass('hidden').html(new_name + '<small><i class="fa fa-pencil pull-right"></i></small>');
   });

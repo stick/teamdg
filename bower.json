@@ -15,6 +15,7 @@
     "bootstrapvalidator": "latest",
     "bootstrap3-ie10-viewport-bug-workaround": "latest",
     "bootstrap-editable": "latest",
+    "bootstrap-validator": "latest",
     "dragula": "latest"
   },
   "private": true,
