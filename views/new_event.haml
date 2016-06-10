@@ -6,6 +6,13 @@
     .col-sm-10
       %input.form-control#event_name{ placeholder: 'Team DG Challenge', type: 'text', name: 'event_name', required: true }
       .help-block.with-errors
+  .form-group
+    %label.col-sm-2.control-label{ for: 'event_startdate' } Dates:
+    .col-sm-4
+      .input-group
+        %input.form-control#event_name{ type: 'text', name: 'event_startdate', required: true, data: { provide: 'datepicker' } }
+        %span.input-group-addon to
+        %input.form-control#event_name{ type: 'text', name: 'event_enddate', required: true, data: { provide: 'datepicker' } }
   .form-group#event_type
     %label.col-sm-2.control-label{ for: 'event_type' }
       Type:

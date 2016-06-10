@@ -3,6 +3,8 @@
     %a{ href: url("/event/#{@event.id}") } #{@event.name.upcase}
   %li.active Teams
 
+=partial(:_event_nav)
+
 .list-group
   - @event.teams.each do |team|
     %a.list-group-item{ href: url("/team/#{team.id}") }= team.name

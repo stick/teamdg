@@ -5,5 +5,9 @@
 require_relative 'partials'
 #require_relative 'display'
 #require_relative 'auth'
+#
+def vs
+  haml "%small <em>vs</em>"
+end
 
 

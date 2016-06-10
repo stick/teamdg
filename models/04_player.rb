@@ -22,6 +22,8 @@ end
 class Player < Sequel::Model(:players)
 
   many_to_one :team
+  one_to_many :games
+  one_to_many :matches
 
   def fullname
     return "#{self.first_name} #{self.last_name}"

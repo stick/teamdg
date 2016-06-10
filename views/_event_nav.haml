@@ -1,0 +1,21 @@
+- groups_assigned = @event.teams.select { |t| t.group_id.nil? }
+%ul.nav.nav-tabs{ role: 'tablist' }
+  %li{ role: 'presentation', class: request.path_info == "/event/#{@event.id}" ? 'active' : '' }
+    %a{ href: url("/event/#{@event.id}") }
+      Settings
+  %li{ role: 'presentation', class: request.path_info.include?("/event/#{@event.id}/groups") ? 'active' : '' }
+    %a{ href: url("/event/#{@event.id}/groups") }
+      - unless groups_assigned.empty?
+        %i.fa.fa-exclamation-triangle.text-danger
+      Group Assignment
+  -# %li{ role: 'presentation', class: groups_assigned.empty? ? '' : 'disabled' }
+  %li{ role: 'presentation', class: [ groups_assigned.empty? ? '' : 'disabled', request.path_info.include?("/event/#{@event.id}/teams") ? 'active' : '' ] }
+    %a{ href: url("/event/#{@event.id}/teams") }
+      Teams
+      - unless groups_assigned.empty?
+        %i.fa.fa-ban
+  %li{ role: 'presentation', class: [ groups_assigned.empty? ? '' : 'disabled', request.path_info.include?("/event/#{@event.id}/rosters") ? 'active' : '' ] }
+    %a{ href: url("/event/#{@event.id}/rosters") }
+      Rosters
+      - unless groups_assigned.empty?
+        %i.fa.fa-ban

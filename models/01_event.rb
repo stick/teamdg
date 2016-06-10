@@ -22,6 +22,8 @@ unless DB.table_exists? (:events)
     Integer     :cycles
     Integer     :tiepoints, :null => false, :default => 1
     String      :semis, :null => false, :default => 'xgrouppoints'
+    Date        :startdate
+    Date        :enddate
     column      :team_seeds, 'text[]'
 
     #unique      [:first_name, :last_name, :email_address]
@@ -36,6 +38,9 @@ class Event < Sequel::Model(:events)
   def validate
     super
     validates_presence [:name]
+  end
+
+  def matches_by_team
   end
 
   def after_create

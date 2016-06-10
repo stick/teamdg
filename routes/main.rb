@@ -30,6 +30,8 @@ class App < Sinatra::Base
       roster_size: params[:roster_size].to_i,
       team_seeds: params[:team_seeds].split(/, /),
       cycles: params[:cycles].to_i || nil,
+      startdate: params[:event_startdate],
+      enddate: params[:event_enddate],
     )
     redirect to("/event/#{e.id}/setup")
   end
@@ -41,7 +43,6 @@ class App < Sinatra::Base
   end
 
   post '/event/:id/setup/?' do
-    pp params
     e = Event[params[:id]]
     # create groups based on event
     (1..e.group_number).each do |g|
@@ -58,29 +59,19 @@ class App < Sinatra::Base
   get_or_post '/event/:event_id/start/?' do
     @event = Event[params[:event_id]]
     @schedule = RRSchedule::Schedule.new(
-      teams: @event.groups.map { |group| @event.teams_dataset.where(group_id: group.id).map(:name) },
+      teams: @event.groups.map { |group| group.teams.map { |t| t.name } },
       rules: [
-        RRSchedule::Rule.new(
-          wday: 6,
-          gt: [
-            "09:00AM",
-            "11:00AM",
-            "01:00PM",
-            "03:00PM",
-          ],
-          ps: [
-            "Unitty Farm",
-          ],
-        ),
+        RRSchedule::Rule.new( wday: 6, gt: [ "09:00AM", "11:00AM", "01:00PM", "03:00PM", ], ps: [ "Unitty Farm", ]),
       ],
-      start_date: Date.parse("2016/05/21"),
-      cycles: 2,
+      start_date: @event.startdate,
+      cycles: @event.cycles,
       shuffle: false,
     )
 
     @schedule.generate
 
-    puts @schedule.rounds.collect{ |r| r.to_s }
+    # puts @schedule.rounds.collect{ |r| r.to_s }
+    puts @schedule.display
 
     # create db objects based on schedule
     @schedule.gamedays.each_with_index do |gd, matchnum|
@@ -89,22 +80,50 @@ class App < Sinatra::Base
           desc: "Match #{matchnum + 1}",
           match_num: matchnum + 1,
           group_id: @event.teams_dataset.where(name: g.team_a.to_s).first.group_id,
-          team_a: @event.teams_dataset.where(name: g.team_a.to_s).first.id,
-          team_b: @event.teams_dataset.where(name: g.team_b.to_s).first.id,
         )
-        match_id = match.id
+        match.add_team(@event.teams_dataset.where(name: g.team_a.to_s).first)
+        match.add_team(@event.teams_dataset.where(name: g.team_b.to_s).first)
         @event.team_seeds.each do |seed|
-          @event.add_game(
+          game = match.add_game(
             seed: seed,
-            player_id_1: @event.teams_dataset.where(name: g.team_a.to_s).first.seed(seed).id,
-            player_id_2: @event.teams_dataset.where(name: g.team_b.to_s).first.seed(seed).id,
-            match_id: match_id,
+            event_id: @event.id,
           )
+          game.add_team(@event.teams_dataset.where(name: g.team_a.to_s).first)
+          game.add_team(@event.teams_dataset.where(name: g.team_b.to_s).first)
+          game.add_player(@event.teams_dataset.where(name: g.team_a.to_s).first.seed(seed))
+          game.add_player(@event.teams_dataset.where(name: g.team_b.to_s).first.seed(seed))
         end
       end
     end
 
     haml :set_schedule
+  end
+
+  get '/event/:event_id/matches/?' do
+    @event = Event[params[:event_id]]
+    haml :matches
+  end
+
+  get '/event/:event_id/games/?' do
+    @event = Event[params[:event_id]]
+    haml :event_games
+  end
+
+  get  '/event/:event_id/match/:match_id/?' do
+    @match = Match[id: params[:match_id], event_id: params[:event_id]]
+    @event = Event[params[:event_id]]
+    haml :event_match
+  end
+
+  get '/event/:event_id/game/:game_id/?' do
+    @game = Game[id: params[:game_id], event_id: params[:event_id]]
+    @event = Event[params[:event_id]]
+    @match = @game.match
+    haml :event_game
+  end
+
+  get '/event/:event_id/match/:match_id/game/:game_id/?' do
+    haml :match_game
   end
 
   get '/event/:event_id/teams/?' do
@@ -164,12 +183,10 @@ class App < Sinatra::Base
 
   get '/team/:team_id/?' do
     @team = Team[params[:team_id]]
-    pp @team
     haml :team
   end
 
   post '/team/:team_id/settings/update/?' do
-    pp params
     t = Team[params[:team_id]]
     t.send("#{params[:setting]}=", params[:value])
     t.save
@@ -208,5 +225,10 @@ class App < Sinatra::Base
       player.seed = params[:seed]
       player.save
     end
+  end
+
+  get '/event/:event_id/rosters/?' do
+    @event = Event[params[:event_id]]
+    haml :rosters
   end
 end

@@ -1,0 +1,24 @@
+%ol.breadcrumb
+  %li
+    %a{ href: url("/event/#{@event.id}") } #{@event.name.upcase}
+  %li.active Rosters
+
+=partial(:_event_nav)
+
+%p
+
+.row
+  - @event.teams.each do |team|
+    .col-md-3
+      .panel{ class: team.group == @event.groups.first.name ? 'panel-primary' : 'panel-default' }
+        .panel-heading
+          %h3.panel-title
+            #{team.name}
+            - unless team.group.nil?
+              &#47; #{team.group}
+        %table.table
+          %tbody
+            - team.players.sort{ |x,y| x.id <=> y.id }.each do |player|
+              %tr
+                %th #{player.seed}
+                %td #{player.name}

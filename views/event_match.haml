@@ -1,0 +1,28 @@
+%ol.breadcrumb
+  %li
+    %a{ href: url("/event/#{@event.id}") } #{@event.name.upcase}
+  %li
+    %a{ href: url("/event/#{@event.id}/matches") } Matches
+  %li.active #{@match.team_a.name} #{vs} #{@match.team_b.name}
+
+%table.table.table-hover
+  %thead
+    %tr
+      %th Team #{@match.team_a.name}
+      %th
+      %th Team #{@match.team_b.name}
+  %tbody
+    - @match.games.each do |game|
+      %tr.clickable{ data: { href: url("/event/#{@event.id}/game/#{game.id}") } }
+        %td #{game.player_a.name}
+        %td <small><em>vs</em></small>
+        %td #{game.player_b.name}
+
+%pre= @match.inspect
+
+:javascript
+  $(document).ready(function(){
+    $('.clickable').click(function(){
+      window.document.location = $(this).data('href');
+    });
+  });

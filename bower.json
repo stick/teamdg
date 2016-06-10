@@ -16,6 +16,7 @@
     "bootstrap3-ie10-viewport-bug-workaround": "latest",
     "bootstrap-editable": "latest",
     "bootstrap-validator": "latest",
+    "bootstrap-datepicker": "latest",
     "dragula": "latest"
   },
   "private": true,

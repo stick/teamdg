@@ -13,8 +13,8 @@ unless DB.table_exists? (:matches)
     String      :desc
     Integer     :match_num
     foreign_key :winner, :teams, :on_delete => :cascade, :null => true
-    foreign_key :team_a, :teams, :on_delete => :cascade, :null => false
-    foreign_key :team_b, :teams, :on_delete => :cascade, :null => false
+    # foreign_key :team_a, :teams, :on_delete => :cascade, :null => true
+    # foreign_key :team_b, :teams, :on_delete => :cascade, :null => true
     foreign_key :group_id, :groups, :on_delete => :cascade, :null => false
     Integer     :wins, :default => 0, :null => false
     Integer     :losses, :default => 0, :null => false
@@ -33,7 +33,16 @@ class Match < Sequel::Model(:matches)
   many_to_one :event
   many_to_many :teams
   one_to_many :games
+  many_to_one :group
 
+
+  def team_a
+    self.teams.first
+  end
+
+  def team_b
+    self.teams.last
+  end
 
   def validate
     super

@@ -9,7 +9,10 @@
       %tr
         %th Match #{matchnum + 1}
         - match.games.each do |g|
-          %td #{g.team_a.to_s} <strong><small>vs</small></strong> #{g.team_b.to_s}
+          - pp g
+          %td
+            %a{ href: url("/event/#{@event.id}/match/") }
+              #{g.team_a.to_s} <strong><small>vs</small></strong> #{g.team_b.to_s}
 
 
 

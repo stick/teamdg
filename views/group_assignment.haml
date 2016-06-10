@@ -3,6 +3,8 @@
     %a{ href: url("/event/#{@event.id}") } #{@event.name.upcase}
   %li.active Groups
 
+= partial(:_event_nav)
+
 .row
   %h6 Assign each team to a group.
   .col-lg-4
@@ -28,7 +30,7 @@
     .col-lg-4
       .panel.panel-default
         .panel-heading
-          %span.change_group_name#spangroup{ id: group.id, data: { id: group.id, name: group.name } }
+          %span.clickable.change_group_name#spangroup{ id: group.id, data: { id: group.id, name: group.name } }
             %strong #{group.name.capitalize}
             %small
               %i.fa.fa-pencil-square-o

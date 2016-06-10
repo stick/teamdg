@@ -1,0 +1,13 @@
+%ol.breadcrumb
+  %li
+    %a{ href: url("/event/#{@event.id}") } #{@event.name.upcase}
+  %li
+    %a{ href: url("/event/#{@event.id}/matches") } Matches
+  %li
+    %a{ href: url("/event/#{@event.id}/match/#{@match.id}") } #{@match.team_a.name} #{vs} #{@match.team_b.name}
+  %li.active
+    %em "#{@match.team_a.name}"
+    #{@game.player_a.name}
+    #{vs}
+    %em "#{@match.team_b.name}"
+    #{@game.player_b.name}

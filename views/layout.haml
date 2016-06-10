@@ -10,6 +10,7 @@
 
     /= Bootstrap core CSS
     %link{ href: '/bower_components/bootstrap/dist/css/bootstrap.min.css', rel: 'stylesheet' }
+    %link{ href: '/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker3.min.css', rel: 'stylesheet' }
 
     /= Font Awesome
     %link{ rel: 'stylesheet', href: '/bower_components/font-awesome/css/font-awesome.min.css' }
@@ -49,7 +50,6 @@
       .row
         .col-sm-3.col-md-2.sidebar
           %ul.nav.nav-sidebar
-            - pp request.path_info
             %li{ class: request.path_info == '/' ? 'active' : '' }
               %a{ href: url('/') } Overview
             %li{ class: request.path_info.include?('/events') ? 'active' : '' }
@@ -67,4 +67,5 @@
 
     %script{ src: '/bower_components/bootstrap/dist/js/bootstrap.min.js' }
     %script{ src: '/bower_components/bootstrap-validator/dist/validator.min.js' }
+    %script{ src: '/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js' }
 

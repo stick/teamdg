@@ -1,0 +1,4 @@
+.list-group
+  - @event.matches.each do |match|
+    %a.list-group-item{ href: url("/event/#{@event.id}/match/#{match.id}") }
+      #{match.group.name} Match #{match.match_num} #{match.team_a.name} vs #{match.team_b.name}

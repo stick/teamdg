@@ -31,7 +31,7 @@ class Team < Sequel::Model(:teams)
   end
 
   def roster
-    self.players.fullname
+    self.players.map(:name)
   end
 
   def seed(seed)
@@ -48,8 +48,11 @@ class Team < Sequel::Model(:teams)
 
   def after_create
     super
+    i = 1
     self.event.team_seeds.each do |seed|
-      self.add_player(seed: seed, name: seed)
+      pp "adding player (player #{i}) as seed (#{seed}) to #{self.name}"
+      self.add_player(seed: seed, name: "Player #{i}")
+      i += 1
     end
   end
 

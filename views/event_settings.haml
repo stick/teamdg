@@ -1,18 +1,7 @@
-- groups_assigned = @event.teams.select { |t| t.group_id.nil? }
-%ul.nav.nav-tabs{ role: 'tablist' }
-  %li.active{ role: 'presentation' }
-    %a{ href: url('#') }
-      Settings
-  %li{ role: 'presentation' }
-    %a{ href: url("/event/#{@event.id}/groups") }
-      - unless groups_assigned.empty?
-        %i.fa.fa-exclamation-triangle.text-danger
-      Group Assignment
-  %li{ role: 'presentation', class: groups_assigned.empty? ? '' : 'disabled' }
-    %a{ href: url("/event/#{@event.id}/teams") }
-      Teams and Rosters
-      - unless groups_assigned.empty?
-        %i.fa.fa-ban
+%ol.breadcrumb
+  %li.active #{@event.name.upcase}
+
+=partial(:_event_nav)
 
 %p Finalize the settings for your event, then click 'Start Event' when finished.
 %form.form.form-horizontal{ method: 'POST', onsubmit: 'return false;' }
