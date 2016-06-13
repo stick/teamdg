@@ -1,12 +1,12 @@
 %h1.page-header Create new event
 
 %form.form-horizontal{ method: 'POST', data: { toggle: 'validator' } }
-  .form-group
+  .form-group.has-feedback
     %label.col-sm-2.control-label{ for: 'event_name' } Name:
     .col-sm-10
       %input.form-control#event_name{ placeholder: 'Team DG Challenge', type: 'text', name: 'event_name', required: true }
       .help-block.with-errors
-  .form-group
+  .form-group.has-feedback
     %label.col-sm-2.control-label{ for: 'event_startdate' } Dates:
     .col-sm-4
       .input-group

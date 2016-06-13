@@ -1,4 +1,24 @@
+%ol.breadcrumb
+  %li
+    %a{ href: url("/event/#{@event.id}") } #{@event.name.upcase}
+  %li.active Matches
+
 .list-group
   - @event.matches.each do |match|
     %a.list-group-item{ href: url("/event/#{@event.id}/match/#{match.id}") }
       #{match.group.name} Match #{match.match_num} #{match.team_a.name} vs #{match.team_b.name}
+
+- @event.groups.each do |group|
+  .col-md-6
+    %table.table.table-hover
+      %thead
+        %tr
+          %th #{group.name}
+      %tbody
+        - group.matches.each do |match|
+          %tr
+            %td
+              %a{ href: url("/event/#{@event.id}/match/#{match.id}") }
+                #{match.team_a.name} vs #{match.team_b.name}
+
+    

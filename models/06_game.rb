@@ -46,6 +46,13 @@ class Game < Sequel::Model(:games)
     self.players.last
   end
 
+  def after_update
+    self.match.team_a_wins = self.match.games_dataset.where(winner: self.match.team_a.players_dataset.map(:id)).count
+    self.match.team_a_losses = self.match.games_dataset.where(winner: self.match.team_b.players_dataset.map(:id)).count
+    self.match.no_decisions = self.match.games_dataset.where(winner: nil).count
+    self.match.save
+  end
+
   def validate
     super
     validates_includes self.event.team_seeds, :seed

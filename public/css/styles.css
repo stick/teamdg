@@ -5,3 +5,13 @@
 .dragable {
   cursor: move;
 }
+
+span.amp {
+  font-family:"Baskerville","Goudy Old Style","Palatino","Book Antiqua",serif;
+  font-size:200%;
+  font-style:italic;
+}
+
+td.versus, th.versus {
+  text-align: center;
+}

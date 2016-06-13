@@ -16,10 +16,10 @@ unless DB.table_exists? (:matches)
     # foreign_key :team_a, :teams, :on_delete => :cascade, :null => true
     # foreign_key :team_b, :teams, :on_delete => :cascade, :null => true
     foreign_key :group_id, :groups, :on_delete => :cascade, :null => false
-    Integer     :wins, :default => 0, :null => false
-    Integer     :losses, :default => 0, :null => false
-    Integer     :ties, :default => 0, :null => false
-    Integer     :no_decision, :default => 0, :null => false
+    Integer     :team_a_wins, :default => 0, :null => false
+    Integer     :team_a_losses, :default => 0, :null => false
+    Integer     :team_a_ties, :default => 0, :null => false
+    Integer     :no_decisions, :default => 0, :null => false
     foreign_key :event_id, :events, :on_delete => :cascade, :null => false
     #unique      [:first_name, :last_name, :email_address]
   end
@@ -35,9 +35,32 @@ class Match < Sequel::Model(:matches)
   one_to_many :games
   many_to_one :group
 
+  def team_b_wins
+    self.team_a_losses
+  end
+
+  def team_b_losses
+    self.team_a_wins
+  end
+
+  def team_b_ties
+    self.team_a_ties
+  end
+
+  def team_b_nods
+    self.team_a_nds
+  end
 
   def team_a
     self.teams.first
+  end
+
+  def team_a_players
+    self.teams.first.players
+  end
+
+  def team_b_players
+    self.teams.last.players
   end
 
   def team_b

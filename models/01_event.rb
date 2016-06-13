@@ -40,7 +40,14 @@ class Event < Sequel::Model(:events)
     validates_presence [:name]
   end
 
+  def matches_by_order
+    # output an array of arrays of the matches by order they are played
+    # 4 matches are played simulataneously for an 8 team RR
+    # something like: [[a v b],[c v d], [e v f],[g v h]]
+  end
+
   def matches_by_team
+    # output matches by teams
   end
 
   def after_create

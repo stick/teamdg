@@ -18,6 +18,7 @@ end
 class Group < Sequel::Model(:groups)
   many_to_one :event
   one_to_many :teams
+  one_to_many :matches
 
   def size
     self.teams.size

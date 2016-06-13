@@ -136,6 +136,16 @@ class App < Sinatra::Base
     haml :group_assignment
   end
 
+  post '/event/:event_id/game/:game_id/?' do
+    pp params
+    game = Game[params[:game_id]]
+    game.winner = params[:winner_id].to_i
+    game.holes_up = params[:holes_up].to_i
+    game.holes_remaining = params[:holes_remaining].to_i
+    game.save
+    redirect back
+  end
+
   get '/event/:event_id/assign_groups/ordered/?' do
     @event = Event[params[:event_id]]
     unassigned_teams = @event.teams_dataset.where(group_id: nil).all
