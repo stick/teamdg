@@ -14,6 +14,7 @@ unless DB.table_exists? (:teams)
     String      :captain
     Bignum      :mobile_number
     String      :email_address
+    Integer     :points
     foreign_key :event_id, :events, :on_delete => :cascade, :null => false
     foreign_key :group_id, :groups, :on_delete => :cascade
     unique      [:name, :event_id]
@@ -25,6 +26,8 @@ class Team < Sequel::Model(:teams)
   one_to_many :players
   many_to_one :event
   one_to_one :group
+  many_to_many :matches
+  many_to_many :games
 
   def roster_size
     self.event.roster_size

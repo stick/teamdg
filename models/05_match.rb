@@ -20,13 +20,19 @@ unless DB.table_exists? (:matches)
     Integer     :team_a_losses, :default => 0, :null => false
     Integer     :team_a_ties, :default => 0, :null => false
     Integer     :no_decisions, :default => 0, :null => false
+    Integer     :day, :default => 6, :null => false
     foreign_key :event_id, :events, :on_delete => :cascade, :null => false
     #unique      [:first_name, :last_name, :email_address]
   end
 end
 
 unless DB.table_exists?(:matches_teams)
-  DB.create_join_table(team_id: :teams, match_id: :matches)
+  DB.create_table :matches_teams do
+    foreign_key :team_id, :teams, on_delete: :cascade, null: false
+    foreign_key :match_id,  :matches, on_delete: :cascade, null: false
+    primary_key [:team_id, :match_id]
+    index [:team_id, :match_id]
+  end
 end
 
 class Match < Sequel::Model(:matches)

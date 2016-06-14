@@ -20,18 +20,9 @@ unless DB.table_exists? (:players)
 end
 
 class Player < Sequel::Model(:players)
-
   many_to_one :team
   one_to_many :games
   one_to_many :matches
-
-  def fullname
-    return "#{self.first_name} #{self.last_name}"
-  end
-
-  def formalname
-    return "#{self.last_name}, #{self.first_name}"
-  end
 
   def validate
     super

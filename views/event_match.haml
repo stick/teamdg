@@ -5,22 +5,34 @@
     %a{ href: url("/event/#{@event.id}/matches") } Matches
   %li.active #{@match.team_a.name} #{vs} #{@match.team_b.name}
 
+%h3
+  Match #{@match.match_num}
+  %small #{@match.group.name}
+%h4
+  #{Date::DAYNAMES[@match.day]}
+
 %table.table.table-hover
   %thead
     %tr
-      %th
-      %th Team #{@match.team_a.name}
+      %th &nbsp;
+      %th Team #{@match.team_a.name} &mdash; #{@match.team_a.points.to_i} pts
       %th.versus #{vs}
-      %th Team #{@match.team_b.name}
+      %th Team #{@match.team_b.name} &mdash; #{@match.team_b.points.to_i} pts
   %tbody
     - @match.games.sort{ |x,y| x.id <=> y.id }.each do |game|
       %tr{ data: { href: url("/event/#{@event.id}/game/#{game.id}") } }
-        %th #{game.seed}
+        %th
+          #{game.seed}
+          - if game.completed
+            %i.clickable.fa.fa-fw.fa-flag-checkered.reset_match{ data: { href: url("/event/#{@event.id}/game/#{game.id}/reset") } }
         %td
           - if game.winner == game.player_a.id
             %i.fa.fa-fw.fa-trophy
             #{game.player_a.name}
             %strong #{game.holes_up} &amp; #{game.holes_remaining}
+          - elsif game.tie == 1
+            #{game.player_a.name}
+            %i.fa.fa-fw.fa-trophy
           - else
             #{game.player_a.name}
         %td.versus
@@ -37,7 +49,7 @@
                 toggle: 'modal',
                 target: '#gameWinnerModal' } }
               %i.fa.fa-fw.fa-arrow-left
-            %button.game_tie.btn.btn-default{ type: 'button' }
+            %a.game_tie.btn.btn-default{ type: 'button', href: url("/event/#{@event.id}/game/#{game.id}/tie") }
               %i.fa.fa-fw.fa-arrows-h
             %button.game_winner.btn.btn-default{ type: 'button',
               data: { match_id: @match.id,
@@ -56,6 +68,9 @@
             %i.fa.fa-fw.fa-trophy
             #{game.player_b.name}
             %strong #{game.holes_up} &amp; #{game.holes_remaining}
+          - elsif game.tie == 1
+            #{game.player_b.name}
+            %i.fa.fa-fw.fa-trophy
           - else
             #{game.player_b.name}
   %tfoot
@@ -99,8 +114,10 @@
               %input.form-control#holesRemaining{ type: 'number', placeholder: 1, 'aria-describedby': 'remaining', name: 'holes_remaining', required: true }
               %span.input-group-addon#addonUp Left
         .modal-footer
-          %button.btn.btn-default{ data: { dismiss: 'modal' } } Close
+          -# %button.btn.btn-default{ data: { dismiss: 'modal' } } Close
           %button.btn.btn-primary{ type: 'submit' } Record Game Result
+
+%pre= @match.inspect
 
 -# %script{ src: url('/bower_components/jquery-validation/dist/jquery.validate.min.js') }
 
@@ -110,6 +127,10 @@
       // e.preventDefault();
       // $.post($(this).attr('action'), $(this).serialize())
 
+    });
+
+    $('.reset_match').click(function(e) {
+      window.location.href = this.dataset.href
     });
 
     $('.game_winner').click(function(e) {

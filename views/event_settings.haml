@@ -3,8 +3,12 @@
 
 =partial(:_event_nav)
 
-%p Finalize the settings for your event, then click 'Start Event' when finished.
+- unless @event.scheduled
+  %p Finalize the settings for your event, then click 'Start Event' when finished.
+%p.help-block Group names can be edited on the 'Group Assignment' page.
 %form.form.form-horizontal{ method: 'POST', onsubmit: 'return false;' }
+  - groups_assigned = @event.teams.select { |t| t.group_id.nil? }
+  %input#groupsAssigned{ type: 'hidden', name: 'groups_assigned', value: groups_assigned.empty? ? 'true' : 'false' }
   .form-group
     %label.col-sm-2.control-label Points for a win:
     .col-sm-10
@@ -36,12 +40,17 @@
     .col-sm-2
       %input.form-control#group_advance{ placeholder: '2', type: 'number', name: "group_advance", value: @event.group_advance }
 
-%a.btn.btn-success{ href: url("/event/#{@event.id}/start") } Start Event
+- unless @event.scheduled
+  %a.btn.btn-success.disabled#startEvent{ href: url("/event/#{@event.id}/start"), disabled: true } Start Event
 %a.btn.btn-danger{ href: url("/event/#{@event.id}/delete") } Delete Event!
 
 :javascript
   $(document).ready(function(){
     $('[data-toggle="popover"]').popover({ 'trigger': 'hover', 'html': 'true' });
+
+    if ($('input#groupsAssigned').val() == 'true') {
+      $('#startEvent').removeClass('disabled').attr('disabled', false);
+    }
   });
 
   $('.matchpoints').change(function(e) {

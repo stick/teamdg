@@ -19,3 +19,15 @@
       Rosters
       - unless groups_assigned.empty?
         %i.fa.fa-ban
+  %li{ role: 'presentation', class: [ @event.scheduled ? '' : 'disabled', request.path_info.include?("/event/#{@event.id}/matches") ? 'active' : '' ] }
+    %a{ href: url("/event/#{@event.id}/matches") }
+      Event Matches
+  %li{ role: 'presentation', class: [ @event.scheduled ? '' : 'disabled', request.path_info.include?("/event/#{@event.id}/group/matches") ? 'active' : '' ] }
+    %a{ href: url("/event/#{@event.id}/group/matches") }
+      Group Matches
+  %li{ role: 'presentation', class: [ @event.scheduled ? '' : 'disabled', request.path_info.include?("/event/#{@event.id}/team/matches") ? 'active' : '' ] }
+    %a{ href: url("/event/#{@event.id}/team/matches") }
+      Team Matches
+  %li{ role: 'presentation', class: [ @event.scheduled ? '' : 'disabled', request.path_info.include?("/event/#{@event.id}/player/matches") ? 'active' : '' ] }
+    %a{ href: url("/event/#{@event.id}/player/matches") }
+      Player Matches

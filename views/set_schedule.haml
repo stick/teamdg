@@ -1,3 +1,4 @@
+-# Warning this uses the RR schedule gem and needs the schedule object which doesn't exist after we've created it and moved on
 %table.table
   %thead
     %tr
@@ -6,6 +7,7 @@
         %th{ colspan: 2 } #{group.name.capitalize}
   %tbody
     - @schedule.gamedays.each_with_index do |match, matchnum|
+      - pp match.to_s
       %tr
         %th Match #{matchnum + 1}
         - match.games.each do |g|

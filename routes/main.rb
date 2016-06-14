@@ -58,6 +58,15 @@ class App < Sinatra::Base
 
   get_or_post '/event/:event_id/start/?' do
     @event = Event[params[:event_id]]
+
+    # if the event is schedule short circuit so we don't create extra matches/games/teams
+    if @event.scheduled
+      redirect to("/event/#{@event.id}/scheduled")
+    else
+      @event.scheduled = true
+      @event.save && @event.refresh
+    end
+
     @schedule = RRSchedule::Schedule.new(
       teams: @event.groups.map { |group| group.teams.map { |t| t.name } },
       rules: [
@@ -80,6 +89,7 @@ class App < Sinatra::Base
           desc: "Match #{matchnum + 1}",
           match_num: matchnum + 1,
           group_id: @event.teams_dataset.where(name: g.team_a.to_s).first.group_id,
+          day: match_num > 4 ? 0 : 6,
         )
         match.add_team(@event.teams_dataset.where(name: g.team_a.to_s).first)
         match.add_team(@event.teams_dataset.where(name: g.team_b.to_s).first)
@@ -95,8 +105,7 @@ class App < Sinatra::Base
         end
       end
     end
-
-    haml :set_schedule
+    redirect to("/event/#{@event.id}/matches")
   end
 
   get '/event/:event_id/matches/?' do
@@ -142,6 +151,29 @@ class App < Sinatra::Base
     game.winner = params[:winner_id].to_i
     game.holes_up = params[:holes_up].to_i
     game.holes_remaining = params[:holes_remaining].to_i
+    game.completed = true
+    game.tie = nil
+    game.save
+    redirect back
+  end
+
+  get '/event/:event_id/game/:game_id/tie/?' do
+    pp params
+    game = Game[params[:game_id]]
+    game.winner = nil
+    game.holes_up = 0
+    game.holes_remaining = 0
+    game.tie = 1
+    game.completed = true
+    game.save
+    redirect back
+  end
+
+  get '/event/:event_id/game/:game_id/reset/?' do
+    game = Game[params[:game_id]]
+    game.winner = nil
+    game.tie = nil
+    game.completed = false
     game.save
     redirect back
   end
