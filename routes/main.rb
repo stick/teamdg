@@ -3,8 +3,13 @@
 #
 # encoding: utf-8
 class App < Sinatra::Base
-  get '/' do
-    @title = "Main"
+
+  get '/?' do
+    redirect to('/dashboard')
+  end
+
+  get '/dashboard/?' do
+    @title = "Dashboard"
     haml :main, layout: true
   end
 
@@ -80,7 +85,7 @@ class App < Sinatra::Base
     @schedule.generate
 
     # puts @schedule.rounds.collect{ |r| r.to_s }
-    puts @schedule.display
+    # puts @schedule.display
 
     # create db objects based on schedule
     @schedule.gamedays.each_with_index do |gd, matchnum|
@@ -89,7 +94,7 @@ class App < Sinatra::Base
           desc: "Match #{matchnum + 1}",
           match_num: matchnum + 1,
           group_id: @event.teams_dataset.where(name: g.team_a.to_s).first.group_id,
-          day: match_num > 4 ? 0 : 6,
+          day: matchnum > 4 ? 0 : 6,
         )
         match.add_team(@event.teams_dataset.where(name: g.team_a.to_s).first)
         match.add_team(@event.teams_dataset.where(name: g.team_b.to_s).first)
@@ -108,9 +113,22 @@ class App < Sinatra::Base
     redirect to("/event/#{@event.id}/matches")
   end
 
+  get '/event/:event_id/scheduled/?' do
+    @event = Event[params[:event_id]]
+    haml :event_scheduled
+  end
+
   get '/event/:event_id/matches/?' do
     @event = Event[params[:event_id]]
     haml :matches
+  end
+
+  get '/event/:event_id/matches/delete/?' do
+    @event = Event[params[:event_id]]
+    @event.matches.map { |m| m.destroy }
+    @event.scheduled = false
+    @event.save
+    redirect to("/event/#{@event.id}/")
   end
 
   get '/event/:event_id/games/?' do
@@ -135,7 +153,11 @@ class App < Sinatra::Base
     haml :match_game
   end
 
-  get '/event/:event_id/teams/?' do
+  get '/event/:event_id/team/?' do
+    redirect to("/event/#{params[:event_id]}/team/all")
+  end
+
+  get '/event/:event_id/team/all?' do
     @event = Event[params[:event_id]]
     haml :teams
   end
@@ -218,12 +240,22 @@ class App < Sinatra::Base
   end
 
   get '/event/:event_id/?' do
+    redirect to("/event/#{params[:event_id]}/settings")
+  end
+
+  get '/event/:event_id/settings/?' do
     @event = Event[params[:event_id]]
     @title = "#{@event.name}:settings"
     haml :event_settings
   end
 
   get '/team/:team_id/?' do
+    @team = Team[params[:team_id]]
+    redirect to("/event/#{@team.event.id}/team/#{@team.id}")
+  end
+
+  get '/event/:event_id/team/:team_id/?' do
+    @event = Event[params[:event_id]]
     @team = Team[params[:team_id]]
     haml :team
   end

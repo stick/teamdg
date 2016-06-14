@@ -6,7 +6,7 @@
  * @summary     LengthLinks
  * @description Page length control via links for DataTables
  * @version     1.1.0
- * @file        dataTables.lengthLinks.js
+ * @file        dataTables.searchHighlight.js
  * @author      SpryMedia Ltd (www.sprymedia.co.uk)
  * @contact     www.sprymedia.co.uk/contact
  * @copyright   Copyright 2014 SpryMedia Ltd.
@@ -37,7 +37,7 @@ $.fn.dataTable.LengthLinks = function ( inst ) {
 	var api = new $.fn.dataTable.Api( inst );
 	var settings = api.settings()[0];
 	var container = $('<div></div>').addClass( settings.oClasses.sLength );
-	var lastLength = null;
+	var lastLength = -1;
 
 	// API so the feature wrapper can return the node to insert
 	this.container = function () {

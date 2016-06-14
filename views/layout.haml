@@ -11,61 +11,103 @@
     /= Bootstrap core CSS
     %link{ href: '/bower_components/bootstrap/dist/css/bootstrap.min.css', rel: 'stylesheet' }
     %link{ href: '/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker3.min.css', rel: 'stylesheet' }
+    %link{ href: '/bower_components/metisMenu/dist/metisMenu.min.css', rel: 'stylesheet' }
+    %link{ href: '/bower_components/startbootstrap-sb-admin-2/dist/css/timeline.css', rel: 'stylesheet' }
+    %link{ href: '/bower_components/startbootstrap-sb-admin-2/dist/css/sb-admin-2.css', rel: 'stylesheet' }
 
     /= Font Awesome
     %link{ rel: 'stylesheet', href: '/bower_components/font-awesome/css/font-awesome.min.css' }
 
-    /= Dashboard custom CSS
-    %link{ href: '/css/dashboard.css', rel: 'stylesheet' }
-
     /= Custom css
     %link{ href: '/css/styles.css', rel: 'stylesheet' }
 
-    %script{ src: '/bower_components/jquery/dist/jquery.min.js' }
   %body
-    %nav.navbar.navbar-inverse.navbar-fixed-top
-      .container-fluid
+    %script{ src: '/bower_components/jquery/dist/jquery.min.js' }
+
+    .wrapper
+      %nav.navbar.navbar-default.navbar-static-top{ role: 'navigation', style: 'margin-bottom: 0' }
         .navbar-header
-          %button.navbar-toggle.collapsed{ data: { toggle: 'collapse', target: '#navbar' }, 'aria-expanded': 'false', 'aria-controls': 'navbar' }
+          %button.navbar-toggle{ type: 'button', data: { toggle: 'collapse', target: '.navbar-collapse' } }
             %span.sr-only Toggle navigation
             %span.icon-bar
             %span.icon-bar
             %span.icon-bar
           %a.navbar-brand{ href: url('/') } TeamDG
-        .navbar-collapse.collapse#navbar
-          %ul.nav.navbar-nav.navbar-right
-            %li
-              %a{ href: '#' } Dashboard
-            %li
-              %a{ href: '#' } Settings
-            %li
-              %a{ href: '#' } Profile
-            %li
-              %a{ href: '#' } Help
-          %form.navbar-form.navbar-right
-            %input.form-control{ type: 'text', placeholder: 'Search...' }
+        %ul.nav.navbar-top-links.navbar-right
+          %li.dropdown
+            %a.dropdown-toggle{ data: { toggle: 'dropdown' }, href: '#' } #{icon('user', true)} #{icon('caret-down', true)}
+            %ul.dropdown-menu.dropdown-user
+              %li
+                %a{ href: '#' } #{icon('user', true)} User Profile
+              %li
+                %a{ href: '#' } #{icon('gear', true)} Settings
+              %li.divider
+              %li
+                %a{ href: url('/login') } #{icon('sign-out', true)} Settings
 
+        .navbar-default.sidebar{ role: 'navigation' }
+          .sidebar-nav.navbar-collapse
+            %ul.nav.in#side-menu
+              %li
+                %a{ href: url('/dashboard') } #{icon('dashboard', true)} Dashboard
+              %li
+                %a{ href: url('/events/') }
+                  #{icon('calendar', true)}
+                  %span Events
+                  %span.badge.pull-right #{Event.all.count}
+              %li
+                %a{ href: url('/event/new') }
+                  #{icon('plus', true)}
+                  %span New Event
+              - if request.path_info.include?('/event/')
+                %li
+                  %a{ href: '#' }
+                    #{icon('sitemap', true)}
+                    #{@event.name}
+                    %span.fa.arrow
+                  %ul.nav.nav-second-level.collapse.in{ 'aria-expanded': 'true' }
+                    %li
+                      %a{ href: url("/event/#{@event.id}/settings") }
+                        Settings
+                        %span.pull-right.fa.fa-cogs
+                    %li
+                      %a{ href: url("/event/#{@event.id}/team/") }
+                        Teams
+                        %span.pull-right.fa.fa-bus
+                    %li
+                      %a{ href: url("/event/#{@event.id}/rosters") }
+                        Rosters
+                        %span.pull-right.fa.fa-users
+                    %li
+                      %a{ href: '#' }
+                        Matches
+                        %span.fa.arrow
+                      %ul.nav.nav-third-level.collapse
+                        %li
+                          %a{ href: url("/event/#{@event.id}/matches") }
+                            Event Matches
+                            %span.pull-right.fa.fa-calendar-plus-o
+                        %li
+                          %a{ href: url("/event/#{@event.id}/group/matches") }
+                            Group Matches
+                            %span.pull-right.fa.fa-calendar-minus-o
+                        %li
+                          %a{ href: url("/event/#{@event.id}/team/matches") }
+                            Team Matches
+                            %span.pull-right.fa.fa-calendar-check-o
+                        %li
+                          %a{ href: url("/event/#{@event.id}/player/matches") }
+                            Player Matches
+                            %span.pull-right.fa.fa-calendar-o
 
-    .container-fluid
-      .row
-        .col-sm-3.col-md-2.sidebar
-          %ul.nav.nav-sidebar
-            %li{ class: request.path_info == '/' ? 'active' : '' }
-              %a{ href: url('/') } Overview
-            %li{ class: request.path_info.include?('/events') ? 'active' : '' }
-              %a{ href: url('/events/') }
-                %i.fa.fa-calendar.fa-fw
-                %span Events
-                %span.badge.pull-right #{Event.all.count}
-            %li{ class: request.path_info.include?('/event/new') ? 'active' : '' }
-              %a{ href: url('/event/new') }
-                %i.fa.fa-plus.fa-fw
-                %span New Event
+      #page-wrapper{ style: 'min-height: 635px' }
+        .row
+          .col-lg-12= yield
 
-        .col-sm-9.col-sm-offset-3.col-md-10.col-md-offset-2.main
-          #page= yield
 
     %script{ src: '/bower_components/bootstrap/dist/js/bootstrap.min.js' }
     %script{ src: '/bower_components/bootstrap-validator/dist/validator.min.js' }
     %script{ src: '/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js' }
+    %script{ src: '/bower_components/startbootstrap-sb-admin-2/dist/js/sb-admin-2.js' }
+    %script{ src: '/bower_components/metisMenu/dist/metisMenu.min.js' }
 

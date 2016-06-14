@@ -1,0 +1,18 @@
+%h3 Event Started
+.col-md-4
+  %p.bg-warning
+    This event has already been started.
+    The matches have been created and scheduled.  In order to redo the schedule
+    you must remove all existing matches.  All Match data will be destroyed.
+
+.list-group
+  %a.btn.btn-danger{ href: url("/event/#{@event.id}/matches/delete") }
+    Remove all matches
+    %i.fa.fa-warning{ data: { toggle: 'tooltip', title: 'This will remove all data!' } }
+
+
+:javascript
+  $(function () {
+    $('[data-toggle="tooltip"]').tooltip();
+  });
+

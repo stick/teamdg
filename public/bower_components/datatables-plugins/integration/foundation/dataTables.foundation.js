@@ -2,13 +2,13 @@
  * ©2011-2014 SpryMedia Ltd - datatables.net/license
  */
 
-/*
- * IMPORTANT
- * This file has now been deprecated and replaced by support for the styling
- * integration with Foundation in the DataTables core software and its
- * accompanying extensions. Please refer to the styling documentation for
- * details:
- * 	https://datatables.net/manual/styling/
+/**
+ * DataTables integration for Foundation. This requires Foundation 5 and
+ * DataTables 1.10 or newer.
+ *
+ * This file sets the defaults and adds options to DataTables to style its
+ * controls using Foundation. See http://datatables.net/manual/styling/foundation
+ * for further information.
  */
 (function(window, document, undefined){
 
@@ -134,7 +134,7 @@ if ( DataTable.TableTools ) {
 	$.extend( true, DataTable.TableTools.classes, {
 		"container": "DTTT button-group",
 		"buttons": {
-			"normal": "button small",
+			"normal": "button",
 			"disabled": "disabled"
 		},
 		"collection": {

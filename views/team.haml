@@ -4,7 +4,7 @@
   %li
     %a{ href: url("/event/#{@team.event.id}/teams") } Teams
   %li.active
-    #{@team.name.capitalize}
+    #{@team.name}
 
 .col-md-4
   .panel.panel-default
@@ -13,7 +13,7 @@
         %tr
           %th{ colspan: 8 }
             %span.edit_team.clickable#span_name{ data: { id: 'name' } }
-              #{@team.name.capitalize}
+              #{@team.name}
               %small
                 %i.fa.fa-edit.pull-right
             %input.form-control.edit_team.hidden#name

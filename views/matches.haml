@@ -1,7 +1,7 @@
 %ol.breadcrumb
   %li
     %a{ href: url("/event/#{@event.id}") } #{@event.name.upcase}
-  %li.active Matches
+  %li.active Event Matches
 
 %table.table.table-hover
   %thead
@@ -18,3 +18,5 @@
           %td
             %a{ href: url("/event/#{@event.id}/match/#{match.id}") }
               #{match.team_a.name} vs #{match.team_b.name}
+- unless @event.scheduled
+  %h4 Event not started, no matches scheduled.

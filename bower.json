@@ -2,22 +2,16 @@
   "name": "teamdg",
   "version": "1.0",
   "dependencies": {
-    "jquery": "~1.11.1",
+    "jquery": "^2.0",
     "bootstrap": "~3.3.0",
-    "font-awesome": "latest",
-    "datatables": "latest",
-    "datatables-bootstrap3-plugin": "latest",
-    "datatables-responsive": "latest",
-    "datatables-plugins": "latest",
+    "font-awesome": "^4.6.3",
     "jasny-bootstrap": "latest",
     "html5shiv": "latest",
-    "respond": "latest",
-    "bootstrapvalidator": "latest",
     "bootstrap3-ie10-viewport-bug-workaround": "latest",
-    "bootstrap-editable": "latest",
     "bootstrap-validator": "latest",
     "bootstrap-datepicker": "latest",
-    "dragula": "latest"
+    "dragula": "latest",
+    "startbootstrap-sb-admin-2": "^1.0.8"
   },
   "private": true,
   "authors": [
@@ -25,8 +19,7 @@
   ],
   "description": "Teat Disc Golf Bracket Manager",
   "main": "app.rb",
-  "moduleType": [
-  ],
+  "moduleType": [],
   "license": "MIT",
   "ignore": [
     "**/.*",
@@ -34,5 +27,8 @@
     "bower_components",
     "test",
     "tests"
-  ]
+  ],
+  "resolutions": {
+    "font-awesome": "^4.6.3"
+  }
 }

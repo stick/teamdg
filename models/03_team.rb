@@ -49,12 +49,16 @@ class Team < Sequel::Model(:teams)
     end
   end
 
+  def add_to_group(group)
+    Group[group.id].add_team(self)
+  end
+
   def after_create
     super
     i = 1
     self.event.team_seeds.each do |seed|
       pp "adding player (player #{i}) as seed (#{seed}) to #{self.name}"
-      self.add_player(seed: seed, name: "Player #{i}")
+      self.add_player(seed: seed, name: "#{self.name} Player #{i}")
       i += 1
     end
   end

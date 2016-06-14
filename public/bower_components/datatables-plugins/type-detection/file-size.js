@@ -1,20 +1,36 @@
 /**
- * Detect file size type columns automatically. Commonly used for computer
+ * Detect "file size" type columns automatically. Commonly used for computer
  * file sizes, this can allow sorting to take the order of magnitude indicated
  * by the label (GB etc) into account.
  *
  *  @name File size
- *  @summary Detect abbreviated file size data (8MB, 4KB, 3B, etc)
- *  @author Allan Jardine - datatables.net
+ *  @summary Detect abbreviated file size data (8MB, 4KB etc)
+ *  @author _anjibman_
  */
 
-jQuery.fn.dataTable.ext.type.detect.unshift( function ( data ) {
-	if ( typeof data !== 'string' ) {
+jQuery.fn.dataTableExt.aTypes.unshift(
+	function ( sData )
+	{
+		var sValidChars = "0123456789";
+		var Char;
+
+		/* Check the numeric part */
+		for ( var i=0 ; i<(sData.length - 3) ; i++ )
+		{
+			Char = sData.charAt(i);
+			if (sValidChars.indexOf(Char) == -1)
+			{
+				return null;
+			}
+		}
+
+		/* Check for size unit KB, MB or GB */
+		if ( sData.substring(sData.length - 2, sData.length) == "KB"
+			|| sData.substring(sData.length - 2, sData.length) == "MB"
+			|| sData.substring(sData.length - 2, sData.length) == "GB" )
+		{
+			return 'file-size';
+		}
 		return null;
 	}
-
-	var matches = data.match( /^(\d+(?:\.\d+)?)\s*([a-z]+)/i );
-	var units = ['b', 'kb', 'mb', 'gb', 'tb', 'pb'];
-	var is_file_size = ( matches && jQuery.inArray(matches[2].toLowerCase(), units) !== -1 );
-	return is_file_size ? 'file-size' : null;
-} );
+);

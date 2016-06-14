@@ -3,14 +3,6 @@
  * and sum it, returning the summed value. The data can come from any data
  * source, including column data, cells or rows.
  *
- * Note that it will attempt to 'deformat' any string based data that is passed
- * into it - i.e. it will strip any non-numeric characters in order to make a
- * best effort attempt to sum all data types. This can be useful when working
- * with formatting numbers such as currency. However the trade-off is that no
- * error is thrown if non-numeric data is passed in. You should be aware of this
- * in case unexpected values are returned - likely the input data is not what is
- * expected.
- *
  *  @name sum()
  *  @summary Sum the values in a data set.
  *  @author [Allan Jardine](http://sprymedia.co.uk)
@@ -29,23 +21,16 @@
  *    $('#example').DataTable( {
  *      drawCallback: function () {
  *        var api = this.api();
- *        $( api.table().footer() ).html(
+ *        api.table().footer().to$().html(
  *          api.column( 4, {page:'current'} ).data().sum()
  *        );
  *      }
  *    } );
  */
 
-jQuery.fn.dataTable.Api.register( 'sum()', function ( ) {
+jQuery.fn.dataTable.Api.register( 'sum()', function () {
 	return this.flatten().reduce( function ( a, b ) {
-		if ( typeof a === 'string' ) {
-			a = a.replace(/[^\d.-]/g, '') * 1;
-		}
-		if ( typeof b === 'string' ) {
-			b = b.replace(/[^\d.-]/g, '') * 1;
-		}
-
-		return a + b;
-	}, 0 );
+		return (a*1) + (b*1); // cast values in-case they are strings
+	} );
 } );
 

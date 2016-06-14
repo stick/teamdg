@@ -10,4 +10,9 @@ def vs
   haml "%small <em>vs</em>"
 end
 
+def icon(name='empire', fw=false, size=nil)
+  iconsize = size.nil? ? '' : ".fa-#{size}"
+  fixedwidth = '.fa-fw' if fw
+  haml "%i.fa#{fixedwidth}.fa-#{name}#{iconsize}"
+end
 

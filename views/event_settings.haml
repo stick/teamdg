@@ -51,18 +51,18 @@
     if ($('input#groupsAssigned').val() == 'true') {
       $('#startEvent').removeClass('disabled').attr('disabled', false);
     }
-  });
 
-  $('.matchpoints').change(function(e) {
-    $.post("/event/#{@event.id}/update", { update: 'matchpoints', value: $(this).val() });
-  });
-  $('.tiepoints').change(function(e) {
-    $.post("/event/#{@event.id}/update", { update: 'tiepoints', value: $(this).val() });
-  });
-  $('.semis').change(function(e) {
-    $.post("/event/#{@event.id}/update", { update: 'semis', value: $(this).val() });
-  });
-  $('#group_advance').change(function(e) {
-    $.post("/event/#{@event.id}/update", { update: 'group_advance', value: $(this).val() });
-    $(this).blur();
+    $('.matchpoints').change(function(e) {
+      $.post("/event/#{@event.id}/update", { update: 'matchpoints', value: $(this).val() });
+    });
+    $('.tiepoints').change(function(e) {
+      $.post("/event/#{@event.id}/update", { update: 'tiepoints', value: $(this).val() });
+    });
+    $('.semis').change(function(e) {
+      $.post("/event/#{@event.id}/update", { update: 'semis', value: $(this).val() });
+    });
+    $('#group_advance').change(function(e) {
+      $.post("/event/#{@event.id}/update", { update: 'group_advance', value: $(this).val() });
+      $(this).blur();
+    });
   });

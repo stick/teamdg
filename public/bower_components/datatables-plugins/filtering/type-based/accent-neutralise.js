@@ -27,7 +27,7 @@
  *        $('#myInput').keyup( function () {
  *          table
  *            .search(
- *              jQuery.fn.DataTable.ext.type.search.string( this.value )
+ *              jQuery.fn.DataTable.ext.type.search.string( this )
  *            )
  *            .draw()
  *        } );
@@ -39,13 +39,13 @@ jQuery.fn.DataTable.ext.type.search.string = function ( data ) {
         '' :
         typeof data === 'string' ?
             data
-                .replace( /έ/g, 'ε' )
-                .replace( /[ύϋΰ]/g, 'υ' )
-                .replace( /ό/g, 'ο' )
-                .replace( /ώ/g, 'ω' )
-                .replace( /ά/g, 'α' )
-                .replace( /[ίϊΐ]/g, 'ι' )
-                .replace( /ή/g, 'η' )
+                .replace( /έ/g, 'ε')
+                .replace( /ύ/g, 'υ')
+                .replace( /ό/g, 'ο')
+                .replace( /ώ/g, 'ω')
+                .replace( /ά/g, 'α')
+                .replace( /ί/g, 'ι')
+                .replace( /ή/g, 'η')
                 .replace( /\n/g, ' ' )
                 .replace( /á/g, 'a' )
                 .replace( /é/g, 'e' )
@@ -58,8 +58,6 @@ jQuery.fn.DataTable.ext.type.search.string = function ( data ) {
                 .replace( /è/g, 'e' )
                 .replace( /ï/g, 'i' )
                 .replace( /ü/g, 'u' )
-                .replace( /ã/g, 'a' )
-                .replace( /õ/g, 'o' )
                 .replace( /ç/g, 'c' )
                 .replace( /ì/g, 'i' ) :
             data;

@@ -14,18 +14,18 @@ unless DB.table_exists? (:events)
     String      :event_type, :null => false, :default => 'two_stage'
     String      :stage_1_format
     String      :stage_2_format
-    Integer     :group_number, :default => 1, :null => false
-    Integer     :group_advance, :default => 1, :null => false
-    Integer     :num_teams, :null => false
-    Integer     :roster_size, :null => false
+    Integer     :group_number, :default => 2, :null => false
+    Integer     :group_advance, :default => 2, :null => false
+    Integer     :num_teams, :null => false, :default => 8
+    Integer     :roster_size, :null => false, :default => 9
     Integer     :matchpoints, :null => false, :default => 3
-    Integer     :cycles
+    Integer     :cycles, :default => 2
     Integer     :tiepoints, :null => false, :default => 1
     TrueClass   :scheduled, :default => false
     String      :semis, :null => false, :default => 'xgrouppoints'
     Date        :startdate
     Date        :enddate
-    column      :team_seeds, 'text[]'
+    column      :team_seeds, 'text[]', :default => []
 
     #unique      [:first_name, :last_name, :email_address]
   end
@@ -53,8 +53,6 @@ class Event < Sequel::Model(:events)
   end
 
   def after_create
-    pp self.team_seeds
-    pp self.team_seeds.empty?
     if self.team_seeds.empty?
       self.team_seeds = (1..self.roster_size).map { |x| x }
       self.save
