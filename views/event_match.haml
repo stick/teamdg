@@ -2,7 +2,12 @@
   %li
     %a{ href: url("/event/#{@event.id}") } #{@event.name.upcase}
   %li
-    %a{ href: url("/event/#{@event.id}/matches") } Matches
+    %a{ href: url(request.path_info.split('/')[0,5].join('/')) } Matches
+  - if request.referrer.include?('matches/team')
+    %li 
+      %a{ href: url(request.referrer) }
+        - t = Team[params[:team_id]]
+        #{t.name}
   %li.active #{@match.team_a.name} #{vs} #{@match.team_b.name}
 
 %h3
@@ -15,26 +20,23 @@
   %thead
     %tr
       %th &nbsp;
-      %th Team #{@match.team_a.name} &mdash; #{@match.team_a.points.to_i} pts
+      %th &nbsp;
+      %th{ colspan: 2 } Team #{@match.team_a.name} &mdash; #{@match.team_a.points.to_i} pts
       %th.versus #{vs}
-      %th Team #{@match.team_b.name} &mdash; #{@match.team_b.points.to_i} pts
+      %th{ colspan: 2 } Team #{@match.team_b.name} &mdash; #{@match.team_b.points.to_i} pts
   %tbody
     - @match.games.sort{ |x,y| x.id <=> y.id }.each do |game|
       %tr{ data: { href: url("/event/#{@event.id}/game/#{game.id}") } }
-        %th
-          #{game.seed}
+        %td
           - if game.completed
             %i.clickable.fa.fa-fw.fa-flag-checkered.reset_match{ data: { href: url("/event/#{@event.id}/game/#{game.id}/reset") } }
+        %th
+          #{game.seed}
         %td
-          - if game.winner == game.player_a.id
-            %i.fa.fa-fw.fa-trophy
-            #{game.player_a.name}
-            %strong #{game.holes_up} &amp; #{game.holes_remaining}
-          - elsif game.tie == 1
-            #{game.player_a.name}
-            %i.fa.fa-fw.fa-trophy
-          - else
-            #{game.player_a.name}
+          #{game.player_a.name}
+        %td
+          %h5
+          #{game.result(game.player_a.id)}
         %td.versus
           .btn-group{ role: 'group' }
             %button.game_winner.btn.btn-default{ type: 'button',
@@ -64,21 +66,17 @@
                 target: '#gameWinnerModal' } }
               %i.fa.fa-fw.fa-arrow-right
         %td
-          - if game.winner == game.player_b.id
-            %i.fa.fa-fw.fa-trophy
-            #{game.player_b.name}
-            %strong #{game.holes_up} &amp; #{game.holes_remaining}
-          - elsif game.tie == 1
-            #{game.player_b.name}
-            %i.fa.fa-fw.fa-trophy
-          - else
-            #{game.player_b.name}
+          #{game.player_b.name}
+        %td
+          %h5
+          #{game.result(game.player_b.id)}
   %tfoot
     %tr
       %th &nbsp;
-      %td #{@match.team_a_wins} &mdash; #{@match.team_a_losses} &mdash; #{@match.team_a_ties}
       %th &nbsp;
-      %td #{@match.team_b_wins} &mdash; #{@match.team_b_losses} &mdash; #{@match.team_b_ties}
+      %td{ colspan: 2} #{@match.team_a_wins} &mdash; #{@match.team_a_losses} &mdash; #{@match.team_a_ties}
+      %th &nbsp;
+      %td{ colspan: 2} #{@match.team_b_wins} &mdash; #{@match.team_b_losses} &mdash; #{@match.team_b_ties}
 
 %form.form-inline#gameResult{ method: 'post', action: '', role: 'form', data: { toggle: 'validator', disable: true } }
   .modal.fade#gameWinnerModal{ tabindex: '-1', role: 'dialog' }
@@ -99,7 +97,7 @@
               %tr
                 %td.winning_player
                 %td
-                  %em defeats 
+                  %em defeats
                 %td.losing_player
           %input#winnerId{ type: 'hidden', name: 'winner_id', value: '' }
           %input#gameId{ type: 'hidden', name: 'game_id', value: '' }

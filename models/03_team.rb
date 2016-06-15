@@ -53,12 +53,20 @@ class Team < Sequel::Model(:teams)
     Group[group.id].add_team(self)
   end
 
+  def holes_up
+    self.games_dataset.where(winner: self.players_dataset.map(:id), completed: true).map(:holes_up).sum
+  end
+
+  def holes_remaining
+    self.games_dataset.where(winner: self.players_dataset.map(:id), completed: true).map(:holes_remaining).sum
+  end
+
   def after_create
     super
     i = 1
     self.event.team_seeds.each do |seed|
       pp "adding player (player #{i}) as seed (#{seed}) to #{self.name}"
-      self.add_player(seed: seed, name: "#{self.name} Player #{i}")
+      self.add_player(seed: seed, name: "#{self.name} Player #{i}", event_id: self.event.id)
       i += 1
     end
   end

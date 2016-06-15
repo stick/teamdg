@@ -19,6 +19,20 @@ class Group < Sequel::Model(:groups)
   many_to_one :event
   one_to_many :teams
   one_to_many :matches
+  one_to_many :players, :dataset => (
+    proc do |r|
+      r.associated_dataset.select_all(:players).join(Team, :id => :team_id, id => [:group_id])
+  end
+  )
+
+  def seed_winner(seed)
+    return '' if seed.nil?
+    self.players_dataset.where(seed: seed).sort_by{ |p| p.rr_wins }.reverse
+  end
+
+  def seed_winners
+    self.players.sort_by{ |p| p.rr_wins }.group_by{ |p| p.seed }
+  end
 
   def size
     self.teams.size

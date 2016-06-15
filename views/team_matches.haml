@@ -1,0 +1,11 @@
+%ol.breadcrumb
+  %li
+    %a{ href: url("/event/#{@event.id}") } #{@event.name.upcase}
+  %li.active
+    Team matches
+
+%h1 Team Matches
+
+.list-group
+  - @event.teams.each do |team|
+    %a.list-group-item{ href: url("/event/#{@event.id}/matches/team/#{team.id}") } #{team.name}

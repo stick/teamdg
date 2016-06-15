@@ -21,6 +21,7 @@ unless DB.table_exists? (:events)
     Integer     :matchpoints, :null => false, :default => 3
     Integer     :cycles, :default => 2
     Integer     :tiepoints, :null => false, :default => 1
+    String      :url
     TrueClass   :scheduled, :default => false
     String      :semis, :null => false, :default => 'xgrouppoints'
     Date        :startdate
@@ -36,10 +37,15 @@ class Event < Sequel::Model(:events)
   one_to_many :groups
   one_to_many :matches
   one_to_many :games
+  one_to_many :players
 
   def validate
     super
     validates_presence [:name]
+  end
+
+  def rr_matches_completed
+    (self.games_dataset.where(completed: true).count.to_f / self.games.count.to_f * 100.0).round
   end
 
   def matches_by_order

@@ -48,6 +48,34 @@ namespace :db do
   end
 end
 
+namespace :sim do
+  desc 'reset games to unplayed'
+  task :reset_games do
+    Event.first.games_dataset.each do |g|
+      g.completed = false
+      g.winner = nil
+      g.tie = nil
+      g.save
+    end
+  end
+
+  desc 'set games completed'
+  task :completed, [ :percent ] do |t, args|
+    num_games = Event.first.games.count.to_f
+    complete_games = num_games * (args[:percent].to_f / 100)
+    puts "num_games: #{num_games}"
+    puts "complete_games: #{complete_games}"
+    Event.first.games_dataset.each_with_index do |g, i|
+      if i < complete_games.round
+        g.completed = true
+      else
+        g.completed = false
+      end
+      g.save
+    end
+  end
+end
+
 namespace :load do
   desc 'Add Test Team data'
   task :ncti do

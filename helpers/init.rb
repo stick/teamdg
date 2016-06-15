@@ -16,3 +16,18 @@ def icon(name='empire', fw=false, size=nil)
   haml "%i.fa#{fixedwidth}.fa-#{name}#{iconsize}"
 end
 
+def result_list_class(game, player)
+  if game.completed
+    return 'list-group-item-info' if game.tie
+    return 'list-group-item-success' if game.winner == player.id
+    return 'list-group-item-danger' if game.winner != player.id
+  end
+end
+
+def result(game, player)
+  if game.completed
+    return 'tie' if game.tie
+    return 'win' if game.winner == player.id
+    return 'loss' if game.winner != player.id
+  end
+end

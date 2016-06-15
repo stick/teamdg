@@ -1,0 +1,134 @@
+%ol.breadcrumb
+  %li
+    %a{ href: url("/event/#{@player.event.id}") } #{@player.event.name.upcase}
+  %li
+    %a{ href: url("/event/#{@player.event.id}/matches/player") } Players Matches
+  %li.active
+    #{@player.name}
+.row
+  .col-lg-12
+    %table.table
+      %caption
+        %h2
+          #{@player.name}
+          %small #{@player.team.name} (#{@player.record})
+      %tbody
+        - @player.games.sort{ |x,y| x.id <=> y.id }.each do |game|
+          %tr
+            %td
+              %h4
+                - if game.completed
+                  %i.clickable.fa.fa-fw.fa-flag-checkered.reset_match{ data: { href: url("/event/#{@event.id}/game/#{game.id}/reset") } }
+            %td
+              %h4
+                #{game.result(@player.id)}
+            %td
+              %h4
+                #{game.match.desc}
+                #{vs}
+                - if game.player_a.id == @player.id
+                  #{game.player_b.name}
+                  %small #{game.player_b.team.name}
+                - else
+                  #{game.player_a.name}
+                  %small #{game.player_a.team.name}
+            %td
+              %h5
+                .btn-group{ role: 'group', 'aria-label': 'action buttons' }
+                  %button.btn.btn-default.game_winner{ type: 'button',
+                    data: { match_id: game.match.id,
+                      game_id: game.id,
+                      event_id: @event.id,
+                      player_a: game.player_a.to_hash,
+                      player_b: game.player_b.to_hash,
+                      winner: game.player_a.id == @player.id ? game.player_a.id : game.player_b.id,
+                      team_a: game.player_a.team.to_hash,
+                      team_b: game.player_b.team.to_hash,
+                      game: game.to_hash,
+                      toggle: 'modal',
+                      target: '#gameWinnerModal' } } #{icon('trophy', true)}
+                  %a.btn.btn-default{ type: 'button', href: url("/event/#{@event.id}/game/#{game.id}/tie") }
+                    #{icon('trophy', true, 'rotate-90')}
+                  %button.btn.btn-default.game_winner{ type: 'button',
+                    data: { match_id: game.match.id,
+                      game_id: game.id,
+                      event_id: @event.id,
+                      player_a: game.player_a.to_hash,
+                      player_b: game.player_b.to_hash,
+                      winner: game.player_b.id == @player.id ? game.player_a.id : game.player_b.id,
+                      team_a: game.player_a.team.to_hash,
+                      team_b: game.player_b.team.to_hash,
+                      game: game.to_hash,
+                      toggle: 'modal',
+                      target: '#gameWinnerModal' } } #{icon('trophy', true, 'rotate-180')}
+
+
+%form.form-inline#gameResult{ method: 'post', action: '', role: 'form', data: { toggle: 'validator', disable: true } }
+  .modal.fade#gameWinnerModal{ tabindex: '-1', role: 'dialog' }
+    .modal-dialog.modal-sm
+      .modal-content
+        .modal-header
+          %button.close{ type: 'button', data: { dismiss: 'modal' }, 'aria-label': 'Close' }
+            %span{ 'aria-hidden': 'true' } &times;
+          %h4.modal-title Game Winner
+        .modal-body
+          %table.table
+            %thead
+              %tr
+                %th.winning_team
+                %th &nbsp;
+                %th.losing_team
+            %tbody
+              %tr
+                %td.winning_player
+                %td
+                  %em defeats
+                %td.losing_player
+          %input#winnerId{ type: 'hidden', name: 'winner_id', value: '' }
+          %input#gameId{ type: 'hidden', name: 'game_id', value: '' }
+          .form-group
+            %label.control-label.sr-only{ for: 'holesUp' } Holes UP
+            .input-group.input-sm
+              %input.form-control#holesUp{ type: 'number', placeholder: 2, name: 'holes_up', required: true, 'aria-describedby': 'addonUp' }
+              %span.input-group-addon#addonUp Up
+          .form-group
+            %label.control-label.sr-only{ for: 'holesRemaining' } Holes Remaining
+            .input-group.input-sm
+              %input.form-control#holesRemaining{ type: 'number', placeholder: 1, 'aria-describedby': 'remaining', name: 'holes_remaining', required: true }
+              %span.input-group-addon#addonUp Left
+        .modal-footer
+          -# %button.btn.btn-default{ data: { dismiss: 'modal' } } Close
+          %button.btn.btn-primary{ type: 'submit' } Record Game Result
+
+:javascript
+  $(document).ready(function() {
+    $('.game_winner').click(function(e) {
+      $('#gameResult').attr('action', "/event/#{@event.id}/game/" + this.dataset.gameId);
+      // $('#gameResult').validator();
+      $('input#gameId').val(this.dataset.gameId);
+      if (this.dataset.winner == this.dataset.playerAId) {
+        $('.winning_player').html(this.dataset.playerAName);
+        $('.winning_team').html(this.dataset.teamAName);
+        $('input#winnerId').val(this.dataset.playerAId);
+        $('.losing_player').html(this.dataset.playerBName);
+        $('.losing_team').html(this.dataset.teamBName);
+      } else if (this.dataset.winner == this.dataset.playerBId) {
+        $('.winning_player').html(this.dataset.playerBName);
+        $('.winning_team').html(this.dataset.teamBName);
+        $('input#winnerId').val(this.dataset.playerBId);
+        $('.losing_player').html(this.dataset.playerAName);
+        $('.losing_team').html(this.dataset.teamAName);
+      } else {
+        console.log('winner does not match id');
+        $('span.winner').html('PROBLEM!!');
+        $('span.loser').html('PROBLEM!!');
+      }
+    });
+
+    $('.reset_match').click(function(e) {
+      window.location.href = this.dataset.href
+    });
+  });
+
+
+

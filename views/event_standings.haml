@@ -1,0 +1,103 @@
+%h3
+  #{@event.name} Standings
+  - if @event.rr_matches_completed >= 100
+    %button.btn.btn-success{ type: 'button' } Setup Semi-Finals
+%h5 Round Robin Progress
+.progress
+  .progress-bar{ role: 'progressbar', 'aria-valuemin': 0, 'aria-valuemax': 100, 'aria-valuenow': @event.rr_matches_completed, style: "width:#{@event.rr_matches_completed}%" } #{@event.rr_matches_completed}%
+
+.row
+  - @event.groups.each do |group|
+    .col-lg-6
+      %table.table
+        %thead
+          %tr
+            %th #{group.name}
+            %th
+              %small Points
+            %th
+              %small
+                1
+                %sup st
+                TB
+            %th
+              %small
+                2
+                %sup nd
+                TB
+            %th &nbsp;
+        - group.teams.sort{ |x,y| [ x.points, x.holes_up, x.holes_remaining ] <=> [ y.points, y.holes_up, y.holes_remaining ] }.reverse.each_with_index do |team, index|
+          %tr
+            %td.team_name #{team.name}
+            %td.team_points #{team.points.to_i}
+            %td.tie_breaker_1 #{team.holes_up}
+            %td.tie_breaker_2 #{team.holes_remaining}
+            %td.advance
+              - if index < @event.group_advance
+                - if @confirmed_advance
+                  #{icon('check-square-o')}
+                - else
+                  #{icon('square-o')}
+
+.graph#graph{ style: 'width:600px;height:300px' } blah
+
+.row
+  - @event.groups.each do |group|
+    .panel.panel-primary
+      .panel-heading #{group.name} Seed Standings
+      .panel-body
+        %ul.nav.nav-tabs{ role: 'tablist' }
+          - @event.team_seeds.each_with_index do |seed, i|
+            %li{ role: 'presentation', class: i == 0 ? 'active' : '' }
+              %a{ href: "##{group.name.downcase}_#{seed.capitalize}", role: 'tab', data: { toggle: 'tab' } } #{seed}
+        .tab-content
+          - @event.team_seeds.each_with_index do |seed, i|
+            .tab-pane{ id: [group.name.downcase, seed.capitalize], role: 'tabpanel', class: i == 0 ? 'active' : '' }
+              %table.table
+                %thead
+                  %tr
+                    %th #{seed}
+                    %th Wins
+                    %th Ties
+                    %th Losses
+                    %th &nbsp;
+                %tbody
+                - group.seed_winner(seed).each do |player|
+                  %tr
+                    %td #{player.name}
+                    %td #{player.rr_wins}
+                    %td #{player.rr_ties}
+                    %td #{player.rr_losses}
+                    %td #{icon('question')}
+
+:javascript
+  $(document).ready(function(){
+    var data = [
+      { label: 'wins', data: 2, color: '#5cb85c' },
+      { label: 'losses', data: 2, color: '#d9534f' },
+      { label: 'ties', data: 2, color: '#5bc0de' },
+    ]
+
+    $.plot('#graph',
+      data, {
+        series: {
+          pie: {
+            show: true,
+            radius: 1,
+            label: {
+              show: true,
+              radius: 2/3,
+              threshold: 0.1,
+            }
+          }
+        },
+        grid: {
+          hoverable: true,
+        },
+        legend: {
+          show: true
+        },
+      }
+    );
+  });
+

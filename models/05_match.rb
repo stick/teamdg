@@ -35,11 +35,24 @@ unless DB.table_exists?(:matches_teams)
   end
 end
 
+# unless DB.table_exists?(:matches_players)
+  # DB.create_table :matches_players do
+    # foreign_key :player_id, :players, on_delete: :cascade, null: false
+    # foreign_key :match_id,  :matches, on_delete: :cascade, null: false
+    # primary_key [:player_id, :match_id]
+    # index [:player_id, :match_id]
+  # end
+# end
+
 class Match < Sequel::Model(:matches)
   many_to_one :event
   many_to_many :teams
   one_to_many :games
   many_to_one :group
+
+  def showdown
+    return "#{self.team_a.name} <small><em>vs</em></small> #{self.team_b.name}"
+  end
 
   def team_b_wins
     self.team_a_losses

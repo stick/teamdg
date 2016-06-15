@@ -57,6 +57,17 @@ class Game < Sequel::Model(:games)
     self.players.last
   end
 
+  def result(id)
+    if self.completed
+      return '<span class="label label-default">Tied</span>' unless self.tie.nil?
+      return "<span class='label label-success'>W #{self.holes_up} &amp; #{self.holes_remaining}</span>" if id == self.winner
+      return "<span class='label label-danger'>L #{self.holes_up} &amp; #{self.holes_remaining}</span>" if id != self.winner
+      # return '<i class="fa fa-trophy text-success"></i>' if id == self.winner
+      # return '<i class="fa fa-trophy fa-flip-vertical text-danger"></i>' if id != self.winner
+    end
+    ''
+  end
+
   def after_update
     # update win/loss record for each match
     self.match.team_a_wins = self.match.games_dataset.where(winner: self.match.team_a.players_dataset.map(:id)).count

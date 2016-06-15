@@ -1,0 +1,14 @@
+%h1 Player Matches
+
+.form-group
+  %label.sr-only{ for: 'playerSearch' } Player...
+  %input.form-control#playerSearch{ name: 'player_search', placeholder: 'Search players...' }
+
+.list-group#playerList
+  - @event.players.each do |player|
+    %a.list-group-item{ href: url("/event/#{@event.id}/matches/player/#{player.id}") } #{player.name}
+
+:javascript
+  $(document).ready(function() {
+    $('#playerList').btsListFilter('#playerSearch');
+  });

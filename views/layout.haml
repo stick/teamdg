@@ -80,25 +80,27 @@
                         %span.pull-right.fa.fa-users
                     %li
                       %a{ href: '#' }
-                        Matches
+                        Round Robin Matches
                         %span.fa.arrow
                       %ul.nav.nav-third-level.collapse
                         %li
-                          %a{ href: url("/event/#{@event.id}/matches") }
+                          %a{ href: url("/event/#{@event.id}/matches/event") }
                             Event Matches
                             %span.pull-right.fa.fa-calendar-plus-o
                         %li
-                          %a{ href: url("/event/#{@event.id}/group/matches") }
+                          %a{ href: url("/event/#{@event.id}/matches/group") }
                             Group Matches
                             %span.pull-right.fa.fa-calendar-minus-o
                         %li
-                          %a{ href: url("/event/#{@event.id}/team/matches") }
+                          %a{ href: url("/event/#{@event.id}/matches/team") }
                             Team Matches
                             %span.pull-right.fa.fa-calendar-check-o
                         %li
-                          %a{ href: url("/event/#{@event.id}/player/matches") }
+                          %a{ href: url("/event/#{@event.id}/matches/player") }
                             Player Matches
                             %span.pull-right.fa.fa-calendar-o
+                    %li
+                      %a{ href: url("/event/#{@event.id}/standings") } Standings <span class='pull-right'>#{icon('bar-chart', true)}</span>
 
       #page-wrapper{ style: 'min-height: 635px' }
         .row
@@ -108,6 +110,11 @@
     %script{ src: '/bower_components/bootstrap/dist/js/bootstrap.min.js' }
     %script{ src: '/bower_components/bootstrap-validator/dist/validator.min.js' }
     %script{ src: '/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js' }
+    %script{ src: '/bower_components/flot/excanvas.min.js' }
+    %script{ src: '/bower_components/flot/jquery.flot.js' }
+    %script{ src: '/bower_components/flot/jquery.flot.pie.js' }
+    %script{ src: '/bower_components/flot/jquery.flot.resize.js' }
     %script{ src: '/bower_components/startbootstrap-sb-admin-2/dist/js/sb-admin-2.js' }
     %script{ src: '/bower_components/metisMenu/dist/metisMenu.min.js' }
+    %script{ src: '/bower_components/bootstrap-list-filter/bootstrap-list-filter.min.js' }
 

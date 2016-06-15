@@ -3,6 +3,8 @@
     %a{ href: url("/event/#{@event.id}") } #{@event.name.upcase}
   %li.active Event Matches
 
+%h2.text-danger BUG in match ordering and division/group
+
 %table.table.table-hover
   %thead
     %tr
@@ -10,13 +12,13 @@
       - @event.groups.each do |group|
         %th{ colspan: 2} #{group.name}
   %tbody
-    - rows = @event.matches_dataset.map(:match_num).uniq
+    - rows = @event.matches_dataset.order(:group_id, :id).map(:match_num).uniq
     - rows.each do |row|
       %tr
         %td Match #{row}
         - @event.matches_dataset.where(match_num: row).each do |match|
           %td
-            %a{ href: url("/event/#{@event.id}/match/#{match.id}") }
+            %a{ href: url("/event/#{@event.id}/matches/event/match/#{match.id}") }
               #{match.team_a.name} vs #{match.team_b.name}
 - unless @event.scheduled
   %h4 Event not started, no matches scheduled.

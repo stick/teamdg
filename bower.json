@@ -11,7 +11,8 @@
     "bootstrap-validator": "latest",
     "bootstrap-datepicker": "latest",
     "dragula": "latest",
-    "startbootstrap-sb-admin-2": "^1.0.8"
+    "startbootstrap-sb-admin-2": "^1.0.8",
+    "bootstrap-list-filter": "^0.3.2"
   },
   "private": true,
   "authors": [

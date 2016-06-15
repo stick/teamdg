@@ -1,0 +1,21 @@
+%ol.breadcrumb
+  %li
+    %a{ href: url("/event/#{@team.event.id}") } #{@team.event.name.upcase}
+  %li
+    %a{ href: url("/event/#{@team.event.id}/matches/team") } Teams Matches
+  %li.active
+    #{@team.name}
+
+%h1 Team #{@team.name} Matches
+
+.col-md-6
+  .list-group
+    - @team.matches.sort{ |x,y| x.id <=> y.id }.each do |match|
+      %a.list-group-item{ href: url("/event/#{@event.id}/matches/team/#{@team.id}/match/#{match.id}") }
+        #{match.desc}
+        #{vs}
+        - if @team.id == match.team_a.id
+          #{match.team_b.name}
+        - else
+          #{match.team_a.name}
+

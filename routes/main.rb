@@ -110,7 +110,7 @@ class App < Sinatra::Base
         end
       end
     end
-    redirect to("/event/#{@event.id}/matches")
+    redirect to("/event/#{@event.id}/matches/event")
   end
 
   get '/event/:event_id/scheduled/?' do
@@ -118,7 +118,7 @@ class App < Sinatra::Base
     haml :event_scheduled
   end
 
-  get '/event/:event_id/matches/?' do
+  get '/event/:event_id/matches/event/?' do
     @event = Event[params[:event_id]]
     haml :matches
   end
@@ -136,10 +136,17 @@ class App < Sinatra::Base
     haml :event_games
   end
 
-  get  '/event/:event_id/match/:match_id/?' do
-    @match = Match[id: params[:match_id], event_id: params[:event_id]]
-    @event = Event[params[:event_id]]
-    haml :event_match
+  [
+    '/event/:event_id/matches/group/match/:match_id/?',
+    '/event/:event_id/matches/event/match/:match_id/?',
+    '/event/:event_id/matches/team/:team_id/match/:match_id/?',
+    '/event/:event_id/match/:match_id/?'
+  ].each do |path|
+    get path do
+      @match = Match[id: params[:match_id], event_id: params[:event_id]]
+      @event = Event[params[:event_id]]
+      haml :event_match
+    end
   end
 
   get '/event/:event_id/game/:game_id/?' do
@@ -304,5 +311,37 @@ class App < Sinatra::Base
   get '/event/:event_id/rosters/?' do
     @event = Event[params[:event_id]]
     haml :rosters
+  end
+
+  get '/event/:event_id/matches/group/?' do
+    @event = Event[params[:event_id]]
+    haml :group_matches
+  end
+
+  get '/event/:event_id/matches/team/?' do
+    @event = Event[params[:event_id]]
+    haml :team_matches
+  end
+
+  get '/event/:event_id/matches/team/:team_id/?' do
+    @event = Event[params[:event_id]]
+    @team = Team[params[:team_id]]
+    haml :team_match
+  end
+
+  get '/event/:event_id/matches/player/?' do
+    @event = Event[params[:event_id]]
+    haml :player_matches
+  end
+
+  get '/event/:event_id/matches/player/:player_id/?' do
+    @event = Event[params[:event_id]]
+    @player = Player[params[:player_id]]
+    haml :player_match
+  end
+
+  get '/event/:event_id/standings/?' do
+    @event = Event[params[:event_id]]
+    haml :event_standings
   end
 end
