@@ -22,12 +22,31 @@ end
 
 class Player < Sequel::Model(:players)
   many_to_one :team
-  many_to_many :games
-  many_to_many :matches
+  many_to_many :games, :order => :games__id
+  many_to_many :matches, :order => :matches__id
   many_to_one :event
 
   def record
-    return "#{self.rr_wins} &mdash; #{self.rr_losses} &mdash; #{self.rr_ties}"
+    wins = self.rr_wins + self.elim_wins
+    losses = self.rr_losses + self.elim_losses
+    ties = self.rr_ties + self.elim_ties
+    return "#{wins} &mdash; #{losses} &mdash; #{ties}"
+  end
+
+  def elim_record
+    return "#{self.elim_wins} &mdash; #{self.elim_losses} &mdash; #{self.elim_ties}"
+  end
+
+  def elim_wins
+    self.games_dataset.where(winner_id: self.id, sudden_death: true).count
+  end
+
+  def elim_losses
+    self.games_dataset.where(completed: true, sudden_death: true).exclude(winner_id: self.id).count
+  end
+
+  def elim_ties
+    self.games_dataset.where(completed: true, sudden_death: true).exclude(tie: nil).count
   end
 
   def rr_record
@@ -35,15 +54,23 @@ class Player < Sequel::Model(:players)
   end
 
   def rr_wins
-    self.games_dataset.where(winner: self.id).count
+    self.games_dataset.where(completed: true, winner_id: self.id, sudden_death: false).count
   end
 
   def rr_losses
-    self.games_dataset.where(completed: true).exclude(winner: self.id).count
+    self.games_dataset.where(completed: true, sudden_death: false).exclude(winner_id: self.id).count
   end
 
   def rr_ties
-    self.games_dataset.where(completed: true).exclude(tie: nil).count
+    self.games_dataset.where(completed: true, sudden_death: false).exclude(tie: nil).count
+  end
+
+  def rr_holes_up
+    self.games_dataset.where(completed: true, winner_id: self.id, sudden_death: false).map(:holes_up).sum
+  end
+
+  def rr_holes_remaining
+    self.games_dataset.where(completed: true, winner_id: self.id, sudden_death: false).map(:holes_remaining).sum
   end
 
   def validate

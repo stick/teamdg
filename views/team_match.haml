@@ -3,8 +3,16 @@
     %a{ href: url("/event/#{@team.event.id}") } #{@team.event.name.upcase}
   %li
     %a{ href: url("/event/#{@team.event.id}/matches/team") } Teams Matches
-  %li.active
-    #{@team.name}
+  %li.active.dropdown
+    %a.dropdown-toggle{ href: '#', data: { toggle: 'dropdown' }, role: 'button' }
+      #{@team.name}
+      %span.caret
+    %ul.dropdown-menu
+      - @event.teams.each do |team|
+        - unless team == @team
+          %li
+            %a{ href: url("/event/#{@event.id}/matches/team/#{team.id}") } #{team.name}
+
 
 %h1 Team #{@team.name} Matches
 
@@ -18,4 +26,67 @@
           #{match.team_b.name}
         - else
           #{match.team_a.name}
+        %span.badge.text-success #{match.games_dataset.where(completed: true).count} / #{match.games.count}
 
+.row
+  %table.table
+    %thead
+      %tr
+        %th{ colspan: 9 }
+          %h3
+            #{@team.name}
+            %small #{@team.group}
+      %tr
+        %th &nbsp;
+        - @team.matches.each do |match|
+          %th #{match.desc}
+        %th Semifinals
+        %th Finals
+      %tr
+        %th &nbsp;
+        - @team.opponents.each do |opponent|
+          %th #{opponent.name}
+        %th.semifinals_opp &nbsp;
+        %th.finals_opp &nbsp;
+    %tbody
+      - @team.players.each do |player|
+        %tr
+          %th
+            %h5
+              #{player.name}
+              %small #{player.seed}
+          - player.games.each do |game|
+            %td.game_cell #{game.result(player.id)}
+          %td.semifinals_game_cell.game_cell &nbsp;
+          %td.semifinals_game_cell.game_cell &nbsp;
+    %tfoot
+      %tr
+        %td &nbsp;
+        - @team.matches.each do |match|
+          %td #{format_record(match.record(@team))}
+        %td.semifinals_match_record &nbsp;
+        %td.finals_match_record &nbsp;
+      %tr
+        %td
+          Match Points
+          %span.badge.pull-right #{@team.points}
+        - @team.matches.each do |match|
+          %td #{match.points(@team)}
+        %td.semifinals_match_record &nbsp;
+        %td.finals_match_record &nbsp;
+      %tr
+        %td
+          1<sup>st</sup> Tiebreak
+          %span.badge.pull-right #{@team.holes_up}
+        - @team.matches.each do |match|
+          %td #{match.holes_up(@team)}
+        %td.semifinals_match_record &nbsp;
+        %td.finals_match_record &nbsp;
+      %tr
+        %td
+          2<sup>nd</sup> Tiebreak
+          %span.badge.pull-right #{@team.holes_remaining}
+        - @team.matches.each do |match|
+          %td #{match.holes_remaining(@team)}
+        %td.semifinals_match_record &nbsp;
+        %td.finals_match_record &nbsp;

@@ -33,11 +33,11 @@ unless DB.table_exists? (:events)
 end
 
 class Event < Sequel::Model(:events)
-  one_to_many :teams
-  one_to_many :groups
-  one_to_many :matches
-  one_to_many :games
-  one_to_many :players
+  one_to_many :teams, :order => :teams__id
+  one_to_many :groups, :order => :groups__id
+  one_to_many :matches, :order => :matches__id
+  one_to_many :games, :order => :games__id
+  one_to_many :players, :order => :players__id
 
   def validate
     super

@@ -14,7 +14,7 @@ unless DB.table_exists? (:games)
     String      :seed, :null => false
     # foreign_key :player_id_1, :players, :on_delete => :cascade, :null => false
     # foreign_key :player_id_2, :players, :on_delete => :cascade, :null => false
-    foreign_key :winner, :players, :on_delete => :cascade, :null => true
+    foreign_key :winner_id, :players, :on_delete => :cascade, :null => true
     foreign_key :match_id, :matches, :on_delete => :cascade, :null => false
     Integer     :holes_up, :default => 0, :null => false
     Integer     :holes_remaining, :default => 0, :null => false
@@ -46,8 +46,11 @@ end
 class Game < Sequel::Model(:games)
   many_to_one :event
   many_to_one :match
-  many_to_many :teams
-  many_to_many :players
+  many_to_many :teams, :order => :teams__id
+  many_to_many :players, :order => :players__id
+  one_to_one :winner, :class => self do |ds|
+    self.players_dataset.where(id: self.winner_id)
+  end
 
   def player_a
     self.players.first
@@ -59,9 +62,9 @@ class Game < Sequel::Model(:games)
 
   def result(id)
     if self.completed
-      return '<span class="label label-default">Tied</span>' unless self.tie.nil?
-      return "<span class='label label-success'>W #{self.holes_up} &amp; #{self.holes_remaining}</span>" if id == self.winner
-      return "<span class='label label-danger'>L #{self.holes_up} &amp; #{self.holes_remaining}</span>" if id != self.winner
+      return '<span class="label label-default col-sm-12">Tied</span>' unless self.tie.nil?
+      return "<span class='label label-success col-sm-12'>W #{self.holes_up} &amp; #{self.holes_remaining}</span>" if id == self.winner_id
+      return "<span class='label label-danger col-sm-12'>L #{self.holes_up} &amp; #{self.holes_remaining}</span>" if id != self.winner_id
       # return '<i class="fa fa-trophy text-success"></i>' if id == self.winner
       # return '<i class="fa fa-trophy fa-flip-vertical text-danger"></i>' if id != self.winner
     end
@@ -70,23 +73,15 @@ class Game < Sequel::Model(:games)
 
   def after_update
     # update win/loss record for each match
-    self.match.team_a_wins = self.match.games_dataset.where(winner: self.match.team_a.players_dataset.map(:id)).count
-    self.match.team_a_losses = self.match.games_dataset.where(winner: self.match.team_b.players_dataset.map(:id)).count
+    self.match.team_a_wins = self.match.games_dataset.where(winner_id: self.match.team_a.players_dataset.map(:id)).count
+    self.match.team_a_losses = self.match.games_dataset.where(winner_id: self.match.team_b.players_dataset.map(:id)).count
+    self.match.team_a_ties = self.match.games_dataset.where(completed: true).exclude(tie: nil).count
     self.match.no_decisions = self.match.games_dataset.where(completed: nil).count
-    self.match.team_a_ties = self.match.games_dataset.where(winner: nil).exclude(tie: nil).count
     self.match.save
 
     # update team point totals
     self.teams.each do |t|
-      pp t
-      wins = self.match.games_dataset.where(winner: t.players_dataset.map(:id)).count
-      ties = self.match.games_dataset.exclude(tie: nil).count
-      points = (t.event.matchpoints * wins) + (t.event.tiepoints * ties)
-      t.points = points
-      t.save
-      pp "wins: #{wins}"
-      pp "ties: #{ties}"
-      pp "points: #{points}"
+      t.update_points
     end
 
   end

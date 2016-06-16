@@ -12,7 +12,7 @@ unless DB.table_exists? (:matches)
     primary_key :id
     String      :desc
     Integer     :match_num
-    foreign_key :winner, :teams, :on_delete => :cascade, :null => true
+    foreign_key :winner_id, :teams, :on_delete => :cascade, :null => true
     # foreign_key :team_a, :teams, :on_delete => :cascade, :null => true
     # foreign_key :team_b, :teams, :on_delete => :cascade, :null => true
     foreign_key :group_id, :groups, :on_delete => :cascade, :null => false
@@ -46,12 +46,20 @@ end
 
 class Match < Sequel::Model(:matches)
   many_to_one :event
-  many_to_many :teams
-  one_to_many :games
+  many_to_many :teams, :order => :teams__id
+  one_to_many :games, :order => :games__id
   many_to_one :group
 
   def showdown
     return "#{self.team_a.name} <small><em>vs</em></small> #{self.team_b.name}"
+  end
+
+  def holes_up(team)
+    self.games_dataset.where(winner_id: team.players_dataset.map(:id), completed: true, sudden_death: false).map(:holes_up).sum
+  end
+
+  def holes_remaining(team)
+    self.games_dataset.where(winner_id: team.players_dataset.map(:id), completed: true, sudden_death: false).map(:holes_remaining).sum
   end
 
   def team_b_wins
@@ -84,6 +92,51 @@ class Match < Sequel::Model(:matches)
 
   def team_b
     self.teams.last
+  end
+
+  def record(team)
+    if self.team_a == team
+      [
+        self.team_a_wins,
+        self.team_a_losses,
+        self.team_a_ties,
+      ]
+    elsif self.team_b == team
+      [
+        self.team_b_wins,
+        self.team_b_losses,
+        self.team_b_ties,
+      ]
+    else
+      [ nil, nil, nil ]
+    end
+  end
+
+  def points(team)
+    if self.team_a == team
+      self.team_a_points
+    elsif self.team_b == team
+      self.team_b_points
+    else
+      -1000
+    end
+  end
+
+  def team_b_points
+    (self.team_b_wins * self.event.matchpoints) + (self.team_b_ties * self.event.tiepoints)
+  end
+
+  def team_a_points
+    (self.team_a_wins * self.event.matchpoints) + (self.team_a_ties * self.event.tiepoints)
+  end
+
+  def decided
+    majority = (self.event.roster_size / 2.0).round
+    if (self.team_a_wins >= majority ) or (self.team_a_losses >= majority)
+      true
+    else
+      false
+    end
   end
 
   def validate

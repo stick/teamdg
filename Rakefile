@@ -1,4 +1,5 @@
 require_relative 'app'
+require 'rake-progressbar'
 
 desc 'Generate secret session key'
 task :session_secret do
@@ -50,13 +51,52 @@ end
 
 namespace :sim do
   desc 'reset games to unplayed'
-  task :reset_games do
-    Event.first.games_dataset.each do |g|
+  task :reset do
+    puts "Resetting matches"
+    match_bar = RakeProgressbar.new(Event.first.matches.count)
+    Event.first.matches.each do |m|
+      m.team_a_wins = 0
+      m.team_a_losses = 0
+      m.team_a_ties = 0
+      m.no_decisions = 0
+      m.save
+      match_bar.inc
+    end
+    match_bar.finished
+
+    puts "Resetting games"
+    games_bar = RakeProgressbar.new(Event.first.games.count)
+    Event.first.games.each do |g|
       g.completed = false
-      g.winner = nil
+      g.winner_id = nil
       g.tie = nil
       g.save
+      games_bar.inc
     end
+    games_bar.finished
+  end
+
+  desc 'simulate games (event.first)'
+  task :games, [ :match ] do |t, args|
+    puts "simulating games for match #{args[:match]}"
+    progress = RakeProgressbar.new(Event.first.matches_dataset.where(match_num: args[:match]).count)
+    Event.first.matches_dataset.where(match_num: args[:match]).each do |match|
+      match.games.each do |g|
+        if rand(1..10) < 3
+          g.tie = 1
+        else
+          g.winner_id = g.players.shuffle.first.id
+          game_scores = [ [1,0], [2,0], [2,1], [3,2], [3,1], [4,3], [4,2], [5,4], [5,3], [6,4] ]
+          r = game_scores.shuffle.first
+          g.holes_up = r.shift
+          g.holes_remaining = r.shift
+        end
+        g.completed = true
+        g.save
+        progress.inc
+      end
+    end
+    progress.finished
   end
 
   desc 'set games completed'

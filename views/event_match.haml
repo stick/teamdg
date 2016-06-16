@@ -4,7 +4,7 @@
   %li
     %a{ href: url(request.path_info.split('/')[0,5].join('/')) } Matches
   - if request.referrer.include?('matches/team')
-    %li 
+    %li
       %a{ href: url(request.referrer) }
         - t = Team[params[:team_id]]
         #{t.name}
@@ -21,22 +21,22 @@
     %tr
       %th &nbsp;
       %th &nbsp;
-      %th{ colspan: 2 } Team #{@match.team_a.name} &mdash; #{@match.team_a.points.to_i} pts
+      %th{ colspan: 2 } Team #{@match.team_a.name} [#{@match.team_a.id}] &mdash; #{@match.team_a.points.to_i} pts
       %th.versus #{vs}
-      %th{ colspan: 2 } Team #{@match.team_b.name} &mdash; #{@match.team_b.points.to_i} pts
+      %th{ colspan: 2 } Team #{@match.team_b.name} [#{@match.team_b.id}] &mdash; #{@match.team_b.points.to_i} pts
   %tbody
     - @match.games.sort{ |x,y| x.id <=> y.id }.each do |game|
       %tr{ data: { href: url("/event/#{@event.id}/game/#{game.id}") } }
         %td
           - if game.completed
             %i.clickable.fa.fa-fw.fa-flag-checkered.reset_match{ data: { href: url("/event/#{@event.id}/game/#{game.id}/reset") } }
+            [ #{game.id} ]
         %th
           #{game.seed}
         %td
           #{game.player_a.name}
         %td
-          %h5
-          #{game.result(game.player_a.id)}
+          %h5 #{game.result(game.player_a.id)}
         %td.versus
           .btn-group{ role: 'group' }
             %button.game_winner.btn.btn-default{ type: 'button',
@@ -68,8 +68,7 @@
         %td
           #{game.player_b.name}
         %td
-          %h5
-          #{game.result(game.player_b.id)}
+          %h5 #{game.result(game.player_b.id)}
   %tfoot
     %tr
       %th &nbsp;

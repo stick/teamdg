@@ -21,17 +21,17 @@ class Group < Sequel::Model(:groups)
   one_to_many :matches
   one_to_many :players, :dataset => (
     proc do |r|
-      r.associated_dataset.select_all(:players).join(Team, :id => :team_id, id => [:group_id])
+      r.associated_dataset.select_all(:players).join(Team, :teams__id => :team_id, id => [:group_id])
   end
   )
 
   def seed_winner(seed)
     return '' if seed.nil?
-    self.players_dataset.where(seed: seed).sort_by{ |p| p.rr_wins }.reverse
+    self.players_dataset.where(seed: seed).sort_by{ |p| [ p.rr_wins, p.rr_ties, -p.rr_losses, p.rr_holes_up, p.rr_holes_remaining ] }.reverse
   end
 
   def seed_winners
-    self.players.sort_by{ |p| p.rr_wins }.group_by{ |p| p.seed }
+    self.players.sort_by{ |p| [ p.rr_wins, p.rr_ties, -p.rr_losses, p.rr_holes_up, p.rr_holes_remaining ] }.group_by{ |p| p.seed }
   end
 
   def size

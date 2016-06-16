@@ -31,3 +31,21 @@ def result(game, player)
     return 'loss' if game.winner != player.id
   end
 end
+
+def format_record(record)
+  # [ wins, losses, ties ]
+  record.join(' &mdash; ')
+end
+
+def ordinalize(i)
+  case i
+  when 1
+    "#{i}<sup>st</sup>"
+  when 2
+    "#{i}<sup>nd</sup>"
+  when 3
+    "#{i}<sup>rd</sup>"
+  else
+    "#{i}<sup>th</sup>"
+  end
+end

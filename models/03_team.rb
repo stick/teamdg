@@ -23,11 +23,11 @@ end
 
 class Team < Sequel::Model(:teams)
   # Team Model
-  one_to_many :players
+  one_to_many :players, :order => :players__id
   many_to_one :event
   one_to_one :group
-  many_to_many :matches
-  many_to_many :games
+  many_to_many :matches, :order => :matches__id
+  many_to_many :games, :order => :games__id
 
   def roster_size
     self.event.roster_size
@@ -39,6 +39,16 @@ class Team < Sequel::Model(:teams)
 
   def seed(seed)
     self.players_dataset.where(seed: seed).first
+  end
+
+  def opponents
+    opp_teams = []
+    self.matches.each do |match|
+      match.teams.each do |team|
+        opp_teams.push(team) unless team.id == self.id
+      end
+    end
+    return opp_teams
   end
 
   def group
@@ -54,11 +64,11 @@ class Team < Sequel::Model(:teams)
   end
 
   def holes_up
-    self.games_dataset.where(winner: self.players_dataset.map(:id), completed: true).map(:holes_up).sum
+    self.games_dataset.where(winner_id: self.players_dataset.map(:id), completed: true, sudden_death: false).map(:holes_up).sum
   end
 
   def holes_remaining
-    self.games_dataset.where(winner: self.players_dataset.map(:id), completed: true).map(:holes_remaining).sum
+    self.games_dataset.where(winner_id: self.players_dataset.map(:id), completed: true, sudden_death: false).map(:holes_remaining).sum
   end
 
   def after_create
@@ -69,6 +79,13 @@ class Team < Sequel::Model(:teams)
       self.add_player(seed: seed, name: "#{self.name} Player #{i}", event_id: self.event.id)
       i += 1
     end
+  end
+
+  def update_points
+    wins = self.games_dataset.where(completed: true, sudden_death: false, winner_id: self.players_dataset.map(:id)).count
+    ties = self.games_dataset.where(completed: true, sudden_death: false).exclude(tie: nil).count
+    self.points = (wins * self.event.matchpoints ) + (ties * self.event.tiepoints)
+    self.save
   end
 
   def validate

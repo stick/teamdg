@@ -33,11 +33,10 @@
             %td.tie_breaker_1 #{team.holes_up}
             %td.tie_breaker_2 #{team.holes_remaining}
             %td.advance
-              - if index < @event.group_advance
-                - if @confirmed_advance
-                  #{icon('check-square-o')}
-                - else
-                  #{icon('square-o')}
+              - if @event.rr_matches_completed
+                - if index < @event.group_advance
+                  #{icon('trophy')}
+                  #{ordinalize(index + 1)}
 
 .graph#graph{ style: 'width:600px;height:300px' } blah
 
@@ -60,6 +59,8 @@
                     %th Wins
                     %th Ties
                     %th Losses
+                    %th Holes Up
+                    %th Holes Remaining
                     %th &nbsp;
                 %tbody
                 - group.seed_winner(seed).each do |player|
@@ -68,6 +69,8 @@
                     %td #{player.rr_wins}
                     %td #{player.rr_ties}
                     %td #{player.rr_losses}
+                    %td #{player.rr_holes_up}
+                    %td #{player.rr_holes_remaining}
                     %td #{icon('question')}
 
 :javascript

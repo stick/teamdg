@@ -3,8 +3,6 @@
     %a{ href: url("/event/#{@event.id}") } #{@event.name.upcase}
   %li.active Event Matches
 
-%h2.text-danger BUG in match ordering and division/group
-
 %table.table.table-hover
   %thead
     %tr
@@ -12,7 +10,7 @@
       - @event.groups.each do |group|
         %th{ colspan: 2} #{group.name}
   %tbody
-    - rows = @event.matches_dataset.order(:group_id, :id).map(:match_num).uniq
+    - rows = @event.matches_dataset.map(:match_num).uniq
     - rows.each do |row|
       %tr
         %td Match #{row}

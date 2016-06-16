@@ -15,3 +15,7 @@ span.amp {
 td.versus, th.versus {
   text-align: center;
 }
+
+td.game_cell, th.game_cell {
+  vertical-align: middle !important;
+}

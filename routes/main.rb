@@ -177,7 +177,7 @@ class App < Sinatra::Base
   post '/event/:event_id/game/:game_id/?' do
     pp params
     game = Game[params[:game_id]]
-    game.winner = params[:winner_id].to_i
+    game.winner_id = params[:winner_id].to_i
     game.holes_up = params[:holes_up].to_i
     game.holes_remaining = params[:holes_remaining].to_i
     game.completed = true
@@ -189,7 +189,7 @@ class App < Sinatra::Base
   get '/event/:event_id/game/:game_id/tie/?' do
     pp params
     game = Game[params[:game_id]]
-    game.winner = nil
+    game.winner_id = nil
     game.holes_up = 0
     game.holes_remaining = 0
     game.tie = 1
@@ -200,7 +200,7 @@ class App < Sinatra::Base
 
   get '/event/:event_id/game/:game_id/reset/?' do
     game = Game[params[:game_id]]
-    game.winner = nil
+    game.winner_id = nil
     game.tie = nil
     game.completed = false
     game.save

@@ -5,4 +5,6 @@
     %h4 #{group.name}
     .list-group
       - group.matches.sort{ |x,y| x.id <=> y.id }.each do |match|
-        %a.list-group-item{ href: url("/event/#{@event.id}/matches/group/match/#{match.id}") } #{match.desc}: #{match.showdown}
+        %a.list-group-item{ href: url("/event/#{@event.id}/matches/group/match/#{match.id}") }
+          #{match.desc}: #{match.showdown}
+          %span.badge.text-success #{match.games_dataset.where(completed: true).count} / #{match.games.count}
