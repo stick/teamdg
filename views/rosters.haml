@@ -3,10 +3,6 @@
     %a{ href: url("/event/#{@event.id}") } #{@event.name.upcase}
   %li.active Rosters
 
-=partial(:_event_nav)
-
-%p
-
 .row
   - @event.teams.each do |team|
     .col-md-3

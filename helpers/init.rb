@@ -7,13 +7,16 @@ require_relative 'partials'
 #require_relative 'auth'
 #
 def vs
-  haml "%small <em>vs</em>"
+  "<small><em>vs</em></small>"
 end
 
-def icon(name='empire', fw=false, size=nil)
-  iconsize = size.nil? ? '' : ".fa-#{size}"
-  fixedwidth = '.fa-fw' if fw
-  haml "%i.fa#{fixedwidth}.fa-#{name}#{iconsize}"
+def icon(name='empire', fw: false, size: nil, ex_classes: [], id: nil)
+  classes = [ 'fa', "fa-#{name}" ]
+  classes.push('fa-fw') if fw
+  classes.push("fa-#{size}") if size
+  classes.push(ex_classes) unless ex_classes.empty?
+  element_id = "id='#{id}' " if id
+  "<i #{element_id}class='#{classes.flatten.join(' ')}'></i>"
 end
 
 def result_list_class(game, player)

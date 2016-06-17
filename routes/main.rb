@@ -344,4 +344,10 @@ class App < Sinatra::Base
     @event = Event[params[:event_id]]
     haml :event_standings
   end
+
+  get '/event/:event_id/matches/games/unreported/?' do
+    @event = Event[params[:event_id]]
+    haml :games_unreported
+  end
+
 end

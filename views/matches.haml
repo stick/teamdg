@@ -18,5 +18,11 @@
           %td
             %a{ href: url("/event/#{@event.id}/matches/event/match/#{match.id}") }
               #{match.team_a.name} vs #{match.team_b.name}
+            %a.pull-right{ tabindex: 0, data: { toggle: 'popover', title: match.showdown, content: match.when, html: 'true', container: 'body', trigger: 'focus', placement: 'left' } } #{icon('calendar')}
 - unless @event.scheduled
   %h4 Event not started, no matches scheduled.
+
+:javascript
+  $(function () {
+    $('[data-toggle="popover"]').popover()
+  });

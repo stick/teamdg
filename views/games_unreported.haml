@@ -1,0 +1,65 @@
+%h3 Incomplete / Unreported Player Matches
+.col-md-8
+  %table.table.table-condensed
+    - @event.games_dataset.where(completed: false).each do |game|
+      %tr
+        %td
+          Match #{game.match.match_num}
+          %a{ href: url("/event/#{@event.id}/matches/player/#{game.player_a.id}"), data: { toggle: 'tooltip', title: 'Player matches' } }
+            #{game.player_a.name}
+          %a{ href: url("/event/#{@event.id}/matches/team/#{game.player_a.team.id}"), data: { toggle: 'tooltip', title: 'Team matches' } }
+            %small (#{game.player_a.team.name})
+          #{vs}
+          %a{ href: url("/event/#{@event.id}/matches/player/#{game.player_b.id}"), data: { toggle: 'tooltip', title: 'Player matches' } }
+            #{game.player_b.name}
+          %a{ href: url("/event/#{@event.id}/matches/team/#{game.player_b.team.id}"), data: { toggle: 'tooltip', title: 'Team matches' } }
+            %small (#{game.player_b.team.name})
+        %td
+          .btn-group.pull-right{ role: 'group', data: { toggle: 'tooltip', title: 'Decide player match' } }
+            %button.decide_match.btn.btn-default{ type: 'button',
+              href: '#',
+              data: { toggle: 'modal',
+                player_a: game.player_a.to_hash,
+                player_b: game.player_b.to_hash,
+                showdown: game.showdown,
+                target: '#decideMatch',
+                game: game.to_hash } } #{icon('gavel')}
+
+%form
+  .modal.fade#decideMatch{ tabindex: '-1', role: 'dialog' }
+    .modal-dialog
+      .modal-content
+        .modal-header
+          %button.close{ type: 'button', 'aria-label': 'close', data: { dismiss: 'modal' } }
+            %span{ 'aria-hidden': 'true' } &times;
+          %h4.modal-title  Blank
+        .modal-body
+          .radio
+            %label
+              %input#radioplayerA{ type: 'radio', name: 'result' }
+              %span#playerA Winner
+            %label
+              %input#tieMatch{ type: 'radio', name: 'result', value: 'tie' }
+              Tie
+            %label
+              %input#radioplayerB{ type: 'radio', name: 'result' }
+              %span#playerB Winner
+        .modal-footer
+          %button.btn.btn-default{ type: 'button', data: { dismiss: 'modal' } } Close
+          %button.btn.btn-primary{ type: 'button' } Record Player Match
+
+
+:javascript
+  $(function () {
+    $('[data-toggle="tooltip"]').tooltip();
+
+    $('.decide_match').click(function(e) {
+      console.log(this.dataset);
+      $('.modal-title').html(this.dataset.showdown);
+      $('#playerA').html(this.dataset.playerAName);
+      $('#playerB').html(this.dataset.playerAName);
+      $('#radioplayerA').val(this.dataset.playerAId);
+      $('#radioplayerB').val(this.dataset.playerBId);
+
+    });
+  });

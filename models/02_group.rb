@@ -31,7 +31,17 @@ class Group < Sequel::Model(:groups)
   end
 
   def seed_winners
-    self.players.sort_by{ |p| [ p.rr_wins, p.rr_ties, -p.rr_losses, p.rr_holes_up, p.rr_holes_remaining ] }.group_by{ |p| p.seed }
+    # self.players.sort_by{ |p| [ p.rr_wins, p.rr_ties, -p.rr_losses, p.rr_holes_up, p.rr_holes_remaining ] }.reverse.group_by{ |p| p.seed }
+    sw = self.players_dataset.association_join(:games).where(completed: true)
+    sw.select_append!{ rank{}.over(:order => [
+      Sequel.expr(:players__rr_wins).desc,
+      Sequel.expr(:players__rr_ties).desc,
+      Sequel.expr(:players__rr_losses).asc,
+      Sequel.expr(:players__rr_holes_up).desc,
+      Sequel.expr(:players__rr_holes_remaining).desc,
+    ], :partition => :players__seed) }
+    sw2 = sw.group_by(:players__seed, :players__id).to_hash_groups(:seed)
+    sw2
   end
 
   def size

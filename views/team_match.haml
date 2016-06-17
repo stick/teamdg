@@ -16,7 +16,7 @@
 
 %h1 Team #{@team.name} Matches
 
-.col-md-6
+.col-lg-6
   .list-group
     - @team.matches.sort{ |x,y| x.id <=> y.id }.each do |match|
       %a.list-group-item{ href: url("/event/#{@event.id}/matches/team/#{@team.id}/match/#{match.id}") }
@@ -28,65 +28,139 @@
           #{match.team_a.name}
         %span.badge.text-success #{match.games_dataset.where(completed: true).count} / #{match.games.count}
 
+.col-lg-3.visible-lg-inline
+  %h5 Round Robin Wins / Losses / Ties
+  .graph#rrgraph{ style: 'width:220px;height:200px' }
+.col-lg-3.visible-lg-inline
+  %h5 Elimination Wins / Losses / Ties
+  .graph#elimgraph{ style: 'width:220px;height:200px' }
+
 .row
-  %table.table
-    %thead
-      %tr
-        %th{ colspan: 9 }
-          %h3
-            #{@team.name}
-            %small #{@team.group}
-      %tr
-        %th &nbsp;
-        - @team.matches.each do |match|
-          %th #{match.desc}
-        %th Semifinals
-        %th Finals
-      %tr
-        %th &nbsp;
-        - @team.opponents.each do |opponent|
-          %th #{opponent.name}
-        %th.semifinals_opp &nbsp;
-        %th.finals_opp &nbsp;
-    %tbody
-      - @team.players.each do |player|
+  .col-lg-12.col-md-12
+    %table.table
+      %thead
         %tr
-          %th
-            %h5
-              #{player.name}
-              %small #{player.seed}
-          - player.games.each do |game|
-            %td.game_cell #{game.result(player.id)}
-          %td.semifinals_game_cell.game_cell &nbsp;
-          %td.semifinals_game_cell.game_cell &nbsp;
-    %tfoot
-      %tr
-        %td &nbsp;
-        - @team.matches.each do |match|
-          %td #{format_record(match.record(@team))}
-        %td.semifinals_match_record &nbsp;
-        %td.finals_match_record &nbsp;
-      %tr
-        %td
-          Match Points
-          %span.badge.pull-right #{@team.points}
-        - @team.matches.each do |match|
-          %td #{match.points(@team)}
-        %td.semifinals_match_record &nbsp;
-        %td.finals_match_record &nbsp;
-      %tr
-        %td
-          1<sup>st</sup> Tiebreak
-          %span.badge.pull-right #{@team.holes_up}
-        - @team.matches.each do |match|
-          %td #{match.holes_up(@team)}
-        %td.semifinals_match_record &nbsp;
-        %td.finals_match_record &nbsp;
-      %tr
-        %td
-          2<sup>nd</sup> Tiebreak
-          %span.badge.pull-right #{@team.holes_remaining}
-        - @team.matches.each do |match|
-          %td #{match.holes_remaining(@team)}
-        %td.semifinals_match_record &nbsp;
-        %td.finals_match_record &nbsp;
+          %th{ colspan: 9 }
+            %h3
+              #{@team.name}
+              %small #{@team.group}
+        %tr
+          %th &nbsp;
+          - @team.matches.each do |match|
+            %th #{match.desc}
+          %th Semifinals
+          %th Finals
+        %tr
+          %th &nbsp;
+          - @team.opponents.each do |opponent|
+            %th #{opponent.name}
+          %th.semifinals_opp &nbsp;
+          %th.finals_opp &nbsp;
+      %tbody
+        - @team.players.each do |player|
+          %tr
+            %th
+              %h5
+                #{player.name}
+                %small #{player.seed}
+            - player.games.each do |game|
+              %td.game_cell #{game.result(player.id)}
+            %td.semifinals_game_cell.game_cell &nbsp;
+            %td.semifinals_game_cell.game_cell &nbsp;
+      %tfoot
+        %tr
+          %td &nbsp;
+          - @team.matches.each do |match|
+            %td #{format_record(match.record(@team))}
+          %td.semifinals_match_record &nbsp;
+          %td.finals_match_record &nbsp;
+        %tr
+          %td
+            Match Points
+            %span.badge.pull-right #{@team.points}
+          - @team.matches.each do |match|
+            %td #{match.points(@team)}
+          %td.semifinals_match_record &nbsp;
+          %td.finals_match_record &nbsp;
+        %tr
+          %td
+            1<sup>st</sup> Tiebreak
+            %span.badge.pull-right #{@team.holes_up}
+          - @team.matches.each do |match|
+            %td #{match.holes_up(@team)}
+          %td.semifinals_match_record &nbsp;
+          %td.finals_match_record &nbsp;
+        %tr
+          %td
+            2<sup>nd</sup> Tiebreak
+            %span.badge.pull-right #{@team.holes_remaining}
+          - @team.matches.each do |match|
+            %td #{match.holes_remaining(@team)}
+          %td.semifinals_match_record &nbsp;
+          %td.finals_match_record &nbsp;
+
+
+:javascript
+  $(document).ready(function(){
+    var rrdata = [
+      { label: 'Wins', data: #{@team.rr_wins}, color: '#5cb85c' },
+      { label: 'Losses', data: #{@team.rr_losses}, color: '#d9534f' },
+      { label: 'Ties', data: #{@team.rr_ties}, color: '#777' },
+    ]
+
+    var elimdata = [
+      { label: 'Wins', data: #{@team.elim_wins}, color: '#5cb85c' },
+      { label: 'Losses', data: #{@team.elim_losses}, color: '#d9534f' },
+      { label: 'Ties', data: #{@team.elim_ties}, color: '#777' },
+    ]
+
+    function labelFormatter(label, series) {
+      return "<div style='font-size:8pt; text-align:center; padding:2px; color:white;'>" + label + "<br/>" + Math.round(series.percent) + "%</div>";
+    }
+
+    $.plot('#rrgraph',
+      rrdata, {
+        series: {
+          pie: {
+            show: true,
+            radius: 1,
+            label: {
+              show: true,
+              radius: 2/3,
+              threshold: 0.1,
+              formatter: labelFormatter,
+            }
+          }
+        },
+        grid: {
+          hoverable: false,
+        },
+        legend: {
+          show: true
+        },
+      }
+    );
+
+    $.plot('#elimgraph',
+      elimdata, {
+        series: {
+          pie: {
+            show: true,
+            radius: 1,
+            label: {
+              show: true,
+              radius: 2/3,
+              threshold: 0.1,
+              formatter: labelFormatter,
+            }
+          }
+        },
+        grid: {
+          hoverable: false,
+        },
+        legend: {
+          show: true
+        },
+      }
+    );
+  });

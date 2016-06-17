@@ -139,6 +139,19 @@ class Match < Sequel::Model(:matches)
     end
   end
 
+  def when
+    case self.match_num
+    when 1 then "Session 1 #{Date::DAYNAMES[self.day]} Morning"
+    when 2 then "Session 2 #{Date::DAYNAMES[self.day]} Morning"
+    when 3 then "Session 3 #{Date::DAYNAMES[self.day]} Afternoon"
+    when 4 then "Session 4 #{Date::DAYNAMES[self.day]} Afternoon"
+    when 5 then "Session 5 #{Date::DAYNAMES[self.day]} Morning"
+    when 6 then "Session 6 #{Date::DAYNAMES[self.day]} Morning"
+    else
+      "Session unknown -- #{Date::DAYNAMES[self.day]} whenever"
+    end
+  end
+
   def validate
     super
     validates_presence [:desc]

@@ -79,11 +79,19 @@ class Game < Sequel::Model(:games)
     self.match.no_decisions = self.match.games_dataset.where(completed: nil).count
     self.match.save
 
+    self.players.each do |p|
+      p.update_stats
+    end
+
     # update team point totals
     self.teams.each do |t|
       t.update_points
     end
 
+  end
+
+  def showdown
+    "#{self.player_a.name} <small>#{self.player_a.team.name}</small> #{vs} #{self.player_b.name} <small>#{self.player_b.team.name}</small>"
   end
 
   def validate

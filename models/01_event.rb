@@ -48,6 +48,10 @@ class Event < Sequel::Model(:events)
     (self.games_dataset.where(completed: true).count.to_f / self.games.count.to_f * 100.0).round
   end
 
+  def rr_incomplete
+    self.games_dataset.where(completed: false).count
+  end
+
   def matches_by_order
     # output an array of arrays of the matches by order they are played
     # 4 matches are played simulataneously for an 8 team RR

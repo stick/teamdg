@@ -15,6 +15,12 @@ unless DB.table_exists? (:teams)
     Bignum      :mobile_number
     String      :email_address
     Integer     :points
+    Integer     :rr_wins
+    Integer     :rr_losses
+    Integer     :rr_ties
+    Integer     :elim_wins
+    Integer     :elim_losses
+    Integer     :elim_ties
     foreign_key :event_id, :events, :on_delete => :cascade, :null => false
     foreign_key :group_id, :groups, :on_delete => :cascade
     unique      [:name, :event_id]
@@ -82,9 +88,15 @@ class Team < Sequel::Model(:teams)
   end
 
   def update_points
-    wins = self.games_dataset.where(completed: true, sudden_death: false, winner_id: self.players_dataset.map(:id)).count
-    ties = self.games_dataset.where(completed: true, sudden_death: false).exclude(tie: nil).count
-    self.points = (wins * self.event.matchpoints ) + (ties * self.event.tiepoints)
+    rr_wins = self.games_dataset.where(completed: true, sudden_death: false, winner_id: self.players_dataset.map(:id)).count
+    rr_ties = self.games_dataset.where(completed: true, sudden_death: false).exclude(tie: nil).count
+    self.rr_wins = rr_wins
+    self.rr_losses = self.games_dataset.where(completed: true, sudden_death: false).exclude(winner_id: self.players_dataset.map(:id)).count
+    self.rr_ties = rr_ties
+    self.elim_wins = self.games_dataset.where(completed: true, sudden_death: true, winner_id: self.players_dataset.map(:id)).count
+    self.elim_losses = self.games_dataset.where(completed: true, sudden_death: true).exclude(winner_id: self.players_dataset.map(:id)).count
+    self.elim_ties = self.games_dataset.where(completed: true, sudden_death: true).exclude(tie: nil).count
+    self.points = (rr_wins * self.event.matchpoints ) + (rr_ties * self.event.tiepoints)
     self.save
   end
 

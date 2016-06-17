@@ -3,8 +3,15 @@
     %a{ href: url("/event/#{@team.event.id}") } #{@team.event.name.upcase}
   %li
     %a{ href: url("/event/#{@team.event.id}/team/") } Teams
-  %li.active
-    #{@team.name}
+  %li.active.dropdown
+    %a.dropdown-toggle{ href: '#', data: { toggle: 'dropdown' }, role: 'button' }
+      #{@team.name}
+      %span.caret
+    %ul.dropdown-menu
+      - @event.teams.each do |team|
+        - unless team == @team
+          %li
+            %a{ href: url("/event/#{@event.id}/team/#{team.id}") } #{team.name}
 
 .col-md-4
   .panel.panel-default
@@ -14,8 +21,7 @@
           %th{ colspan: 8 }
             %span.edit_team.clickable#span_name{ data: { id: 'name' } }
               #{@team.name}
-              %small
-                %i.fa.fa-edit.pull-right
+              %small #{icon('edit', ex_classes: 'pull-right')}
             %input.form-control.edit_team.hidden#name
       %tbody
         %tr
@@ -23,24 +29,21 @@
           %td
             %span.edit_team.clickable#span_captain{ data: { id: 'captain' } }
               #{@team.captain}
-              %small
-                %i.fa.fa-edit.pull-right
+              %small #{icon('edit', ex_classes: 'pull-right')}
             %input.form-control.edit_team.hidden#captain
         %tr
           %th Email
           %td
             %span.edit_team.clickable#span_email_address{ data: { id: 'email_address' } }
               #{@team.email_address}
-              %small
-                %i.fa.fa-edit.pull-right
+              %small #{icon('edit', ex_classes: 'pull-right')}
             %input.form-control.edit_team.hidden#email_address
         %tr
           %th Mobile
           %td
             %span.edit_team.clickable#span_mobile_number{ data: { id: 'mobile_number' } }
               #{@team.mobile_number}
-              %small
-                %i.fa.fa-edit.pull-right
+              %small #{icon('edit', ex_classes: 'pull-right')}
             %input.form-control.edit_team.hidden#mobile_number
         %tr
           %th Group
@@ -62,8 +65,7 @@
         %td
           %span.edit_seed.clickable#span{ id: player.seed, data: { seed: player.seed, playerid: player.id } }
             #{player.name}
-            %small
-              %i.fa.fa-pencil.pull-right
+            %small #{icon('pencil', ex_classes: 'pull-right')}
           %input.form-control.edit_seed#input{ id: player.seed, name: player.seed, data: { seed: player.seed, playerid: player.id }, class: player.nil? ? '' : 'hidden' }
 
 :javascript

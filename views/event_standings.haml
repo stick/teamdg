@@ -1,7 +1,7 @@
 %h3
   #{@event.name} Standings
   - if @event.rr_matches_completed >= 100
-    %button.btn.btn-success{ type: 'button' } Setup Semi-Finals
+    %a.btn.btn-success{ type: 'button', href: url("/event/#{@event.id}/semifinals") } Setup Semi-Finals
 %h5 Round Robin Progress
 .progress
   .progress-bar{ role: 'progressbar', 'aria-valuemin': 0, 'aria-valuemax': 100, 'aria-valuenow': @event.rr_matches_completed, style: "width:#{@event.rr_matches_completed}%" } #{@event.rr_matches_completed}%
@@ -38,12 +38,12 @@
                   #{icon('trophy')}
                   #{ordinalize(index + 1)}
 
-.graph#graph{ style: 'width:600px;height:300px' } blah
-
 .row
   - @event.groups.each do |group|
     .panel.panel-primary
-      .panel-heading #{group.name} Seed Standings
+      .panel-heading
+        #{group.name} Seed Standings
+        %i.fa.fa-question-circle.fa-fw{ data: { container: 'body', toggle: 'popover', placement: 'top', title: 'Seed Standings',  content: 'Ranked based on<ol><li>Wins</li><li>Ties</li><li>Losses</li><li>Holes Up</li><li>Holes Remaining</li></ul>' } }
       .panel-body
         %ul.nav.nav-tabs{ role: 'tablist' }
           - @event.team_seeds.each_with_index do |seed, i|
@@ -55,52 +55,27 @@
               %table.table
                 %thead
                   %tr
+                    %th #{icon('trophy')}
                     %th #{seed}
                     %th Wins
                     %th Ties
                     %th Losses
                     %th Holes Up
                     %th Holes Remaining
-                    %th &nbsp;
                 %tbody
-                - group.seed_winner(seed).each do |player|
+                -# - group.seed_winner(seed).each do |player|
+                - group.seed_winners[seed].each do |player|
                   %tr
+                    %td #{player[:rank]}
                     %td #{player.name}
                     %td #{player.rr_wins}
                     %td #{player.rr_ties}
                     %td #{player.rr_losses}
                     %td #{player.rr_holes_up}
                     %td #{player.rr_holes_remaining}
-                    %td #{icon('question')}
+
 
 :javascript
   $(document).ready(function(){
-    var data = [
-      { label: 'wins', data: 2, color: '#5cb85c' },
-      { label: 'losses', data: 2, color: '#d9534f' },
-      { label: 'ties', data: 2, color: '#5bc0de' },
-    ]
-
-    $.plot('#graph',
-      data, {
-        series: {
-          pie: {
-            show: true,
-            radius: 1,
-            label: {
-              show: true,
-              radius: 2/3,
-              threshold: 0.1,
-            }
-          }
-        },
-        grid: {
-          hoverable: true,
-        },
-        legend: {
-          show: true
-        },
-      }
-    );
+    $('[data-toggle="popover"]').popover({ 'trigger': 'hover', 'html': 'true' });
   });
-

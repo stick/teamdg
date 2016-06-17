@@ -1,8 +1,6 @@
 %ol.breadcrumb
   %li.active #{@event.name.upcase}
 
-=partial(:_event_nav)
-
 - unless @event.scheduled
   %p Finalize the settings for your event, then click 'Start Event' when finished.
 %p.help-block Group names can be edited on the 'Group Assignment' page.

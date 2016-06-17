@@ -14,6 +14,14 @@ unless DB.table_exists? (:players)
     Bignum      :mobile_number
     String      :email_address
     String      :seed, :null => false
+    Integer     :rr_wins
+    Integer     :rr_losses
+    Integer     :rr_ties
+    Integer     :rr_holes_up
+    Integer     :rr_holes_remaining
+    Integer     :elim_wins
+    Integer     :elim_losses
+    Integer     :elim_ties
     foreign_key :team_id, :teams, :on_delete => :cascade, :null => false
     foreign_key :event_id, :events, :one_delete => :cascade, :null => false
     #unique      [:first_name, :last_name, :email_address]
@@ -33,44 +41,24 @@ class Player < Sequel::Model(:players)
     return "#{wins} &mdash; #{losses} &mdash; #{ties}"
   end
 
+  def update_stats
+    self.rr_wins = self.games_dataset.where(completed: true, winner_id: self.id, sudden_death: false).count
+    self.rr_losses = self.games_dataset.where(completed: true, sudden_death: false).exclude(winner_id: self.id).count
+    self.rr_ties = self.games_dataset.where(completed: true, sudden_death: false).exclude(tie: nil).count
+    self.elim_wins = self.games_dataset.where(winner_id: self.id, sudden_death: true).count
+    self.elim_losses = self.games_dataset.where(completed: true, sudden_death: true).exclude(winner_id: self.id).count
+    self.elim_ties = self.games_dataset.where(completed: true, sudden_death: true).exclude(tie: nil).count
+    self.rr_holes_up = self.games_dataset.where(completed: true, winner_id: self.id, sudden_death: false).map(:holes_up).sum
+    self.rr_holes_remaining = self.games_dataset.where(completed: true, winner_id: self.id, sudden_death: false).map(:holes_remaining).sum
+    self.save
+  end
+
   def elim_record
     return "#{self.elim_wins} &mdash; #{self.elim_losses} &mdash; #{self.elim_ties}"
   end
 
-  def elim_wins
-    self.games_dataset.where(winner_id: self.id, sudden_death: true).count
-  end
-
-  def elim_losses
-    self.games_dataset.where(completed: true, sudden_death: true).exclude(winner_id: self.id).count
-  end
-
-  def elim_ties
-    self.games_dataset.where(completed: true, sudden_death: true).exclude(tie: nil).count
-  end
-
   def rr_record
     return "#{self.rr_wins} &mdash; #{self.rr_losses} &mdash; #{self.rr_ties}"
-  end
-
-  def rr_wins
-    self.games_dataset.where(completed: true, winner_id: self.id, sudden_death: false).count
-  end
-
-  def rr_losses
-    self.games_dataset.where(completed: true, sudden_death: false).exclude(winner_id: self.id).count
-  end
-
-  def rr_ties
-    self.games_dataset.where(completed: true, sudden_death: false).exclude(tie: nil).count
-  end
-
-  def rr_holes_up
-    self.games_dataset.where(completed: true, winner_id: self.id, sudden_death: false).map(:holes_up).sum
-  end
-
-  def rr_holes_remaining
-    self.games_dataset.where(completed: true, winner_id: self.id, sudden_death: false).map(:holes_remaining).sum
   end
 
   def validate

@@ -35,34 +35,34 @@
           %a.navbar-brand{ href: url('/') } TeamDG
         %ul.nav.navbar-top-links.navbar-right
           %li.dropdown
-            %a.dropdown-toggle{ data: { toggle: 'dropdown' }, href: '#' } #{icon('user', true)} #{icon('caret-down', true)}
+            %a.dropdown-toggle{ data: { toggle: 'dropdown' }, href: '#' } #{icon('user', fw: true)} #{icon('caret-down', fw: true)}
             %ul.dropdown-menu.dropdown-user
               %li
-                %a{ href: '#' } #{icon('user', true)} User Profile
+                %a{ href: '#' } #{icon('user', fw: true)} User Profile
               %li
-                %a{ href: '#' } #{icon('gear', true)} Settings
+                %a{ href: '#' } #{icon('gear', fw: true)} Settings
               %li.divider
               %li
-                %a{ href: url('/login') } #{icon('sign-out', true)} Settings
+                %a{ href: url('/login') } #{icon('sign-out', fw: true)} Settings
 
         .navbar-default.sidebar{ role: 'navigation' }
           .sidebar-nav.navbar-collapse
             %ul.nav.in#side-menu
               %li
-                %a{ href: url('/dashboard') } #{icon('dashboard', true)} Dashboard
+                %a{ href: url('/dashboard') } #{icon('dashboard', fw: true)} Dashboard
               %li
                 %a{ href: url('/events/') }
-                  #{icon('calendar', true)}
+                  #{icon('calendar', fw: true)}
                   %span Events
                   %span.badge.pull-right #{Event.all.count}
               %li
                 %a{ href: url('/event/new') }
-                  #{icon('plus', true)}
+                  #{icon('plus', fw: true)}
                   %span New Event
               - if request.path_info.include?('/event/')
                 %li
                   %a{ href: '#' }
-                    #{icon('sitemap', true)}
+                    #{icon('sitemap', fw: true)}
                     #{@event.name}
                     %span.fa.arrow
                   %ul.nav.nav-second-level.collapse.in{ 'aria-expanded': 'true' }
@@ -99,8 +99,12 @@
                           %a{ href: url("/event/#{@event.id}/matches/player") }
                             Player Matches
                             %span.pull-right.fa.fa-calendar-o
+                        %li
+                          %a{ href: url("/event/#{@event.id}/matches/games/unreported") }
+                            Unreported Games
+                            %span.pull-right.badge #{@event.rr_incomplete}
                     %li
-                      %a{ href: url("/event/#{@event.id}/standings") } Standings <span class='pull-right'>#{icon('bar-chart', true)}</span>
+                      %a{ href: url("/event/#{@event.id}/standings") } Standings <span class='pull-right'>#{icon('bar-chart', fw: true)}</span>
 
       #page-wrapper{ style: 'min-height: 635px' }
         .row
