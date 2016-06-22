@@ -15,12 +15,14 @@ unless DB.table_exists? (:matches)
     foreign_key :winner_id, :teams, :on_delete => :cascade, :null => true
     # foreign_key :team_a, :teams, :on_delete => :cascade, :null => true
     # foreign_key :team_b, :teams, :on_delete => :cascade, :null => true
-    foreign_key :group_id, :groups, :on_delete => :cascade, :null => false
+    foreign_key :group_id, :groups, :on_delete => :cascade, :null => true
     Integer     :team_a_wins, :default => 0, :null => false
     Integer     :team_a_losses, :default => 0, :null => false
     Integer     :team_a_ties, :default => 0, :null => false
     Integer     :no_decisions, :default => 0, :null => false
     Integer     :day, :default => 6, :null => false
+    TrueClass   :semi, :default => false
+    TrueClass   :final, :default => false
     foreign_key :event_id, :events, :on_delete => :cascade, :null => false
     #unique      [:first_name, :last_name, :email_address]
   end
@@ -137,6 +139,12 @@ class Match < Sequel::Model(:matches)
     else
       false
     end
+  end
+
+  def winner
+    majority = (self.event.roster_size / 2.0).round
+    return self.team_a if self.team_a_wins >= majority
+    return self.team_b if self.team_b_wins >= majority
   end
 
   def when

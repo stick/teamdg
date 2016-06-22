@@ -31,13 +31,13 @@ class App < Sinatra::Base
   configure :development do
     register Sinatra::Reloader
     enable :logging
-    enable :show_exceptions
+    set :show_exceptions, :after_handler
     set :force_ssl, false
   end
 
   configure :test do
     enable :logging
-    enable :show_exceptions
+    set :show_exceptions, :after_handler
     set :force_ssl, false
   end
 
@@ -77,6 +77,13 @@ class App < Sinatra::Base
   def self.get_or_post(url,&block)
     get(url,&block)
     post(url,&block)
+  end
+
+  error Sequel::Error do
+    e = env['sinatra.error']
+    content_type :json
+    status(400)
+    return e.message
   end
 
   error do

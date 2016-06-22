@@ -1,0 +1,36 @@
+%form.form-inline#gameResult{ method: 'post', action: '', role: 'form', data: { toggle: 'validator', disable: 'true' } }
+  .modal.fade#gameWinnerModal{ tabindex: '-1', role: 'dialog' }
+    .modal-dialog.modal-sm
+      .modal-content
+        .modal-header
+          %button.close{ type: 'button', data: { dismiss: 'modal' }, 'aria-label': 'Close' }
+            %span{ 'aria-hidden': 'true' } &times;
+          %h4.modal-title Player Match Winner
+        .modal-body
+          %table.table
+            %thead
+              %tr
+                %th.winning_team
+                %th &nbsp;
+                %th.losing_team
+            %tbody
+              %tr
+                %td.winning_player
+                %td
+                  %em defeats
+                %td.losing_player
+          %input#winnerId{ type: 'hidden', name: 'winner_id', value: '' }
+          %input#gameId{ type: 'hidden', name: 'game_id', value: '' }
+          .form-group
+            %label.control-label.sr-only{ for: 'holesUp' } Holes UP
+            .input-group.input-sm
+              %input.form-control#holesUp{ type: 'number', placeholder: 2, name: 'holes_up', required: true, 'aria-describedby': 'addonUp' }
+              %span.input-group-addon#addonUp Up
+          .form-group
+            %label.control-label.sr-only{ for: 'holesRemaining' } Holes Remaining
+            .input-group.input-sm
+              %input.form-control#holesRemaining{ type: 'number', placeholder: 1, 'aria-describedby': 'remaining', name: 'holes_remaining', required: true }
+              %span.input-group-addon#addonUp Left
+        .modal-footer
+          -# %button.btn.btn-default{ data: { dismiss: 'modal' } } Close
+          %button.btn.btn-primary{ type: 'submit' } Record Game Result

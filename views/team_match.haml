@@ -1,22 +1,23 @@
-%ol.breadcrumb
-  %li
-    %a{ href: url("/event/#{@team.event.id}") } #{@team.event.name.upcase}
-  %li
-    %a{ href: url("/event/#{@team.event.id}/matches/team") } Teams Matches
-  %li.active.dropdown
-    %a.dropdown-toggle{ href: '#', data: { toggle: 'dropdown' }, role: 'button' }
-      #{@team.name}
-      %span.caret
-    %ul.dropdown-menu
-      - @event.teams.each do |team|
-        - unless team == @team
-          %li
-            %a{ href: url("/event/#{@event.id}/matches/team/#{team.id}") } #{team.name}
+- if locals[:hide_breadcrumbs].nil?
+  %ol.breadcrumb
+    %li
+      %a{ href: url("/event/#{@team.event.id}") } #{@team.event.name.upcase}
+    %li
+      %a{ href: url("/event/#{@team.event.id}/matches/team") } Teams Matches
+    %li.active.dropdown
+      %a.dropdown-toggle{ href: '#', data: { toggle: 'dropdown' }, role: 'button' }
+        #{@team.name}
+        %span.caret
+      %ul.dropdown-menu
+        - @event.teams.each do |team|
+          - unless team == @team
+            %li
+              %a{ href: url("/event/#{@event.id}/matches/team/#{team.id}") } #{team.name}
 
 
-%h1 Team #{@team.name} Matches
+%h3 Team #{@team.name} Matches
 
-.col-lg-6
+.col-lg-6.col-xs-10
   .list-group
     - @team.matches.sort{ |x,y| x.id <=> y.id }.each do |match|
       %a.list-group-item{ href: url("/event/#{@event.id}/matches/team/#{@team.id}/match/#{match.id}") }
@@ -26,36 +27,36 @@
           #{match.team_b.name}
         - else
           #{match.team_a.name}
-        %span.badge.text-success #{match.games_dataset.where(completed: true).count} / #{match.games.count}
+        %span.badge{ data: { toggle: 'tooltip', title: 'Reported matches' } } #{match.games_dataset.where(completed: true).count} / #{match.games.count}
 
-.col-lg-3.visible-lg-inline
+.col-lg-3.col-sm-6.col-xs-10
   %h5 Round Robin Wins / Losses / Ties
   .graph#rrgraph{ style: 'width:220px;height:200px' }
-.col-lg-3.visible-lg-inline
+.col-lg-3.col-sm-6.col-xs-10
   %h5 Elimination Wins / Losses / Ties
   .graph#elimgraph{ style: 'width:220px;height:200px' }
 
 .row
-  .col-lg-12.col-md-12
-    %table.table
+  .col-lg-12.col-md-12.col-xs-12.col-sm-12
+    %table.table.table-responsive.table-condensed
       %thead
         %tr
-          %th{ colspan: 9 }
+          %th{ colspan: @team.opponents.count + 1 }
             %h3
               #{@team.name}
               %small #{@team.group}
         %tr
           %th &nbsp;
           - @team.matches.each do |match|
-            %th #{match.desc}
-          %th Semifinals
-          %th Finals
+            %th
+              %span.hidden-xs #{match.desc}
+              %span.hidden-sm.hidden-md.hidden-lg #{match.match_num}
         %tr
           %th &nbsp;
           - @team.opponents.each do |opponent|
-            %th #{opponent.name}
-          %th.semifinals_opp &nbsp;
-          %th.finals_opp &nbsp;
+            %th
+              %span.hidden-xs #{opponent.name}
+              %span.hidden-sm.hidden-md.hidden-lg #{opponent.name.slice(0..1)}
       %tbody
         - @team.players.each do |player|
           %tr
@@ -64,54 +65,58 @@
                 #{player.name}
                 %small #{player.seed}
             - player.games.each do |game|
-              %td.game_cell #{game.result(player.id)}
-            %td.semifinals_game_cell.game_cell &nbsp;
-            %td.semifinals_game_cell.game_cell &nbsp;
+              %td.game_cell
+                %span.hidden-xs #{game.result(player.id)}
+                %span.hidden-sm.hidden-md.hidden-lg #{game.result(player.id, true)}
       %tfoot
         %tr
           %td &nbsp;
           - @team.matches.each do |match|
-            %td #{format_record(match.record(@team))}
-          %td.semifinals_match_record &nbsp;
-          %td.finals_match_record &nbsp;
+            %td #{format_record(match.record(@team), true)}
         %tr
           %td
-            Match Points
+            %span.hidden-xs Match Points
+            %span.hidden-sm.hidden-md.hidden-lg Pts
             %span.badge.pull-right #{@team.points}
           - @team.matches.each do |match|
-            %td #{match.points(@team)}
-          %td.semifinals_match_record &nbsp;
-          %td.finals_match_record &nbsp;
+            - if match.semi or match.final
+              %td &nbsp;
+            - else
+              %td #{match.points(@team)}
         %tr
           %td
-            1<sup>st</sup> Tiebreak
+            %span.hidden-xs 1<sup>st</sup> Tiebreak
+            %span.hidden-sm.hidden-md.hidden-lg 1<sup>st</sup>
             %span.badge.pull-right #{@team.holes_up}
           - @team.matches.each do |match|
-            %td #{match.holes_up(@team)}
-          %td.semifinals_match_record &nbsp;
-          %td.finals_match_record &nbsp;
+            - if match.semi or match.final
+              %td &nbsp;
+            - else
+              %td #{match.holes_up(@team)}
         %tr
           %td
-            2<sup>nd</sup> Tiebreak
+            %span.hidden-xs 2<sup>nd</sup> Tiebreak
+            %span.hidden-sm.hidden-md.hidden-lg 2<sup>nd</sup>
             %span.badge.pull-right #{@team.holes_remaining}
           - @team.matches.each do |match|
-            %td #{match.holes_remaining(@team)}
-          %td.semifinals_match_record &nbsp;
-          %td.finals_match_record &nbsp;
+            - if match.semi or match.final
+              %td &nbsp;
+            - else
+              %td #{match.holes_remaining(@team)}
 
 
 :javascript
   $(document).ready(function(){
     var rrdata = [
-      { label: 'Wins', data: #{@team.rr_wins}, color: '#5cb85c' },
-      { label: 'Losses', data: #{@team.rr_losses}, color: '#d9534f' },
-      { label: 'Ties', data: #{@team.rr_ties}, color: '#777' },
+      { label: 'Wins', data: #{@team.rr_wins.to_i}, color: '#5cb85c' },
+      { label: 'Losses', data: #{@team.rr_losses.to_i}, color: '#d9534f' },
+      { label: 'Ties', data: #{@team.rr_ties.to_i}, color: '#777' },
     ]
 
     var elimdata = [
-      { label: 'Wins', data: #{@team.elim_wins}, color: '#5cb85c' },
-      { label: 'Losses', data: #{@team.elim_losses}, color: '#d9534f' },
-      { label: 'Ties', data: #{@team.elim_ties}, color: '#777' },
+      { label: 'Wins', data: #{@team.elim_wins.to_i}, color: '#5cb85c' },
+      { label: 'Losses', data: #{@team.elim_losses.to_i}, color: '#d9534f' },
+      { label: 'Ties', data: #{@team.elim_ties.to_i}, color: '#777' },
     ]
 
     function labelFormatter(label, series) {

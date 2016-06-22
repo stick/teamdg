@@ -59,52 +59,63 @@
                 %a{ href: url('/event/new') }
                   #{icon('plus', fw: true)}
                   %span New Event
-              - if request.path_info.include?('/event/')
-                %li
-                  %a{ href: '#' }
-                    #{icon('sitemap', fw: true)}
-                    #{@event.name}
-                    %span.fa.arrow
-                  %ul.nav.nav-second-level.collapse.in{ 'aria-expanded': 'true' }
-                    %li
-                      %a{ href: url("/event/#{@event.id}/settings") }
-                        Settings
-                        %span.pull-right.fa.fa-cogs
-                    %li
-                      %a{ href: url("/event/#{@event.id}/team/") }
-                        Teams
-                        %span.pull-right.fa.fa-bus
-                    %li
-                      %a{ href: url("/event/#{@event.id}/rosters") }
-                        Rosters
-                        %span.pull-right.fa.fa-users
-                    %li
-                      %a{ href: '#' }
-                        Round Robin Matches
-                        %span.fa.arrow
-                      %ul.nav.nav-third-level.collapse
-                        %li
-                          %a{ href: url("/event/#{@event.id}/matches/event") }
-                            Event Matches
-                            %span.pull-right.fa.fa-calendar-plus-o
-                        %li
-                          %a{ href: url("/event/#{@event.id}/matches/group") }
-                            Group Matches
-                            %span.pull-right.fa.fa-calendar-minus-o
-                        %li
-                          %a{ href: url("/event/#{@event.id}/matches/team") }
-                            Team Matches
-                            %span.pull-right.fa.fa-calendar-check-o
-                        %li
-                          %a{ href: url("/event/#{@event.id}/matches/player") }
-                            Player Matches
-                            %span.pull-right.fa.fa-calendar-o
-                        %li
-                          %a{ href: url("/event/#{@event.id}/matches/games/unreported") }
-                            Unreported Games
-                            %span.pull-right.badge #{@event.rr_incomplete}
-                    %li
-                      %a{ href: url("/event/#{@event.id}/standings") } Standings <span class='pull-right'>#{icon('bar-chart', fw: true)}</span>
+              - unless @event.nil?
+                - if request.path_info.include?('/event/')
+                  %li
+                    %a{ href: '#' }
+                      #{icon('sitemap', fw: true)}
+                      #{@event.name}
+                      %span.fa.arrow
+                    %ul.nav.nav-second-level.collapse.in{ 'aria-expanded': 'true' }
+                      %li
+                        %a{ href: url("/event/#{@event.id}/settings") }
+                          Settings
+                          %span.pull-right.fa.fa-cogs
+                      %li
+                        %a{ href: url("/event/#{@event.id}/team/") }
+                          Teams
+                          %span.pull-right.fa.fa-bus
+                      %li
+                        %a{ href: url("/event/#{@event.id}/rosters") }
+                          Rosters
+                          %span.pull-right.fa.fa-users
+                      %li
+                        %a{ href: '#' }
+                          Round Robin Matches
+                          %span.fa.arrow
+                        %ul.nav.nav-third-level.collapse
+                          %li
+                            %a{ href: url("/event/#{@event.id}/matches/event") }
+                              Event Matches
+                              %span.pull-right.fa.fa-calendar-plus-o
+                          %li
+                            %a{ href: url("/event/#{@event.id}/matches/group") }
+                              Group Matches
+                              %span.fa-stack.fa-sm.pull-right
+                                #{icon('calendar-o', size: 'stack-2x', fw: true)}
+                                #{icon('users', size: 'stack-1x', ex_classes: 'inside_calendar', fw: true)}
+                          %li
+                            %a{ href: url("/event/#{@event.id}/matches/team") }
+                              Team Matches
+                              %span.fa-stack.fa-sm.pull-right
+                                #{icon('calendar-o', size: 'stack-2x', fw: true)}
+                                #{icon('bus', size: 'stack-1x', ex_classes: 'inside_calendar', fw: true)}
+                          %li
+                            %a{ href: url("/event/#{@event.id}/matches/player") }
+                              Player Matches
+                              %span.fa-stack.fa-sm.pull-right
+                                #{icon('calendar-o', size: 'stack-2x', fw: true)}
+                                #{icon('user', size: 'stack-1x', ex_classes: 'inside_calendar', fw: true)}
+                          %li
+                            %a{ href: url("/event/#{@event.id}/matches/games/unreported") }
+                              Unreported Games
+                              %span.pull-right.badge #{@event.rr_incomplete}
+                      %li
+                        %a{ href: url("/event/#{@event.id}/standings") } Standings #{icon('bar-chart', ex_classes: 'pull-right', fw: true)}
+                      %li
+                        %a{ href: url("/event/#{@event.id}/semifinals") } Semifinals #{icon('institution', fw: true, ex_classes: 'pull-right')}
+                      %li
+                        %a{ href: url("/event/#{@event.id}/finals") } Finals #{icon('trophy', ex_classes: 'pull-right', fw: true)}
 
       #page-wrapper{ style: 'min-height: 635px' }
         .row
@@ -122,3 +133,5 @@
     %script{ src: '/bower_components/metisMenu/dist/metisMenu.min.js' }
     %script{ src: '/bower_components/bootstrap-list-filter/bootstrap-list-filter.min.js' }
 
+:javascript
+  $('[data-toggle="tooltip"]').tooltip();

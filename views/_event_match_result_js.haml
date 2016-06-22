@@ -1,0 +1,59 @@
+:javascript
+  $('body').on('click', 'a.disabled', function(event) { event.preventDefault(); });
+  $(document).ready(function(){
+    $('.reset_match').click(function(e) {
+      window.location.href = this.dataset.href
+    });
+
+    $('.game_winner').click(function(e) {
+      $('#gameResult').attr('action', "/event/#{@event.id}/game/" + this.dataset.gameId);
+      // $('#gameResult').validator();
+      if (e.altKey) {
+        console.log('record match winner with no details');
+        $.post("/event/#{@event.id}/game/" + this.dataset.gameId,
+        {
+          'winner_id': this.dataset.winner,
+          'game_id': this.dataset.gameId,
+          'holes_up': 0,
+          'hole_remaining': 0,
+        }, function(data) {
+          window.location.href = window.location.href;
+        });
+      } else {
+        console.log('no alt key - show modal');
+        $('#gameWinnerModal').modal('show');
+      }
+
+      $('input#gameId').val(this.dataset.gameId);
+      var completed = this.dataset.gameCompleted;
+      if (typeof completed === "undefined") {
+        //
+      } else {
+        if (this.dataset.gameTie == 1) {
+          //
+        } else {
+          $('input#holesUp').val(this.dataset.gameHolesUp);
+          $('input#holesRemaining').val(this.dataset.gameHolesRemaining);
+        }
+      }
+      if (this.dataset.winner == this.dataset.playerAId) {
+        $('.winning_player').html(this.dataset.playerAName);
+        $('.winning_team').html(this.dataset.teamAName);
+        $('input#winnerId').val(this.dataset.playerAId);
+        $('.losing_player').html(this.dataset.playerBName);
+        $('.losing_team').html(this.dataset.teamBName);
+      } else if (this.dataset.winner == this.dataset.playerBId) {
+        $('.winning_player').html(this.dataset.playerBName);
+        $('.winning_team').html(this.dataset.teamBName);
+        $('input#winnerId').val(this.dataset.playerBId);
+        $('.losing_player').html(this.dataset.playerAName);
+        $('.losing_team').html(this.dataset.teamAName);
+      } else {
+        console.log('winner does not match id');
+        $('span.winner').html('PROBLEM!!');
+        $('span.loser').html('PROBLEM!!');
+      }
+    });
+
+    $('[data-toggle="tooltip"]').tooltip();
+  });

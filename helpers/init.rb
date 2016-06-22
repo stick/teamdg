@@ -10,13 +10,14 @@ def vs
   "<small><em>vs</em></small>"
 end
 
-def icon(name='empire', fw: false, size: nil, ex_classes: [], id: nil)
+def icon(name='empire', fw: false, size: nil, ex_classes: [], id: nil, tooltip: nil)
   classes = [ 'fa', "fa-#{name}" ]
   classes.push('fa-fw') if fw
   classes.push("fa-#{size}") if size
   classes.push(ex_classes) unless ex_classes.empty?
   element_id = "id='#{id}' " if id
-  "<i #{element_id}class='#{classes.flatten.join(' ')}'></i>"
+  tooltip_attr = "data-toggle='tooltip' data-title='#{tooltip}' " if tooltip
+  "<i #{tooltip_attr}#{element_id}class='#{classes.flatten.join(' ')}'></i>"
 end
 
 def result_list_class(game, player)
@@ -35,9 +36,13 @@ def result(game, player)
   end
 end
 
-def format_record(record)
+def format_record(record, tiny=nil)
   # [ wins, losses, ties ]
-  record.join(' &mdash; ')
+  if tiny
+    record.join('/')
+  else
+    record.join(' &mdash; ')
+  end
 end
 
 def ordinalize(i)

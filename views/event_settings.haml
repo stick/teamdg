@@ -37,6 +37,17 @@
     %label.col-sm-2.control-label{ for: "group_advance" } Teams advancing from group stage:
     .col-sm-2
       %input.form-control#group_advance{ placeholder: '2', type: 'number', name: "group_advance", value: @event.group_advance }
+  .form-group
+    %label.col-sm-2.control-label{ for: "event_url" } Event URL
+    .col-sm-4
+      .form-group#urlFormGroup
+        .input-group
+          %span.input-group-addon #{url("/")}
+          %input.form-control#event_url{ placeholder: 'mycoolevent', type: 'text', name: "event_url", 'aria-describedby': 'event_url_addon', value: @event.url.nil? ? false : @event.url }
+          .input-group-btn
+            %button.random_url.btn.btn-primary#event_url_addon{ type: 'button', data: { toggle: 'tooltip', title: 'Generate random url' } } &nbsp;#{icon('random')}&nbsp;
+        %span.help-block#urlHelpBlock
+
 
 - unless @event.scheduled
   %a.btn.btn-success.disabled#startEvent{ href: url("/event/#{@event.id}/start"), disabled: true } Start Event
@@ -49,6 +60,35 @@
     if ($('input#groupsAssigned').val() == 'true') {
       $('#startEvent').removeClass('disabled').attr('disabled', false);
     }
+
+    $('.random_url').click(function(e) {
+      $('input#event_url').val(Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5));
+      $.post("/event/#{@event.id}/update", {
+        update: 'url',
+        value: $('input#event_url').val()
+      })
+        .success(function() {
+          $('#urlFormGroup').addClass('has-success');
+        })
+        .fail(function(e) {
+          $('#urlFormGroup').addClass('has-error');
+          $('#urlHelpBlock').html(e.responseText).addClass('has-error');
+        })
+    });
+
+    $('input#event_url').change(function(e) {
+      $.post("/event/#{@event.id}/update", {
+        update: 'url',
+        value: $(this).val()
+      })
+        .success(function() {
+          $('#urlFormGroup').addClass('has-success');
+        })
+        .fail(function(e) {
+          $('#urlFormGroup').addClass('has-error');
+          $('#urlHelpBlock').html(e.responseText).addClass('has-error');
+        })
+    });
 
     $('.matchpoints').change(function(e) {
       $.post("/event/#{@event.id}/update", { update: 'matchpoints', value: $(this).val() });

@@ -19,3 +19,23 @@ td.versus, th.versus {
 td.game_cell, th.game_cell {
   vertical-align: middle !important;
 }
+
+.header_icon {
+  font-size: 0.4em;
+}
+
+.inside_calendar {
+  margin-top: 0.3em;
+}
+
+.fa-sm {
+  font-size: 0.5em;
+}
+
+.fa-xs {
+  font-size: 0.3em;
+}
+
+.game_cell {
+  max-width: 100px;
+}

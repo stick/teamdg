@@ -21,7 +21,7 @@ unless DB.table_exists? (:events)
     Integer     :matchpoints, :null => false, :default => 3
     Integer     :cycles, :default => 2
     Integer     :tiepoints, :null => false, :default => 1
-    String      :url
+    String      :url, :unique => true
     TrueClass   :scheduled, :default => false
     String      :semis, :null => false, :default => 'xgrouppoints'
     Date        :startdate
@@ -42,14 +42,15 @@ class Event < Sequel::Model(:events)
   def validate
     super
     validates_presence [:name]
+    validates_unique [:url]
   end
 
   def rr_matches_completed
-    (self.games_dataset.where(completed: true).count.to_f / self.games.count.to_f * 100.0).round
+    (self.games_dataset.where(completed: true, sudden_death: false).count.to_f / self.games.count.to_f * 100.0).to_i
   end
 
   def rr_incomplete
-    self.games_dataset.where(completed: false).count
+    self.games_dataset.where(completed: false, sudden_death: false).count
   end
 
   def matches_by_order
@@ -60,6 +61,20 @@ class Event < Sequel::Model(:events)
 
   def matches_by_team
     # output matches by teams
+  end
+
+  def semi_matches
+    self.matches_dataset.where(semi: true)
+  end
+
+  def semi_games
+  end
+
+  def final_matches
+    self.matches_dataset.where(final: true)
+  end
+
+  def final_games
   end
 
   def after_create

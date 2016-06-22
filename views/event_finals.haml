@@ -1,0 +1,14 @@
+%h1
+  #{@event.name} Finals
+  %a{ href: url("/event/#{@event.id}/finals/delete") }
+    #{icon('trash', ex_classes: [ 'header_icon', 'text-danger', 'clickable' ], tooltip: 'Delete Final Matches')}
+
+- if @event.final_matches.count > 0
+  = partial(:event_match, locals: { hide_breadcrumbs: true })
+  = partial(:_event_match_result_modal)
+  = partial(:_event_match_result_js)
+- else
+  %h3
+    No final matches available
+    %small Have the semifinal matches been decided?
+

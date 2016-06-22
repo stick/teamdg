@@ -44,6 +44,14 @@ class Group < Sequel::Model(:groups)
     sw2
   end
 
+  def winner
+    self.teams_dataset.order(Sequel.expr(:points).desc, Sequel.expr(:holes_up), Sequel.expr(:holes_remaining)).to_a[0]
+  end
+
+  def runnerup
+    self.teams_dataset.order(Sequel.expr(:points).desc, Sequel.expr(:holes_up), Sequel.expr(:holes_remaining)).to_a[1]
+  end
+
   def size
     self.teams.size
   end

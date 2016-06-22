@@ -15,6 +15,8 @@ unless DB.table_exists? (:teams)
     Bignum      :mobile_number
     String      :email_address
     Integer     :points
+    Integer     :holes_up
+    Integer     :holes_remaining
     Integer     :rr_wins
     Integer     :rr_losses
     Integer     :rr_ties
@@ -69,14 +71,6 @@ class Team < Sequel::Model(:teams)
     Group[group.id].add_team(self)
   end
 
-  def holes_up
-    self.games_dataset.where(winner_id: self.players_dataset.map(:id), completed: true, sudden_death: false).map(:holes_up).sum
-  end
-
-  def holes_remaining
-    self.games_dataset.where(winner_id: self.players_dataset.map(:id), completed: true, sudden_death: false).map(:holes_remaining).sum
-  end
-
   def after_create
     super
     i = 1
@@ -97,6 +91,8 @@ class Team < Sequel::Model(:teams)
     self.elim_losses = self.games_dataset.where(completed: true, sudden_death: true).exclude(winner_id: self.players_dataset.map(:id)).count
     self.elim_ties = self.games_dataset.where(completed: true, sudden_death: true).exclude(tie: nil).count
     self.points = (rr_wins * self.event.matchpoints ) + (rr_ties * self.event.tiepoints)
+    self.holes_up = self.games_dataset.where(winner_id: self.players_dataset.map(:id), completed: true, sudden_death: false).map(:holes_up).sum
+    self.holes_remaining = self.games_dataset.where(winner_id: self.players_dataset.map(:id), completed: true, sudden_death: false).map(:holes_remaining).sum
     self.save
   end
 

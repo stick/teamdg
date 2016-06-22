@@ -60,13 +60,17 @@ class Game < Sequel::Model(:games)
     self.players.last
   end
 
-  def result(id)
+  def result(id, tiny=nil)
     if self.completed
-      return '<span class="label label-default col-sm-12">Tied</span>' unless self.tie.nil?
-      return "<span class='label label-success col-sm-12'>W #{self.holes_up} &amp; #{self.holes_remaining}</span>" if id == self.winner_id
-      return "<span class='label label-danger col-sm-12'>L #{self.holes_up} &amp; #{self.holes_remaining}</span>" if id != self.winner_id
-      # return '<i class="fa fa-trophy text-success"></i>' if id == self.winner
-      # return '<i class="fa fa-trophy fa-flip-vertical text-danger"></i>' if id != self.winner
+      if tiny
+        return '<span class="label label-default col-sm-12">T</span>' unless self.tie.nil?
+        return "<span class='label label-success col-sm-12'>W" if id == self.winner_id
+        return "<span class='label label-danger col-sm-12'>L" if id != self.winner_id
+      else
+        return '<span class="label label-default col-sm-12">Tied</span>' unless self.tie.nil?
+        return "<span class='label label-success col-sm-12'>W #{self.holes_up} &amp; #{self.holes_remaining}</span>" if id == self.winner_id
+        return "<span class='label label-danger col-sm-12'>L #{self.holes_up} &amp; #{self.holes_remaining}</span>" if id != self.winner_id
+      end
     end
     ''
   end
@@ -77,6 +81,9 @@ class Game < Sequel::Model(:games)
     self.match.team_a_losses = self.match.games_dataset.where(winner_id: self.match.team_b.players_dataset.map(:id)).count
     self.match.team_a_ties = self.match.games_dataset.where(completed: true).exclude(tie: nil).count
     self.match.no_decisions = self.match.games_dataset.where(completed: nil).count
+    if self.match.decided
+      self.match.winner_id = self.match.winner.id
+    end
     self.match.save
 
     self.players.each do |p|

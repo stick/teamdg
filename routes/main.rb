@@ -99,10 +99,7 @@ class App < Sinatra::Base
         match.add_team(@event.teams_dataset.where(name: g.team_a.to_s).first)
         match.add_team(@event.teams_dataset.where(name: g.team_b.to_s).first)
         @event.team_seeds.each do |seed|
-          game = match.add_game(
-            seed: seed,
-            event_id: @event.id,
-          )
+          game = match.add_game( seed: seed, event_id: @event.id,)
           game.add_team(@event.teams_dataset.where(name: g.team_a.to_s).first)
           game.add_team(@event.teams_dataset.where(name: g.team_b.to_s).first)
           game.add_player(@event.teams_dataset.where(name: g.team_a.to_s).first.seed(seed))
@@ -177,11 +174,18 @@ class App < Sinatra::Base
   post '/event/:event_id/game/:game_id/?' do
     pp params
     game = Game[params[:game_id]]
-    game.winner_id = params[:winner_id].to_i
-    game.holes_up = params[:holes_up].to_i
-    game.holes_remaining = params[:holes_remaining].to_i
+    if params[:winner_id] == 'tie'
+      game.tie = 1
+      game.winner_id = nil
+      game.holes_up = 0
+      game.holes_remaining = 0
+    else
+      game.winner_id = params[:winner_id].to_i
+      game.holes_up = params[:holes_up].to_i
+      game.holes_remaining = params[:holes_remaining].to_i
+      game.tie = nil
+    end
     game.completed = true
-    game.tie = nil
     game.save
     redirect back
   end
@@ -308,6 +312,21 @@ class App < Sinatra::Base
     end
   end
 
+  get '/:event_slug/team/:team_name/?' do
+    @event = Event[url: CGI::unescape(params[:event_slug])]
+    @team = @event.teams_dataset.where(name: CGI::unescape(params[:team_name])).first
+    pp @team
+    pp @event
+    @public = true
+    haml :team_match, layout: :layout_no_sidebar, locals: { hide_breadcrumbs: true }
+  end
+
+  get '/:event_slug/?' do
+    @event = Event[url: CGI::unescape(params[:event_slug])]
+    @public = true
+    haml :event_standings, locals: { hide_breadcrumbs: true }, layout: :layout_no_sidebar
+  end
+
   get '/event/:event_id/rosters/?' do
     @event = Event[params[:event_id]]
     haml :rosters
@@ -349,5 +368,69 @@ class App < Sinatra::Base
     @event = Event[params[:event_id]]
     haml :games_unreported
   end
+
+  get '/event/:event_id/semifinals/?' do
+    @event = Event[params[:event_id]]
+
+    if @event.semi_matches.count < 1 and @event.rr_matches_completed >= 100
+      match_num = @event.matches_dataset.max(:match_num) + 1
+      m1 = @event.add_match(match_num: match_num, desc: 'Semifinals Match 1', semi: true, day: 0)
+      m2 = @event.add_match(match_num: match_num, desc: 'Semifinals Match 2', semi: true, day: 0)
+      m1.add_team(@event.groups.first.winner)
+      m1.add_team(@event.groups.last.runnerup)
+      m2.add_team(@event.groups.last.winner)
+      m2.add_team(@event.groups.first.runnerup)
+      @event.team_seeds.each do |seed|
+        pp "creating game for match 1 - seed #{seed}"
+        g1 = m1.add_game( seed: seed, event_id: @event.id, sudden_death: true)
+        g1.add_team(@event.groups.first.winner)
+        g1.add_team(@event.groups.last.runnerup)
+        g1.add_player(@event.groups.first.winner.seed(seed))
+        g1.add_player(@event.groups.last.runnerup.seed(seed))
+
+        pp "creating game for match 2 - seed #{seed}"
+        g2 = m2.add_game( seed: seed, event_id: @event.id, sudden_death: true)
+        g2.add_team(@event.groups.last.winner)
+        g2.add_team(@event.groups.first.runnerup)
+        g2.add_player(@event.groups.last.winner.seed(seed))
+        g2.add_player(@event.groups.first.runnerup.seed(seed))
+      end
+    end
+
+    haml :event_semifinals
+  end
+
+  get '/event/:event_id/semifinals/delete/?' do
+    @event = Event[params[:event_id]]
+    @event.semi_matches.each { |m| m.destroy }
+    redirect to("/event/#{@event.id}/standings")
+  end
+
+  get '/event/:event_id/finals/?' do
+    @event = Event[params[:event_id]]
+    if @event.final_matches.count > 0
+      @match = @event.final_matches.first
+    else
+      if @event.semi_matches.map(:winner_id).compact.size == 2
+        match_num = @event.matches_dataset.max(:match_num) + 1
+        @match = @event.add_match(match_num: match_num, desc: 'Finals', final: true, day: 0)
+        # add the semi winners to the final match
+        @event.semi_matches.each { |m| @match.add_team(m.winner) }
+        @event.team_seeds.each do |seed|
+          game = @match.add_game(seed: seed, event_id: @event.id, sudden_death: true)
+          @event.semi_matches.each { |m| game.add_team(m.winner) }
+          @event.semi_matches.each { |m| game.add_player(m.winner.seed(seed)) }
+        end
+      end
+    end
+    haml :event_finals
+  end
+
+  get '/event/:event_id/finals/delete/?' do
+    @event = Event[params[:event_id]]
+    @event.final_matches.each { |m| m.destroy }
+    redirect to("/event/#{@event.id}/semifinals")
+  end
+
 
 end

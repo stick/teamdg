@@ -1,0 +1,39 @@
+%h1
+  #{@event.name} Semi-finals
+  %a{ href: url("/event/#{@event.id}/semifinals/delete") }
+    #{icon('trash', ex_classes: [ 'header_icon', 'text-danger', 'clickable' ], tooltip: 'Delete Semifinal Matches')}
+
+- if @event.semi_matches.count > 0
+  %ul.nav.nav-tabs{ role: 'tablist' }
+    - @event.semi_matches.each_with_index do |match, i|
+      %li{ role: 'presentation', class: i < 1 ? 'active' : '' }
+        - match_small_name = match.desc.split(' ').join('')
+        %a{ role: 'tab', data: { toggle: 'tab' }, href: "##{match_small_name}", 'aria-controls': match_small_name } #{match.desc}
+
+  .tab-content
+    - @event.semi_matches.each_with_index do |match, i|
+      - match_small_name = match.desc.split(' ').join('')
+      .tab-pane{ id: match_small_name,  role: 'tabpanel', class: i < 1 ? 'active' : '' }
+        - @match = match
+        =partial(:event_match, locals: { hide_breadcrumbs: true})
+
+  = partial(:_event_match_result_modal)
+  = partial(:_event_match_result_js)
+
+  :javascript
+    $(document).ready(function(){
+      // Javascript to enable link to tab
+      var url = document.location.toString();
+      if (url.match('#')) {
+        $('.nav-tabs a[href="#' + url.split('#')[1] + '"]').tab('show');
+      } 
+
+      // Change hash for page-reload
+      $('.nav-tabs a').on('shown.bs.tab', function (e) {
+        window.location.hash = e.target.hash;
+      });
+    });
+- else
+  %h3
+    No Semifinal maches available
+    %small Has the group stage completed yet?

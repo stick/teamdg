@@ -1,37 +1,49 @@
-%ol.breadcrumb
-  %li
-    %a{ href: url("/event/#{@event.id}") } #{@event.name.upcase}
-  %li
-    %a{ href: url(request.path_info.split('/')[0,5].join('/')) } Matches
-  - unless request.referrer.nil?
-    - if request.referrer.include?('matches/team')
-      - @team = Team[params[:team_id]]
-      %li.active.dropdown
-        %a.dropdown-toggle{ href: '#', data: { toggle: 'dropdown' }, role: 'button' }
-          #{@team.name}
-          %span.caret
-        %ul.dropdown-menu
-          - @event.teams.each do |team|
-            - unless team == @team
-              %li
-                %a{ href: url("/event/#{@event.id}/matches/team/#{team.id}/match/#{team.matches_dataset.where(match_num: @match.match_num).first.id}") } #{team.name}
-      %li.active.dropdown
-        %a.dropdown-toggle{ href: '#', data: { toggle: 'dropdown' }, role: 'button' }
-          #{@match.desc}
-          %span.caret
-        %ul.dropdown-menu
-          - @team.matches.each do |m|
-            - unless m == @match
-              %li
-                %a{ href: url("/event/#{@event.id}/matches/team/#{@team.id}/match/#{m.id}") } #{m.desc}
-  %li.active #{@match.team_a.name} #{vs} #{@match.team_b.name}
+- rr_matches = ((@event.num_teams / @event.group_number) - 1) * @event.cycles
+- pp rr_matches
+- pp @match.match_num
+- if locals[:hide_breadcrumbs].nil?
+  %ol.breadcrumb
+    %li
+      %a{ href: url("/event/#{@event.id}") } #{@event.name.upcase}
+    %li
+      %a{ href: url(request.path_info.split('/')[0,5].join('/')) } Matches
+    - unless request.referrer.nil?
+      - if request.referrer.include?('matches/team')
+        - @team = Team[params[:team_id]]
+        %li.active.dropdown
+          %a.dropdown-toggle{ href: '#', data: { toggle: 'dropdown' }, role: 'button' }
+            #{@team.name}
+            %span.caret
+          %ul.dropdown-menu
+            - @event.matches_dataset.where(match_num: @match.match_num).each do |match|
+              - match.teams.each do |team|
+                - unless team == @team
+                  %li
+                    %a{ href: url("/event/#{@event.id}/matches/team/#{team.id}/match/#{match.id}") } #{team.name}
+        - if @match.match_num > rr_matches
+          %li.active #{@match.desc}
+        - else
+          %li.active.dropdown
+            %a.dropdown-toggle{ href: '#', data: { toggle: 'dropdown' }, role: 'button' }
+              #{@match.desc}
+              %span.caret
+            %ul.dropdown-menu
+              - @team.matches_dataset.where(semi: false, final: false).each do |m|
+                - unless m == @match
+                  %li
+                    %a{ href: url("/event/#{@event.id}/matches/team/#{@team.id}/match/#{m.id}") } #{m.desc}
+    %li.active #{@match.team_a.name} #{vs} #{@match.team_b.name}
 
 %h3
   Match #{@match.match_num}
-  %small #{@match.group.name}
+  - if @match.group.nil?
+    %small #{@match.desc}
+  - else
+    %small #{@match.group.name}
 %h4
-  #{@match.when}
-  &mdash;
+  - unless @match.group.nil?
+    #{@match.when}
+    &mdash;
   #{@match.showdown}
 
 %table.table.table-hover
@@ -40,12 +52,19 @@
       %th &nbsp;
       %th &nbsp;
       %th{ colspan: 2 }
-        Team #{@match.team_a.name} &mdash; #{@match.team_a_points.to_i} pts
+        Team #{@match.team_a.name}
+        - if @match.group.nil?
+          - if @match.decided
+            %span.text-success #{icon('trophy')}
+        - else @match.group.nil?
+          &mdash; #{@match.team_a_points.to_i} pts
         - if params[:debug]
           [ #{@match.team_a.id} ]
       %th.versus #{vs}
       %th{ colspan: 2 }
-        Team #{@match.team_b.name} &mdash; #{@match.team_b_points.to_i} pts
+        Team #{@match.team_b.name}
+        - unless @match.group.nil?
+          &mdash; #{@match.team_b_points.to_i} pts
         - if params[:debug]
           [ #{@match.team_b.id} ]
   %tbody
@@ -75,11 +94,9 @@
                 player_b: game.player_b.to_hash,
                 winner: game.player_a.id,
                 team_a: game.player_a.team.to_hash,
-                team_b: game.player_b.team.to_hash,
-                toggle: 'modal',
-                target: '#gameWinnerModal' } }
+                team_b: game.player_b.team.to_hash } }
               #{icon('gavel', fw: true)}
-            %a.game_tie.btn.btn-default{ type: 'button', href: url("/event/#{@event.id}/game/#{game.id}/tie") }
+            %a.game_tie.btn.btn-default{ type: 'button', href: url("/event/#{@event.id}/game/#{game.id}/tie"), class: game.sudden_death ? 'disabled' : '' }
               #{icon('balance-scale', fw: true)}
             %button.game_winner.btn.btn-default{ type: 'button',
               data: { match_id: @match.id,
@@ -90,9 +107,7 @@
                 player_b: game.player_b.to_hash,
                 winner: game.player_b.id,
                 team_a: game.player_a.team.to_hash,
-                team_b: game.player_b.team.to_hash,
-                toggle: 'modal',
-                target: '#gameWinnerModal' } }
+                team_b: game.player_b.team.to_hash } }
               #{icon('gavel', fw: true, ex_classes: 'fa-flip-horizontal')}
         %td
           #{game.player_b.name}
@@ -108,93 +123,8 @@
       %th &nbsp;
       %td{ colspan: 2} #{@match.team_b_wins} &mdash; #{@match.team_b_losses} &mdash; #{@match.team_b_ties}
 
-%form.form-inline#gameResult{ method: 'post', action: '', role: 'form', data: { toggle: 'validator', disable: true } }
-  .modal.fade#gameWinnerModal{ tabindex: '-1', role: 'dialog' }
-    .modal-dialog.modal-sm
-      .modal-content
-        .modal-header
-          %button.close{ type: 'button', data: { dismiss: 'modal' }, 'aria-label': 'Close' }
-            %span{ 'aria-hidden': 'true' } &times;
-          %h4.modal-title Player Match Winner
-        .modal-body
-          %table.table
-            %thead
-              %tr
-                %th.winning_team
-                %th &nbsp;
-                %th.losing_team
-            %tbody
-              %tr
-                %td.winning_player
-                %td
-                  %em defeats
-                %td.losing_player
-          %input#winnerId{ type: 'hidden', name: 'winner_id', value: '' }
-          %input#gameId{ type: 'hidden', name: 'game_id', value: '' }
-          .form-group
-            %label.control-label.sr-only{ for: 'holesUp' } Holes UP
-            .input-group.input-sm
-              %input.form-control#holesUp{ type: 'number', placeholder: 2, name: 'holes_up', required: true, 'aria-describedby': 'addonUp' }
-              %span.input-group-addon#addonUp Up
-          .form-group
-            %label.control-label.sr-only{ for: 'holesRemaining' } Holes Remaining
-            .input-group.input-sm
-              %input.form-control#holesRemaining{ type: 'number', placeholder: 1, 'aria-describedby': 'remaining', name: 'holes_remaining', required: true }
-              %span.input-group-addon#addonUp Left
-        .modal-footer
-          -# %button.btn.btn-default{ data: { dismiss: 'modal' } } Close
-          %button.btn.btn-primary{ type: 'submit' } Record Game Result
+- if locals.empty?
+  = partial(:_event_match_result_modal)
+  = partial(:_event_match_result_js)
 
-%pre= @match.inspect
 
--# %script{ src: url('/bower_components/jquery-validation/dist/jquery.validate.min.js') }
-
-:javascript
-  $(document).ready(function(){
-    $('form#gameResult').submit(function(e) {
-      // e.preventDefault();
-      // $.post($(this).attr('action'), $(this).serialize())
-
-    });
-
-    $('.reset_match').click(function(e) {
-      window.location.href = this.dataset.href
-    });
-
-    $('.game_winner').click(function(e) {
-      $('#gameResult').attr('action', "/event/#{@event.id}/game/" + this.dataset.gameId);
-      // $('#gameResult').validator();
-      console.log(this.dataset);
-      $('input#gameId').val(this.dataset.gameId);
-      var completed = this.dataset.gameCompleted;
-      if (typeof completed === "undefined") {
-        //
-      } else {
-        if (this.dataset.gameTie == 1) {
-          //
-        } else {
-          $('input#holesUp').val(this.dataset.gameHolesUp);
-          $('input#holesRemaining').val(this.dataset.gameHolesRemaining);
-        }
-      }
-      if (this.dataset.winner == this.dataset.playerAId) {
-        $('.winning_player').html(this.dataset.playerAName);
-        $('.winning_team').html(this.dataset.teamAName);
-        $('input#winnerId').val(this.dataset.playerAId);
-        $('.losing_player').html(this.dataset.playerBName);
-        $('.losing_team').html(this.dataset.teamBName);
-      } else if (this.dataset.winner == this.dataset.playerBId) {
-        $('.winning_player').html(this.dataset.playerBName);
-        $('.winning_team').html(this.dataset.teamBName);
-        $('input#winnerId').val(this.dataset.playerBId);
-        $('.losing_player').html(this.dataset.playerAName);
-        $('.losing_team').html(this.dataset.teamAName);
-      } else {
-        console.log('winner does not match id');
-        $('span.winner').html('PROBLEM!!');
-        $('span.loser').html('PROBLEM!!');
-      }
-    });
-
-    $('[data-toggle="tooltip"]').tooltip();
-  });
