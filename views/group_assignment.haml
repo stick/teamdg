@@ -3,8 +3,6 @@
     %a{ href: url("/event/#{@event.id}") } #{@event.name.upcase}
   %li.active Groups
 
-= partial(:_event_nav)
-
 .row
   %h6 Assign each team to a group.
   .col-lg-4
@@ -48,62 +46,60 @@
 
 :javascript
   $(function () {
-    $('[data-toggle="tooltip"]').tooltip();
-  });
-
-  var drake = dragula(
-    {
-      isContainer: function(el) {
-        return el.classList.contains('teamlist');
-      }
-    }
-    ).on('drop', function(el, target, source, sibling) {
-      if (target == source) { return; }
-      // hide the placeholder element
-      $(target).children('.holder').hide();
-
-      // save each team when dropped
-      $.post('/team/' + el.dataset.id + '/update', { teamname: el.dataset.name, group_name: target.dataset.name, group_id: target.dataset.id });
-
-      var target_badge = Number($('#groupsize_' + target.dataset.id).html()) + 1;
-      var source_badge = Number($('#groupsize_' + source.dataset.id).html()) - 1;
-      $('#groupsize_' + target.dataset.id).html(target_badge);
-      $('#groupsize_' + source.dataset.id).html(source_badge);
-
-      // remove warning icon when lists are equal and available is empty
-      if ( $('#available_teams li').length < 1 ) {
-        if ( $('#group_1 li').length == $('#group_2 li').length ) {
-          $('.fa-exclamation').hide();
-          $('.fa-ban').hide();
+    var drake = dragula(
+      {
+        isContainer: function(el) {
+          return el.classList.contains('teamlist');
         }
       }
-    });
+      ).on('drop', function(el, target, source, sibling) {
+        if (target == source) { return; }
+        // hide the placeholder element
+        $(target).children('.holder').hide();
 
-    $('span.change_group_name').click(function(e) {
-      console.log(this);
-      $(this).addClass('hidden');
-      var input = $("#inputgroup_" + this.dataset.id)
-      input.removeClass('hidden').focus();
-      console.log('done click');
-    });
+        // save each team when dropped
+        $.post('/team/' + el.dataset.id + '/update', { teamname: el.dataset.name, group_name: target.dataset.name, group_id: target.dataset.id });
 
-    $('input.change_group_name').change(function(e) {
-      console.log('something changed', e);
-      console.log('this: ', this);
-      console.log('text: ', $(this).val());
-      var new_name = $(this).val();
-      // change name
-      var span = $('#spangroup_' + this.dataset.id)
-      span.html("<strong>" + new_name + "</strong>\n<small><i class='fa fa-pencil-square-o'></i></small>");
-      $.post("/group/" + this.dataset.id + "/update", { group_name: new_name });
-      span.removeClass('hidden');
-      $(this).addClass('hidden');
-    });
+        var target_badge = Number($('#groupsize_' + target.dataset.id).html()) + 1;
+        var source_badge = Number($('#groupsize_' + source.dataset.id).html()) - 1;
+        $('#groupsize_' + target.dataset.id).html(target_badge);
+        $('#groupsize_' + source.dataset.id).html(source_badge);
 
-    $('#assign_teams_shuffle').click(function(e) {
-      console.log('shuffle teams and assign');
-    });
+        // remove warning icon when lists are equal and available is empty
+        if ( $('#available_teams li').length < 1 ) {
+          if ( $('#group_1 li').length == $('#group_2 li').length ) {
+            $('.fa-exclamation').hide();
+            $('.fa-ban').hide();
+          }
+        }
+      });
 
-    $('#assign_teams_ordered').click(function(e) {
-      console.log('assign teams in order');
-    });
+      $('span.change_group_name').click(function(e) {
+        console.log(this);
+        $(this).addClass('hidden');
+        var input = $("#inputgroup_" + this.dataset.id)
+        input.removeClass('hidden').focus();
+        console.log('done click');
+      });
+
+      $('input.change_group_name').change(function(e) {
+        console.log('something changed', e);
+        console.log('this: ', this);
+        console.log('text: ', $(this).val());
+        var new_name = $(this).val();
+        // change name
+        var span = $('#spangroup_' + this.dataset.id)
+        span.html("<strong>" + new_name + "</strong>\n<small><i class='fa fa-pencil-square-o'></i></small>");
+        $.post("/group/" + this.dataset.id + "/update", { group_name: new_name });
+        span.removeClass('hidden');
+        $(this).addClass('hidden');
+      });
+
+      $('#assign_teams_shuffle').click(function(e) {
+        console.log('shuffle teams and assign');
+      });
+
+      $('#assign_teams_ordered').click(function(e) {
+        console.log('assign teams in order');
+      });
+  });

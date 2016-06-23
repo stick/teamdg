@@ -45,8 +45,21 @@ class Event < Sequel::Model(:events)
     validates_unique [:url]
   end
 
+  def rr_matches?
+    self.games_dataset.where(sudden_death: false).count > 0 ? true : false
+  end
+
   def rr_matches_completed
-    (self.games_dataset.where(completed: true, sudden_death: false).count.to_f / self.games.count.to_f * 100.0).to_i
+    ratio = self.games_dataset.where(completed: true, sudden_death: false).count.to_f / self.games_dataset.where(sudden_death: false).count.to_f * 100.0
+    ratio.nan? ? 0 : ratio.to_i
+  end
+
+  def rr_matches_completed?
+    if self.rr_matches_completed >= 100
+      true
+    else
+      false
+    end
   end
 
   def rr_incomplete
@@ -67,11 +80,39 @@ class Event < Sequel::Model(:events)
     self.matches_dataset.where(semi: true)
   end
 
+  def semi_matches?
+    self.semi_matches.count > 0
+  end
+
+  def semi_matches_complete?
+    a_results = []
+    self.semi_matches.each { |m| a_results.push m.decided }
+    a_results.select{ |x| !x }.empty?
+  end
+
+  def match_rounds
+    (self.num_teams / self.group_number) - 1
+  end
+
+  def group_matches
+    (self.num_teams / self.group_number) / 2
+  end
+
   def semi_games
   end
 
   def final_matches
     self.matches_dataset.where(final: true)
+  end
+
+  def final_matches?
+    self.final_matches.count > 0
+  end
+
+  def final_matches_complete?
+    a_results = []
+    self.final_matches.each { |m| a_results.push m.decided }
+    a_results.select{ |x| !x }.empty?
   end
 
   def final_games

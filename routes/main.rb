@@ -75,7 +75,8 @@ class App < Sinatra::Base
     @schedule = RRSchedule::Schedule.new(
       teams: @event.groups.map { |group| group.teams.map { |t| t.name } },
       rules: [
-        RRSchedule::Rule.new( wday: 6, gt: [ "09:00AM", "11:00AM", "01:00PM", "03:00PM", ], ps: [ "Unitty Farm", ]),
+        RRSchedule::Rule.new( wday: 6, gt: [ "09:00AM", "11:00AM", "01:00PM" ], ps: [ "Unitty Farm", ]),
+        RRSchedule::Rule.new( wday: 0, gt: [ "09:00AM" ], ps: [ "Unitty Farm", ]),
       ],
       start_date: @event.startdate,
       cycles: @event.cycles,
@@ -84,29 +85,49 @@ class App < Sinatra::Base
 
     @schedule.generate
 
-    # puts @schedule.rounds.collect{ |r| r.to_s }
-    # puts @schedule.display
-
-    # create db objects based on schedule
-    @schedule.gamedays.each_with_index do |gd, matchnum|
-      gd.games.each do |g|
-        match = @event.add_match(
-          desc: "Match #{matchnum + 1}",
-          match_num: matchnum + 1,
-          group_id: @event.teams_dataset.where(name: g.team_a.to_s).first.group_id,
-          day: matchnum > 4 ? 0 : 6,
-        )
-        match.add_team(@event.teams_dataset.where(name: g.team_a.to_s).first)
-        match.add_team(@event.teams_dataset.where(name: g.team_b.to_s).first)
-        @event.team_seeds.each do |seed|
-          game = match.add_game( seed: seed, event_id: @event.id,)
-          game.add_team(@event.teams_dataset.where(name: g.team_a.to_s).first)
-          game.add_team(@event.teams_dataset.where(name: g.team_b.to_s).first)
-          game.add_player(@event.teams_dataset.where(name: g.team_a.to_s).first.seed(seed))
-          game.add_player(@event.teams_dataset.where(name: g.team_b.to_s).first.seed(seed))
+    @schedule.rounds.each do |round|
+      round.each do |match_by_round|
+        match_by_round.games.each do |team_match|
+          pp match_by_round.inspect
+          match = @event.add_match(
+            desc: "Match #{match_by_round.round}",
+            match_num: match_by_round.round_with_cycle,
+            group_id: @event.teams_dataset.where(name: team_match.team_a.to_s).first.group_id,
+            day: 0
+          )
+          match.add_team(@event.teams_dataset.where(name: team_match.team_a.to_s).first)
+          match.add_team(@event.teams_dataset.where(name: team_match.team_b.to_s).first)
+          @event.team_seeds.each do |seed|
+            game = match.add_game( seed: seed, event_id: @event.id,)
+            game.add_team(@event.teams_dataset.where(name: team_match.team_a.to_s).first)
+            game.add_team(@event.teams_dataset.where(name: team_match.team_b.to_s).first)
+            game.add_player(@event.teams_dataset.where(name: team_match.team_a.to_s).first.seed(seed))
+            game.add_player(@event.teams_dataset.where(name: team_match.team_b.to_s).first.seed(seed))
+          end
         end
       end
     end
+
+    # create db objects based on schedule
+    # @schedule.gamedays.each_with_index do |gd, matchnum|
+      # gd.games.each do |g|
+        # match = @event.add_match(
+          # desc: "Match #{matchnum + 1}",
+          # match_num: matchnum + 1,
+          # group_id: @event.teams_dataset.where(name: g.team_a.to_s).first.group_id,
+          # day: matchnum > 4 ? 0 : 6,
+        # )
+        # match.add_team(@event.teams_dataset.where(name: g.team_a.to_s).first)
+        # match.add_team(@event.teams_dataset.where(name: g.team_b.to_s).first)
+        # @event.team_seeds.each do |seed|
+          # game = match.add_game( seed: seed, event_id: @event.id,)
+          # game.add_team(@event.teams_dataset.where(name: g.team_a.to_s).first)
+          # game.add_team(@event.teams_dataset.where(name: g.team_b.to_s).first)
+          # game.add_player(@event.teams_dataset.where(name: g.team_a.to_s).first.seed(seed))
+          # game.add_player(@event.teams_dataset.where(name: g.team_b.to_s).first.seed(seed))
+        # end
+      # end
+    # end
     redirect to("/event/#{@event.id}/matches/event")
   end
 
@@ -117,12 +138,14 @@ class App < Sinatra::Base
 
   get '/event/:event_id/matches/event/?' do
     @event = Event[params[:event_id]]
-    haml :matches
+    haml :event_matches
   end
 
   get '/event/:event_id/matches/delete/?' do
     @event = Event[params[:event_id]]
     @event.matches.map { |m| m.destroy }
+    @event.teams.map { |t| t.update_points }
+    @event.players.map { |p| p.update_stats }
     @event.scheduled = false
     @event.save
     redirect to("/event/#{@event.id}/")
@@ -310,6 +333,21 @@ class App < Sinatra::Base
       player.seed = params[:seed]
       player.save
     end
+  end
+
+  get '/:event_slug/match/:match_id/?' do
+    @event = Event[url: CGI::unescape(params[:event_slug])]
+    # @player = @event.players_dataset.where(name: CGI::unescape(params[:player_name])).first
+    @match = Match[params[:match_id]]
+    @public = true
+    haml :event_match, layout: :layout_no_sidebar, locals: { hide_breadcrumbs: true }
+  end
+
+  get '/:event_slug/player/:player_name/?' do
+    @event = Event[url: CGI::unescape(params[:event_slug])]
+    @player = @event.players_dataset.where(name: CGI::unescape(params[:player_name])).first
+    @public = true
+    haml :player_match, layout: :layout_no_sidebar, locals: { hide_breadcrumbs: true }
   end
 
   get '/:event_slug/team/:team_name/?' do

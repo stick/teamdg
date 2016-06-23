@@ -9,10 +9,3 @@
   %a.btn.btn-danger{ href: url("/event/#{@event.id}/matches/delete") }
     Remove all matches
     %i.fa.fa-warning{ data: { toggle: 'tooltip', title: 'This will remove all data!' } }
-
-
-:javascript
-  $(function () {
-    $('[data-toggle="tooltip"]').tooltip();
-  });
-

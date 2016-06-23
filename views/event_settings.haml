@@ -38,7 +38,9 @@
     .col-sm-2
       %input.form-control#group_advance{ placeholder: '2', type: 'number', name: "group_advance", value: @event.group_advance }
   .form-group
-    %label.col-sm-2.control-label{ for: "event_url" } Event URL
+    %label.col-sm-2.control-label{ for: "event_url" }
+      Public URL
+      %a#publicUrlLink{ target: '_blank', href: url("/#{@event.url}") } #{icon('external-link')}
     .col-sm-4
       .form-group#urlFormGroup
         .input-group
@@ -68,6 +70,7 @@
         value: $('input#event_url').val()
       })
         .success(function() {
+          $('a#publicUrlLink').attr('href', "/" + $('input#event_url').val())
           $('#urlFormGroup').addClass('has-success');
         })
         .fail(function(e) {
@@ -82,6 +85,7 @@
         value: $(this).val()
       })
         .success(function() {
+          $('a#publicUrlLink').prop('href', "/" + $('input#event_url').val());
           $('#urlFormGroup').addClass('has-success');
         })
         .fail(function(e) {

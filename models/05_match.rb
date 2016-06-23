@@ -52,8 +52,18 @@ class Match < Sequel::Model(:matches)
   one_to_many :games, :order => :games__id
   many_to_one :group
 
-  def showdown
+  def showdown(record: false)
+    if record
+      return "#{self.team_a.name} <strong color='text-success'>#{self.team_a_wins}</strong> <small><em>vs</em></small> #{self.team_b.name} <strong class='text-success'>#{self.team_b_wins}</strong>"
+    end
     return "#{self.team_a.name} <small><em>vs</em></small> #{self.team_b.name}"
+  end
+
+  def showdown_score(winner: false)
+    html = "<span class='fa-stack'>#{icon('square-o', size: 'stack-2x', ex_classes: 'text-success')}<strong class='fa-stack-1x'>#{ winner ? self.winner_score : self.team_a_wins }</strong></span>"
+    html += "#{icon('minus')}"
+    html += "<span class='fa-stack'>#{icon('square-o', size: 'stack-2x', ex_classes: 'text-success')}<strong class='fa-stack-1x'>#{ winner ? self.loser_score : self.team_b_wins }</strong></span>"
+    return html
   end
 
   def holes_up(team)
@@ -141,10 +151,28 @@ class Match < Sequel::Model(:matches)
     end
   end
 
+  def winner_score
+    majority = (self.event.roster_size / 2.0).round
+    return self.team_a_wins if self.team_a_wins >= majority
+    return self.team_b_wins if self.team_b_wins >= majority
+  end
+
+  def loser_score
+    majority = (self.event.roster_size / 2.0).round
+    return self.team_b_wins if self.team_a_wins >= majority
+    return self.team_a_wins if self.team_b_wins >= majority
+  end
+
   def winner
     majority = (self.event.roster_size / 2.0).round
     return self.team_a if self.team_a_wins >= majority
     return self.team_b if self.team_b_wins >= majority
+  end
+
+  def loser
+    majority = (self.event.roster_size / 2.0).round
+    return self.team_b if self.team_a_wins >= majority
+    return self.team_a if self.team_b_wins >= majority
   end
 
   def when

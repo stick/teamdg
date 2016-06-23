@@ -30,6 +30,10 @@ class Group < Sequel::Model(:groups)
     self.players_dataset.where(seed: seed).sort_by{ |p| [ p.rr_wins, p.rr_ties, -p.rr_losses, p.rr_holes_up, p.rr_holes_remaining ] }.reverse
   end
 
+  def seed_winners?
+    self.players_dataset.association_join(:games).where(completed: true).count > 0 ? true : false
+  end
+
   def seed_winners
     # self.players.sort_by{ |p| [ p.rr_wins, p.rr_ties, -p.rr_losses, p.rr_holes_up, p.rr_holes_remaining ] }.reverse.group_by{ |p| p.seed }
     sw = self.players_dataset.association_join(:games).where(completed: true)

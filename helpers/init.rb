@@ -36,13 +36,11 @@ def result(game, player)
   end
 end
 
-def format_record(record, tiny=nil)
+def format_record(record, tiny: false, color: false)
   # [ wins, losses, ties ]
-  if tiny
-    record.join('/')
-  else
-    record.join(' &mdash; ')
-  end
+  return record.join('/') if tiny
+  return "<span class='text-success'>#{record[0]}</span> &mdash; <span class='text-danger'>#{record[1]}</span> &mdash; <span class='text-muted'>#{record[2]}</span>" if color
+  return record.join(' &mdash; ')
 end
 
 def ordinalize(i)

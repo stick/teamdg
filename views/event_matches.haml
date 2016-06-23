@@ -1,0 +1,37 @@
+%ol.breadcrumb
+  %li
+    %a{ href: url("/event/#{@event.id}") } #{@event.name.upcase}
+  %li.active Event Matches
+
+.page-header
+  %h1
+    Event matches
+    %a{ href: url("/event/#{@event.id}/matches/delete") }
+      #{icon('trash', ex_classes: [ 'header_icon', 'text-danger', 'clickable' ], tooltip: 'Delete Event Matches')}
+
+
+.row
+  .col-xs-12.col-sm-12.col-md-12.col-lg-12
+    %table.table.table-hover
+      %thead
+        %tr
+          %th &nbsp;
+          - @event.groups.each do |group|
+            %th{ colspan: @event.group_matches} #{group.name}
+      %tbody
+        - rows = @event.matches_dataset.map(:match_num).uniq
+        - rows.each do |row|
+          %tr
+            %td Match #{row}
+            - @event.matches_dataset.where(match_num: row).each do |match|
+              %td
+                %a{ href: url("/event/#{@event.id}/matches/event/match/#{match.id}") }
+                  #{match.team_a.name} vs #{match.team_b.name}
+                %a.pull-right{ tabindex: 0, data: { toggle: 'popover', title: match.showdown, content: match.when, html: 'true', container: 'body', trigger: 'focus', placement: 'left' } } #{icon('calendar')}
+    - unless @event.scheduled
+      %h4 Event not started, no matches scheduled.
+
+:javascript
+  $(function () {
+    $('[data-toggle="popover"]').popover()
+  });

@@ -14,6 +14,20 @@
             %li
               %a{ href: url("/event/#{@event.id}/matches/team/#{team.id}") } #{team.name}
 
+- if @public
+  %ol.breadcrumb
+    %li
+      %a{ href: url("/#{CGI::escape @event.url}") } #{@event.name.upcase}
+    %li.active.dropdown
+      %a.dropdown-toggle{ href: '#', data: { toggle: 'dropdown' }, role: 'button' }
+        #{@team.name}
+        %span.caret
+      %ul.dropdown-menu
+        - @event.teams.each do |team|
+          - unless team == @team
+            %li
+              %a{ href: url("/#{CGI::escape @event.url}/team/#{CGI::escape team.name}") } #{team.name}
+
 
 %h3 Team #{@team.name} Matches
 
@@ -27,6 +41,7 @@
           #{match.team_b.name}
         - else
           #{match.team_a.name}
+        %strong.record (#{format_record(match.record(@team), color: true)})
         %span.badge{ data: { toggle: 'tooltip', title: 'Reported matches' } } #{match.games_dataset.where(completed: true).count} / #{match.games.count}
 
 .col-lg-3.col-sm-6.col-xs-10
@@ -48,8 +63,12 @@
         %tr
           %th &nbsp;
           - @team.matches.each do |match|
-            %th
-              %span.hidden-xs #{match.desc}
+            %th.match_header
+              %span.hidden-xs
+                - if match.desc =~ /Semi/
+                  #{match.desc.gsub(/Match \d/, '')}
+                - else
+                  #{match.desc}
               %span.hidden-sm.hidden-md.hidden-lg #{match.match_num}
         %tr
           %th &nbsp;
@@ -67,12 +86,14 @@
             - player.games.each do |game|
               %td.game_cell
                 %span.hidden-xs #{game.result(player.id)}
-                %span.hidden-sm.hidden-md.hidden-lg #{game.result(player.id, true)}
+                %span.hidden-sm.hidden-md.hidden-lg #{game.result(player.id, tiny: true)}
       %tfoot
         %tr
           %td &nbsp;
           - @team.matches.each do |match|
-            %td #{format_record(match.record(@team), true)}
+            %td
+              %span.hidden-xs #{format_record(match.record(@team))}
+              %span.hidden-sm.hidden-md.hidden-lg #{format_record(match.record(@team), tiny: true)}
         %tr
           %td
             %span.hidden-xs Match Points

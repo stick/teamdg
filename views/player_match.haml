@@ -1,30 +1,57 @@
-%ol.breadcrumb
-  %li
-    %a{ href: url("/event/#{@player.event.id}") } #{@player.event.name.upcase}
-  %li
-    %a{ href: url("/event/#{@player.event.id}/matches/player") } Player Matches
-  %li.active
-    #{@player.name}
+- if locals[:hide_breadcrumbs].nil?
+  %ol.breadcrumb
+    %li
+      %a{ href: url("/event/#{@player.event.id}") } #{@player.event.name.upcase}
+    %li
+      %a{ href: url("/event/#{@player.event.id}/matches/player") } Player Matches
+    %li.active
+      #{@player.name}
+
+- if @public
+  %ol.breadcrumb
+    %li
+      %a{ href: url("/#{CGI::escape @event.url}") } #{@event.name.upcase}
+    %li.active.dropdown
+      %a.dropdown-toggle{ href: '#', data: { toggle: 'dropdown' }, role: 'button' }
+        #{@player.team.name}
+        %span.caret
+      %ul.dropdown-menu
+        - @event.teams.each do |team|
+          %li
+            %a{ href: url("/#{CGI::escape @event.url}/team/#{CGI::escape team.name}") } #{team.name}
+    %li.active.dropdown
+      %a.dropdown-toggle{ href: '#', data: { toggle: 'dropdown' }, role: 'button' }
+        #{@player.name}
+        %span.caret
+      %ul.dropdown-menu
+        - @player.team.players.each do |p|
+          - unless p == @player
+            %li
+              %a{ href: url("/#{CGI::escape @event.url}/player/#{CGI::escape p.name}") } #{p.name}
+
 .row
   .col-lg-12
     %table.table
       %caption
-        %h2
+        %h3
           #{@player.name}
           %small #{@player.team.name} (#{@player.record})
       %tbody
         - @player.games.sort{ |x,y| x.id <=> y.id }.each do |game|
           %tr
-            %td
-              %h4
-                - if game.completed
-                  %i.clickable.fa.fa-fw.fa-flag-checkered.reset_match{ data: { href: url("/event/#{@event.id}/game/#{game.id}/reset") } }
+            - unless @public
+              %td
+                %h4
+                  - if game.completed
+                    %i.clickable.fa.fa-fw.fa-flag-checkered.reset_match{ data: { href: url("/event/#{@event.id}/game/#{game.id}/reset") } }
             %td
               %h4
                 #{game.result(@player.id)}
             %td
               %h4
-                #{game.match.desc}
+                %span.hidden-xs #{game.match.desc}
+                %span.hidden-sm.hidden-md.hidden-lg #{game.match.desc.gsub('Match ', 'M')}
+
                 #{vs}
                 - if game.player_a.id == @player.id
                   #{game.player_b.name}
@@ -32,35 +59,36 @@
                 - else
                   #{game.player_a.name}
                   %small #{game.player_a.team.name}
-            %td
-              %h5
-                .btn-group{ role: 'group', 'aria-label': 'action buttons', data: { toggle: 'tooltip', title: 'Win / Tie / Loss' } }
-                  %button.btn.btn-default.game_winner{ type: 'button',
-                    data: { match_id: game.match.id,
-                      game_id: game.id,
-                      event_id: @event.id,
-                      player_a: game.player_a.to_hash,
-                      player_b: game.player_b.to_hash,
-                      winner: game.player_a.id == @player.id ? game.player_a.id : game.player_b.id,
-                      team_a: game.player_a.team.to_hash,
-                      team_b: game.player_b.team.to_hash,
-                      game: game.to_hash,
-                      toggle: 'modal',
-                      target: '#gameWinnerModal' } } #{icon('trophy', fw: true)}
-                  %a.btn.btn-default{ type: 'button', href: url("/event/#{@event.id}/game/#{game.id}/tie") }
-                    #{icon('balance-scale', fw: true)}
-                  %button.btn.btn-default.game_winner{ type: 'button',
-                    data: { match_id: game.match.id,
-                      game_id: game.id,
-                      event_id: @event.id,
-                      player_a: game.player_a.to_hash,
-                      player_b: game.player_b.to_hash,
-                      winner: game.player_b.id == @player.id ? game.player_a.id : game.player_b.id,
-                      team_a: game.player_a.team.to_hash,
-                      team_b: game.player_b.team.to_hash,
-                      game: game.to_hash,
-                      toggle: 'modal',
-                      target: '#gameWinnerModal' } } #{icon('trophy', fw: true, ex_classes: 'fa-rotate-180')}
+            - unless @public
+              %td
+                %h5
+                  .btn-group{ role: 'group', 'aria-label': 'action buttons', data: { toggle: 'tooltip', title: 'Win / Tie / Loss' } }
+                    %button.btn.btn-default.game_winner{ type: 'button',
+                      data: { match_id: game.match.id,
+                        game_id: game.id,
+                        event_id: @event.id,
+                        player_a: game.player_a.to_hash,
+                        player_b: game.player_b.to_hash,
+                        winner: game.player_a.id == @player.id ? game.player_a.id : game.player_b.id,
+                        team_a: game.player_a.team.to_hash,
+                        team_b: game.player_b.team.to_hash,
+                        game: game.to_hash,
+                        toggle: 'modal',
+                        target: '#gameWinnerModal' } } #{icon('trophy', fw: true)}
+                    %a.btn.btn-default{ type: 'button', href: url("/event/#{@event.id}/game/#{game.id}/tie") }
+                      #{icon('balance-scale', fw: true)}
+                    %button.btn.btn-default.game_winner{ type: 'button',
+                      data: { match_id: game.match.id,
+                        game_id: game.id,
+                        event_id: @event.id,
+                        player_a: game.player_a.to_hash,
+                        player_b: game.player_b.to_hash,
+                        winner: game.player_b.id == @player.id ? game.player_a.id : game.player_b.id,
+                        team_a: game.player_a.team.to_hash,
+                        team_b: game.player_b.team.to_hash,
+                        game: game.to_hash,
+                        toggle: 'modal',
+                        target: '#gameWinnerModal' } } #{icon('trophy', fw: true, ex_classes: 'fa-rotate-180')}
 
 
 %form.form-inline#gameResult{ method: 'post', action: '', role: 'form', data: { toggle: 'validator', disable: true } }
@@ -128,8 +156,6 @@
     $('.reset_match').click(function(e) {
       window.location.href = this.dataset.href
     });
-
-    $('[data-toggle="tooltip"]').tooltip();
   });
 
 

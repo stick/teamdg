@@ -60,7 +60,7 @@ class Game < Sequel::Model(:games)
     self.players.last
   end
 
-  def result(id, tiny=nil)
+  def result(id, tiny: false)
     if self.completed
       if tiny
         return '<span class="label label-default col-sm-12">T</span>' unless self.tie.nil?

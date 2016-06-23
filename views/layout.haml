@@ -72,6 +72,10 @@
                           Settings
                           %span.pull-right.fa.fa-cogs
                       %li
+                        %a{ href: url("/event/#{@event.id}/groups") }
+                          Group Assignment
+                          %span.pull-right #{icon('shield')}
+                      %li
                         %a{ href: url("/event/#{@event.id}/team/") }
                           Teams
                           %span.pull-right.fa.fa-bus

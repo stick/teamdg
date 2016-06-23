@@ -1,18 +1,27 @@
-%h1 this is the main
+.row
+  .col-xs-12.col-sm-12.col-md-12.col-lg-12
+    .page-header
+      %h1 Welcome to TeamDG
+.row
+  %p
+    Events consist of groups (1 or more), teams (as many as you add).  Each team
+    will consist of some number of players.  Depending on the format you chooose
+    each team will play matches against the other teams.
+  %p
+    Once your group play is completed you can activate the semifinals.  Once you
+    have completed your semifinals, you then advance to the finals.
+.row
+  .col-xs-12.col-sm-12.col-md-12.col-lg-12
+    %h4 Terminology
+    %dl.dl-horizontal
+      %dt Event
+      %dd A tournament, consisting of a number of teams playing each other in a variety of formats.
+      %dt Group
+      %dd A division of teams, could be half of a bracket or teams sectioned into a group.
+      %dt Team
+      %dd A team of players.
+      %dt Match
+      %dd A content between two teams.
+      %dt Game / Player Match
+      %dd An individual contest between two players of two separate teams.
 
-%span.fa-stack.fa-lg
-  #{icon('calendar-o', size: 'stack-2x')}
-  #{icon('bus', size: 'stack-1x', ex_classes: 'inside_calendar')}
-%span.fa-stack.fa-lg
-  #{icon('calendar-o', size: 'stack-2x')}
-  #{icon('users', size: 'stack-1x', ex_classes: 'inside_calendar')}
-%span.fa-stack.fa-lg
-  #{icon('calendar-o', size: 'stack-2x')}
-  #{icon('user', size: 'stack-1x', ex_classes: 'inside_calendar')}
-
-
-
-%span.fa-stack.fa-sm
-  #{icon('calendar-o', size: 'stack-2x', fw: true)}
-  #{icon('bus', size: 'stack-1x', ex_classes: 'inside_calendar', fw: true)}
-#{icon('calendar')}

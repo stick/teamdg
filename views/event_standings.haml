@@ -1,93 +1,164 @@
-%h3
-  #{@event.name} Standings
-  - if @event.rr_matches_completed >= 100
-    %a.btn.btn-success{ type: 'button', href: url("/event/#{@event.id}/semifinals") } Setup Semi-Finals
-%h5
-  Round Robin Progress
-  - if @event.rr_matches_completed < 100
-    - unless @public
-      %a{ href: url("/event/#{@event.id}/matches/games/unreported") } #{icon('user-times', tooltip: 'Unreported Player Matches')}
-.progress.hidden-xs
-  .progress-bar{ role: 'progressbar', 'aria-valuemin': 0, 'aria-valuemax': 100, 'aria-valuenow': @event.rr_matches_completed, style: "width:#{@event.rr_matches_completed}%" } #{@event.rr_matches_completed}%
+- if @event.final_matches_complete? and @public
+  .jumbotron
+    - @event.final_matches.each do |match|
+      %h1 #{match.winner.name} is the #{@event.name} Champion!
+      %p.lead
+        #{match.winner.name} defeats #{match.loser.name} Finals score: #{match.showdown_score}
 
-.row
-  - @event.groups.each do |group|
-    .col-lg-6.col-sm-6
-      %table.table.table-condensed.table-responsive
-        %thead
-          %tr
-            %th &nbsp;
-            %th #{group.name}
-            %th
-              %small Points
-            %th.hidden-xs
-              %small
-                1<sup>st</sup> TB
-            %th.hidden-xs
-              %small
-                2<sup>nd</sup> TB
-            %th.hidden-xs &nbsp;
-        - group.teams.sort{ |x,y| [ x.points, x.holes_up, x.holes_remaining ] <=> [ y.points, y.holes_up, y.holes_remaining ] }.reverse.each_with_index do |team, index|
-          %tr
-            %td #{ordinalize(index + 1)}
-            %td.team_name
-              - if @public
-                %a{ href: url("/#{@event.url}/team/#{CGI::escape(team.name)}/") } #{team.name}
+%h2 #{@event.name} Standings
+
+- if @event.rr_matches_completed?
+  .row
+    .col-lg-6.col-md-6.col-sm-12.col.xs-12
+      %h3
+        Semifinals
+        - if @event.rr_matches_completed? and @event.semi_matches? == false
+          %sup #{icon('plus-square-o', ex_classes: [ 'clickable' ], id: 'createSemis', tooltip: 'create semifinal matches', size: '1')}
+      - if @event.semi_matches?
+        .list-group
+          - @event.semi_matches.each do |match|
+            %a.list-group-item{ href: @public ? url("/#{CGI::escape @event.url}/match/#{match.id}") : url("/event/#{@event.id}/matches/event/match/#{match.id}") }
+              #{match.desc.gsub('Semifinals ', '')}
+              - if match.decided
+                #{match.winner.name} defeats #{match.loser.name}
+                %strong.pull-right #{match.showdown_score(winner: true)}
               - else
-                %a{ href: url("/event/#{@event.id}/matches/team/#{team.id}/") } #{team.name}
-            %td.team_points #{team.points.to_i}
-            %td.tie_breaker_1.hidden-xs #{team.holes_up}
-            %td.tie_breaker_2.hidden-xs #{team.holes_remaining}
-            %td.advance.hidden-xs.hidden-sm
-              - if @event.rr_matches_completed >= 100
-                - if index < @event.group_advance
-                  #{icon('trophy')}
+                #{match.showdown}
+                %span.pull-right #{match.showdown_score}
+      - else
+        - if @event.rr_matches_completed?
+          %p Semifinal matches not created.
+        - else
+          %p Round robin play not completed.
+
+    .col-lg-6.col-md-6.col-sm-12.col.xs-12
+      %h3
+        Finals
+        - if @event.semi_matches? and @event.semi_matches_complete? and @event.final_matches? == false
+          %sup #{icon('plus-square-o', ex_classes: [ 'clickable' ], id: 'createFinals', tooltip: 'create final matches', size: '1')}
+      - if @event.final_matches?
+        .list-group
+          - @event.final_matches.each do |match|
+            %a.list-group-item{ href: @public ? url("/#{CGI::escape @event.url}/match/#{match.id}") : url("/event/#{@event.id}/matches/event/match/#{match.id}") }
+              #{match.desc}
+              - if match.decided
+                #{match.winner.name} defeats #{match.loser.name}
+                %strong.pull-right #{match.showdown_score(winner: true)}
+              - else
+                #{match.showdown}
+                %span.pull-right #{match.showdown_score}
+      - else
+        - if @event.semi_matches?
+          - if @event.semi_matches_complete?
+            %p Semifinal matches not decided.
+        - else
+          %p Semifinals not started.
 
 .row
-  - @event.groups.each do |group|
-    .panel.panel-primary
-      .panel-heading
-        #{group.name} Seed Standings
-        %i.fa.fa-question-circle.fa-fw{ data: { container: 'body', toggle: 'popover', placement: 'top', title: 'Seed Standings',  content: 'Ranked based on<ol><li>Wins</li><li>Ties</li><li>Losses</li><li>Holes Up</li><li>Holes Remaining</li></ul>' } }
-      .panel-body
-        %ul.nav.nav-tabs{ role: 'tablist' }
-          - @event.team_seeds.each_with_index do |seed, i|
-            %li{ role: 'presentation', class: i == 0 ? 'active' : '' }
-              %a{ href: "##{group.name.downcase}_#{seed.capitalize}", role: 'tab', data: { toggle: 'tab' } } #{seed}
-        .tab-content
-          - @event.team_seeds.each_with_index do |seed, i|
-            .tab-pane{ id: [group.name.downcase, seed.capitalize], role: 'tabpanel', class: i == 0 ? 'active' : '' }
-              %table.table.table-responsive
-                %thead
-                  %tr
-                    %th &nbsp;
-                    %th #{seed}
-                    %th Wins
-                    %th Ties
-                    %th Losses
-                    %th.hidden-xs Holes Up
-                    %th.hidden-xs Holes Remaining
-                %tbody
-                -# - group.seed_winner(seed).each do |player|
-                - group.seed_winners[seed].each do |player|
-                  %tr
-                    %td #{ordinalize(player[:rank])}
-                    %td
-                      - if @public
-                        %a{ href: url("/#{@event.url}/player/#{CGI::escape(player.name)}") } #{player.name}
-                      - else
-                        %a{ href: url("/event/#{@event.id}/matches/player/#{player.id}") } #{player.name}
-                      - if @event.rr_matches_completed >= 100
-                        - if player[:rank].to_i == 1
-                          #{icon('trophy')}
-                    %td #{player.rr_wins}
-                    %td #{player.rr_ties}
-                    %td #{player.rr_losses}
-                    %td.hidden-xs #{player.rr_holes_up}
-                    %td.hidden-xs #{player.rr_holes_remaining}
+  .col-lg-12.col-md-12.col-sm-12.col-xs-12
+    %h3 Group Standings
+    %h5
+      Round Robin Progress
+      - if @event.rr_matches_completed?
+        - unless @public
+          %a{ href: url("/event/#{@event.id}/matches/games/unreported") } #{icon('user-times', tooltip: 'Unreported Player Matches')}
+    .progress.hidden-xs
+      .progress-bar{ role: 'progressbar', 'aria-valuemin': 0, 'aria-valuemax': 100, 'aria-valuenow': @event.rr_matches_completed, style: "width:#{@event.rr_matches_completed}%" } #{@event.rr_matches_completed}%
+
+.row
+  .col-lg-12.col-md-12.col-sm-12.col-xs-12
+    - @event.groups.each do |group|
+      .col-lg-6.col-sm-6
+        %table.table.table-condensed.table-responsive
+          %thead
+            %tr
+              %th &nbsp;
+              %th #{group.name}
+              %th
+                %small Points
+              %th.hidden-xs
+                %small
+                  1<sup>st</sup> TB
+              %th.hidden-xs
+                %small
+                  2<sup>nd</sup> TB
+              %th.hidden-xs &nbsp;
+          - group.teams.sort{ |x,y| [ x.points, x.holes_up, x.holes_remaining ] <=> [ y.points, y.holes_up, y.holes_remaining ] }.reverse.each_with_index do |team, index|
+            %tr
+              %td #{ordinalize(index + 1)}
+              %td.team_name
+                - if @public
+                  %a{ href: url("/#{@event.url}/team/#{CGI::escape(team.name)}/") } #{team.name}
+                - else
+                  %a{ href: url("/event/#{@event.id}/matches/team/#{team.id}/") } #{team.name}
+              %td.team_points #{team.points.to_i}
+              %td.tie_breaker_1.hidden-xs #{team.holes_up}
+              %td.tie_breaker_2.hidden-xs #{team.holes_remaining}
+              %td.advance.hidden-xs.hidden-sm
+                - if @event.rr_matches_completed >= 100
+                  - if index < @event.group_advance
+                    #{icon('trophy')}
+
+- if @event.rr_matches?
+  .row
+    .col-lg-12.col-md-12.col-sm-12.col-xs-12
+      - @event.groups.each do |group|
+        .panel.panel-primary
+          .panel-heading
+            #{group.name} Seed Standings
+            %i.fa.fa-question-circle.fa-fw{ data: { container: 'body', toggle: 'popover', placement: 'top', title: 'Seed Standings',  content: 'Ranked based on<ol><li>Wins</li><li>Ties</li><li>Losses</li><li>Holes Up</li><li>Holes Remaining</li></ul>' } }
+          .panel-body
+            %ul.nav.nav-tabs{ role: 'tablist' }
+              - @event.team_seeds.each_with_index do |seed, i|
+                %li{ role: 'presentation', class: i == 0 ? 'active' : '' }
+                  %a{ href: "##{group.name.downcase}_#{seed.capitalize}", role: 'tab', data: { toggle: 'tab' } } #{seed}
+            .tab-content
+              - @event.team_seeds.each_with_index do |seed, i|
+                .tab-pane{ id: [group.name.downcase, seed.capitalize], role: 'tabpanel', class: i == 0 ? 'active' : '' }
+                  %table.table.table-responsive
+                    %thead
+                      %tr
+                        %th &nbsp;
+                        %th #{seed}
+                        %th Wins
+                        %th Ties
+                        %th Losses
+                        %th.hidden-xs Holes Up
+                        %th.hidden-xs Holes Remaining
+                    %tbody
+                    -# - group.seed_winner(seed).each do |player|
+                    - if group.seed_winners[seed].nil?
+                      %tr
+                        %td{ colspan: @event.roster_size } No player matches reported.
+                    - else
+                      - group.seed_winners[seed].each do |player|
+                        %tr
+                          %td #{ordinalize(player[:rank])}
+                          %td
+                            - if @public
+                              %a{ href: url("/#{@event.url}/player/#{CGI::escape(player.name)}") } #{player.name}
+                            - else
+                              %a{ href: url("/event/#{@event.id}/matches/player/#{player.id}") } #{player.name}
+                            - if @event.rr_matches_completed >= 100
+                              - if player[:rank].to_i == 1
+                                #{icon('trophy')}
+                          %td #{player.rr_wins}
+                          %td #{player.rr_ties}
+                          %td #{player.rr_losses}
+                          %td.hidden-xs #{player.rr_holes_up}
+                          %td.hidden-xs #{player.rr_holes_remaining}
 
 
 :javascript
   $(document).ready(function(){
     $('[data-toggle="popover"]').popover({ 'trigger': 'hover', 'html': 'true' });
+
+    $('#createSemis').click(function(e) {
+      $.get('/event/#{@event.id}/semifinals');
+      window.location.href = window.location.href;
+    });
+    $('#createFinals').click(function(e) {
+      $.get('/event/#{@event.id}/finals');
+      window.location.href = window.location.href;
+    });
   });

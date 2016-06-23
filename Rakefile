@@ -78,9 +78,12 @@ namespace :sim do
 
   desc 'simulate games (event.first)'
   task :games, [ :match ] do |t, args|
+    event = Event[ENV['event']] or Event.first
+    match_count = event.matches_dataset.where(match_num: args[:match]).count
     puts "simulating games for match #{args[:match]}"
-    progress = RakeProgressbar.new(Event.first.matches_dataset.where(match_num: args[:match]).count)
-    Event.first.matches_dataset.where(match_num: args[:match]).each do |match|
+    puts "match_count: #{match_count}"
+    progress = RakeProgressbar.new(match_count)
+    event.matches_dataset.where(match_num: args[:match]).each do |match|
       match.games.each do |g|
         if rand(1..10) < 3
           g.tie = 1
@@ -93,8 +96,8 @@ namespace :sim do
         end
         g.completed = true
         g.save
-        progress.inc
       end
+      progress.inc
     end
     progress.finished
   end
