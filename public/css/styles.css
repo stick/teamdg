@@ -43,3 +43,7 @@ td.game_cell, th.game_cell {
 th.match_header {
   max-width: 115px;
 }
+
+.nowrap {
+  white-space: nowrap;
+}

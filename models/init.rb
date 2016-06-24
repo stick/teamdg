@@ -15,6 +15,8 @@ DB.extension :pg_enum
 Sequel.default_timezone = :utc
 Sequel.application_timezone = :local
 Sequel::Model.plugin :validation_helpers
+Sequel::Model.plugin :auto_validations
+#Sequel::Model.plugin :contraint_validations
 
 require_relative '01_event'
 require_relative '02_group'

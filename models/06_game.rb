@@ -52,6 +52,8 @@ class Game < Sequel::Model(:games)
     self.players_dataset.where(id: self.winner_id)
   end
 
+
+
   def player_a
     self.players.first
   end
@@ -80,9 +82,16 @@ class Game < Sequel::Model(:games)
     self.match.team_a_wins = self.match.games_dataset.where(winner_id: self.match.team_a.players_dataset.map(:id)).count
     self.match.team_a_losses = self.match.games_dataset.where(winner_id: self.match.team_b.players_dataset.map(:id)).count
     self.match.team_a_ties = self.match.games_dataset.where(completed: true).exclude(tie: nil).count
-    self.match.no_decisions = self.match.games_dataset.where(completed: nil).count
+    self.match.no_decisions = self.match.games_dataset.where(completed: false).count
     if self.match.decided
-      self.match.winner_id = self.match.winner.id
+      if self.match.winner
+        self.match.winner_id = self.match.winner.id
+        self.match.tie = nil
+      else
+        self.match.winner_id = nil
+        self.match.tie = 1
+      end
+      self.match.completed = true
     end
     self.match.save
 

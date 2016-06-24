@@ -54,19 +54,21 @@ namespace :sim do
   task :reset do
     puts "Resetting matches"
     match_bar = RakeProgressbar.new(Event.first.matches.count)
-    Event.first.matches.each do |m|
+    event = Event[ENV['event']] or Event.first
+    event.matches.each do |m|
       m.team_a_wins = 0
       m.team_a_losses = 0
       m.team_a_ties = 0
       m.no_decisions = 0
+      m.completed = false
       m.save
       match_bar.inc
     end
     match_bar.finished
 
     puts "Resetting games"
-    games_bar = RakeProgressbar.new(Event.first.games.count)
-    Event.first.games.each do |g|
+    games_bar = RakeProgressbar.new(event.games.count)
+    event.games.each do |g|
       g.completed = false
       g.winner_id = nil
       g.tie = nil
@@ -86,8 +88,10 @@ namespace :sim do
     event.matches_dataset.where(match_num: args[:match]).each do |match|
       match.games.each do |g|
         if rand(1..10) < 3
+          g.winner_id = nil
           g.tie = 1
         else
+          g.tie = nil
           g.winner_id = g.players.shuffle.first.id
           game_scores = [ [1,0], [2,0], [2,1], [3,2], [3,1], [4,3], [4,2], [5,4], [5,3], [6,4] ]
           r = game_scores.shuffle.first

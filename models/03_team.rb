@@ -23,6 +23,9 @@ unless DB.table_exists? (:teams)
     Integer     :elim_wins
     Integer     :elim_losses
     Integer     :elim_ties
+    Integer     :match_wins
+    Integer     :match_losses
+    Integer     :match_ties
     foreign_key :event_id, :events, :on_delete => :cascade, :null => false
     foreign_key :group_id, :groups, :on_delete => :cascade
     unique      [:name, :event_id]
@@ -81,6 +84,14 @@ class Team < Sequel::Model(:teams)
     end
   end
 
+  def record
+    {
+      wins: self.match_wins,
+      losses: self.match_losses,
+      ties: self.match_ties,
+    }
+  end
+
   def update_points
     rr_wins = self.games_dataset.where(completed: true, sudden_death: false, winner_id: self.players_dataset.map(:id)).count
     rr_ties = self.games_dataset.where(completed: true, sudden_death: false).exclude(tie: nil).count
@@ -93,6 +104,9 @@ class Team < Sequel::Model(:teams)
     self.points = (rr_wins * self.event.matchpoints ) + (rr_ties * self.event.tiepoints)
     self.holes_up = self.games_dataset.where(winner_id: self.players_dataset.map(:id), completed: true, sudden_death: false).map(:holes_up).sum
     self.holes_remaining = self.games_dataset.where(winner_id: self.players_dataset.map(:id), completed: true, sudden_death: false).map(:holes_remaining).sum
+    self.match_wins = self.matches_dataset.where(completed: true).where(winner_id: self.id).count
+    self.match_losses = self.matches_dataset.where(completed: true).exclude(winner_id: self.id).count
+    self.match_ties = self.matches_dataset.where(completed: true).exclude(tie: nil).count
     self.save
   end
 

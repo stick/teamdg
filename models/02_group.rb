@@ -34,6 +34,25 @@ class Group < Sequel::Model(:groups)
     self.players_dataset.association_join(:games).where(completed: true).count > 0 ? true : false
   end
 
+  def rank
+    case self.event.semis 
+    when 'xgrouppoints'
+    when 'grouppoints'
+      self.teams_dataset.order(Sequel.expr(:points).desc, Sequel.expr(:holes_up), Sequel.expr(:holes_remaining))
+    when 'points'
+      self.event.teams_dataset.order(Sequel.expr(:points).desc, Sequel.expr(:holes_up), Sequel.expr(:holes_remaining))
+    when 'record'
+      # self.teams_dataset.order(Sequel.expr(:match_wins).desc, Sequel.expr(:match_losses), Sequel.expr(:match_ties).desc)
+      self.teams_dataset.select_append!{ rank{}.over(:order => [
+        Sequel.expr(:match_wins).desc,
+        Sequel.expr(:match_losses),
+        Sequel.expr(:match_ties).desc,
+      ]) }
+    else
+      nil
+    end
+  end
+
   def seed_winners
     # self.players.sort_by{ |p| [ p.rr_wins, p.rr_ties, -p.rr_losses, p.rr_holes_up, p.rr_holes_remaining ] }.reverse.group_by{ |p| p.seed }
     sw = self.players_dataset.association_join(:games).where(completed: true)

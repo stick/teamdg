@@ -90,7 +90,7 @@ class App < Sinatra::Base
         match_by_round.games.each do |team_match|
           pp match_by_round.inspect
           match = @event.add_match(
-            desc: "Match #{match_by_round.round}",
+            desc: "Match #{match_by_round.round_with_cycle}",
             match_num: match_by_round.round_with_cycle,
             group_id: @event.teams_dataset.where(name: team_match.team_a.to_s).first.group_id,
             day: 0
@@ -107,27 +107,6 @@ class App < Sinatra::Base
         end
       end
     end
-
-    # create db objects based on schedule
-    # @schedule.gamedays.each_with_index do |gd, matchnum|
-      # gd.games.each do |g|
-        # match = @event.add_match(
-          # desc: "Match #{matchnum + 1}",
-          # match_num: matchnum + 1,
-          # group_id: @event.teams_dataset.where(name: g.team_a.to_s).first.group_id,
-          # day: matchnum > 4 ? 0 : 6,
-        # )
-        # match.add_team(@event.teams_dataset.where(name: g.team_a.to_s).first)
-        # match.add_team(@event.teams_dataset.where(name: g.team_b.to_s).first)
-        # @event.team_seeds.each do |seed|
-          # game = match.add_game( seed: seed, event_id: @event.id,)
-          # game.add_team(@event.teams_dataset.where(name: g.team_a.to_s).first)
-          # game.add_team(@event.teams_dataset.where(name: g.team_b.to_s).first)
-          # game.add_player(@event.teams_dataset.where(name: g.team_a.to_s).first.seed(seed))
-          # game.add_player(@event.teams_dataset.where(name: g.team_b.to_s).first.seed(seed))
-        # end
-      # end
-    # end
     redirect to("/event/#{@event.id}/matches/event")
   end
 
@@ -335,36 +314,6 @@ class App < Sinatra::Base
     end
   end
 
-  get '/:event_slug/match/:match_id/?' do
-    @event = Event[url: CGI::unescape(params[:event_slug])]
-    # @player = @event.players_dataset.where(name: CGI::unescape(params[:player_name])).first
-    @match = Match[params[:match_id]]
-    @public = true
-    haml :event_match, layout: :layout_no_sidebar, locals: { hide_breadcrumbs: true }
-  end
-
-  get '/:event_slug/player/:player_name/?' do
-    @event = Event[url: CGI::unescape(params[:event_slug])]
-    @player = @event.players_dataset.where(name: CGI::unescape(params[:player_name])).first
-    @public = true
-    haml :player_match, layout: :layout_no_sidebar, locals: { hide_breadcrumbs: true }
-  end
-
-  get '/:event_slug/team/:team_name/?' do
-    @event = Event[url: CGI::unescape(params[:event_slug])]
-    @team = @event.teams_dataset.where(name: CGI::unescape(params[:team_name])).first
-    pp @team
-    pp @event
-    @public = true
-    haml :team_match, layout: :layout_no_sidebar, locals: { hide_breadcrumbs: true }
-  end
-
-  get '/:event_slug/?' do
-    @event = Event[url: CGI::unescape(params[:event_slug])]
-    @public = true
-    haml :event_standings, locals: { hide_breadcrumbs: true }, layout: :layout_no_sidebar
-  end
-
   get '/event/:event_id/rosters/?' do
     @event = Event[params[:event_id]]
     haml :rosters
@@ -470,5 +419,34 @@ class App < Sinatra::Base
     redirect to("/event/#{@event.id}/semifinals")
   end
 
+  get '/:event_slug/match/:match_id/?' do
+    @event = Event[url: CGI::unescape(params[:event_slug])]
+    # @player = @event.players_dataset.where(name: CGI::unescape(params[:player_name])).first
+    @match = Match[params[:match_id]]
+    @public = true
+    haml :event_match, layout: :layout_no_sidebar, locals: { hide_breadcrumbs: true }
+  end
+
+  get '/:event_slug/player/:player_name/?' do
+    @event = Event[url: CGI::unescape(params[:event_slug])]
+    @player = @event.players_dataset.where(name: CGI::unescape(params[:player_name])).first
+    @public = true
+    haml :player_match, layout: :layout_no_sidebar, locals: { hide_breadcrumbs: true }
+  end
+
+  get '/:event_slug/team/:team_name/?' do
+    @event = Event[url: CGI::unescape(params[:event_slug])]
+    @team = @event.teams_dataset.where(name: CGI::unescape(params[:team_name])).first
+    pp @team
+    pp @event
+    @public = true
+    haml :team_match, layout: :layout_no_sidebar, locals: { hide_breadcrumbs: true }
+  end
+
+  get '/:event_slug/?' do
+    @event = Event[url: CGI::unescape(params[:event_slug])]
+    @public = true
+    haml :event_standings, locals: { hide_breadcrumbs: true }, layout: :layout_no_sidebar
+  end
 
 end

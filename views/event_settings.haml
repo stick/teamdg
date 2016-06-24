@@ -8,6 +8,18 @@
   - groups_assigned = @event.teams.select { |t| t.group_id.nil? }
   %input#groupsAssigned{ type: 'hidden', name: 'groups_assigned', value: groups_assigned.empty? ? 'true' : 'false' }
   .form-group
+    %label.col-sm-2.control-label Semi Finalists:
+    .col-sm-10
+      %label.radio-inline
+        %input.semis.use_points{ name: 'semis', type: 'radio', value: 'xgrouppoints', checked: @event.semis == 'xgrouppoints' ? true : false } Cross group by points
+      %label.radio-inline
+        %input.semis.use_points{ name: 'semis', type: 'radio', value: 'grouppoints', checked: @event.semis == 'grouppoints' ? true : false } Same group by points.
+      %label.radio-inline
+        %input.semis.use_points{ name: 'semis', type: 'radio', value: 'points', checked: @event.semis == 'points' ? true : false } Pure Points
+      %label.radio-inline
+        %input.semis#semiUseRecord{ name: 'semis', type: 'radio', value: 'record', checked: @event.semis == 'record' ? true : false } Record
+      %i.fa.fa-question-circle.clickable{ data: { container: 'body', toggle: 'popover', placement: 'left', title: 'Group Advance',  content: partial(:_group_advance_info) } }
+  .form-group.points
     %label.col-sm-2.control-label Points for a win:
     .col-sm-10
       %label.radio-inline
@@ -16,23 +28,13 @@
         %input.matchpoints{ name: 'matchpoints', type: 'radio', value: 2, checked: @event.matchpoints == 2 ? true : false} 2
       %label.radio-inline
         %input.matchpoints{ name: 'matchpoints', type: 'radio', value: 3, checked: @event.matchpoints == 3 ? true : false } 3
-  .form-group
+  .form-group.points
     %label.col-sm-2.control-label Points for a tie:
     .col-sm-10
       %label.radio-inline
         %input.tiepoints{ name: 'tiepoints', type: 'radio', value: 0, checked: @event.tiepoints == 0 ? true: false } 0
       %label.radio-inline
         %input.tiepoints{ name: 'tiepoints', type: 'radio', value: 1, checked: @event.tiepoints == 1 ? true: false } 1
-  .form-group
-    %label.col-sm-2.control-label Semi Finalists:
-    .col-sm-10
-      %label.radio-inline
-        %input.semis{ name: 'semis', type: 'radio', value: 'xgrouppoints', checked: @event.semis == 'xgrouppoints' ? true : false } Cross group by points
-      %label.radio-inline
-        %input.semis{ name: 'semis', type: 'radio', value: 'grouppoints', checked: @event.semis == 'grouppoints' ? true : false } Same group by points.
-      %label.radio-inline
-        %input.semis{ name: 'semis', type: 'radio', value: 'points', checked: @event.semis == 'points' ? true : false } Pure Points
-      %i.fa.fa-question-circle.clickable{ data: { container: 'body', toggle: 'popover', placement: 'left', title: 'Group Points',  content: 'How group play affects the semifinals.  "Cross group by points" will have the top finisher from one group play the second finisher from the second group (only supported for 2 groups) and vice versa.  "Same group by points" will have the top finisher in the group play the second place team.  "Pure points" will build the semifinals based on points regardless of the group/division.' } }
   .form-group
     %label.col-sm-2.control-label{ for: "group_advance" } Teams advancing from group stage:
     .col-sm-2
@@ -61,6 +63,21 @@
 
     if ($('input#groupsAssigned').val() == 'true') {
       $('#startEvent').removeClass('disabled').attr('disabled', false);
+    }
+
+    $('.use_points').click(function(e) {
+      $('.points').removeClass('hidden');
+    });
+
+    $('#semiUseRecord').click(function(e) {
+      $('.points').addClass('hidden');
+    });
+
+    if ($('#semiUseRecord').is(':checked')) {
+      console.log('semiUseRecord clicked');
+      $('.points').addClass('hidden');
+    } else {
+      $('.points').removeClass('hidden');
     }
 
     $('.random_url').click(function(e) {

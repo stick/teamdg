@@ -37,10 +37,18 @@ def result(game, player)
 end
 
 def format_record(record, tiny: false, color: false)
-  # [ wins, losses, ties ]
-  return record.join('/') if tiny
-  return "<span class='text-success'>#{record[0]}</span> &mdash; <span class='text-danger'>#{record[1]}</span> &mdash; <span class='text-muted'>#{record[2]}</span>" if color
-  return record.join(' &mdash; ')
+  # [ wins, losses, ties ] / { wins: x, losses: y, ties: z }
+  if record.is_a?(Hash)
+    return record.values.join('/') if tiny
+    return "<span class='text-success'>#{record[:wins]}</span> &mdash; <span class='text-danger'>#{record[:losses]}</span> &mdash; <span class='text-muted'>#{record[:ties]}</span>" if color
+    return record.values.join(' &mdash; ')
+  elsif record.is_a?(Array)
+    return record.join('/') if tiny
+    return "<span class='text-success'>#{record[0]}</span> &mdash; <span class='text-danger'>#{record[1]}</span> &mdash; <span class='text-muted'>#{record[2]}</span>" if color
+    return record.join(' &mdash; ')
+  else
+    "shoo"
+  end
 end
 
 def ordinalize(i)

@@ -22,6 +22,7 @@ unless DB.table_exists? (:events)
     Integer     :cycles, :default => 2
     Integer     :tiepoints, :null => false, :default => 1
     String      :url, :unique => true
+    String      :group_decider, :null => false, :default => 'points'
     TrueClass   :scheduled, :default => false
     String      :semis, :null => false, :default => 'xgrouppoints'
     Date        :startdate

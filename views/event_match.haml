@@ -58,6 +58,10 @@
     #{@match.when}
     &mdash;
   #{@match.showdown}
+  - if @match.winner
+    #{@match.winner.name} wins!
+  - elsif @match.tie
+    Match tied
 
 %table.table.table-hover.table-responsive.table-condensed
   %thead
@@ -133,7 +137,7 @@
         %td
           #{game.player_b.name}
           - if params[:debug]
-            [ #{game.player_a.id} ]
+            [ #{game.player_b.id} ]
         %td
           %h5
             %span.hidden-xs #{game.result(game.player_b.id)}

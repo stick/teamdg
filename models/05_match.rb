@@ -21,6 +21,8 @@ unless DB.table_exists? (:matches)
     Integer     :team_a_ties, :default => 0, :null => false
     Integer     :no_decisions, :default => 0, :null => false
     Integer     :day, :default => 6, :null => false
+    Integer     :tie, :null => true
+    TrueClass   :completed, :default => false
     TrueClass   :semi, :default => false
     TrueClass   :final, :default => false
     foreign_key :event_id, :events, :on_delete => :cascade, :null => false
@@ -143,11 +145,27 @@ class Match < Sequel::Model(:matches)
   end
 
   def decided
-    majority = (self.event.roster_size / 2.0).round
-    if (self.team_a_wins >= majority ) or (self.team_a_losses >= majority)
-      true
+    if self.semi or self.final
+      majority = (self.event.roster_size / 2.0).round
+      if (self.team_a_wins >= majority ) or (self.team_a_losses >= majority)
+        true
+      else
+        false
+      end
     else
-      false
+       self.no_decisions > 0 ? false : true
+    end
+  end
+
+  def result
+    if self.completed
+      if self.winner
+        1
+      elsif self.tie
+        0
+      else
+        -1
+      end
     end
   end
 
@@ -164,9 +182,16 @@ class Match < Sequel::Model(:matches)
   end
 
   def winner
-    majority = (self.event.roster_size / 2.0).round
-    return self.team_a if self.team_a_wins >= majority
-    return self.team_b if self.team_b_wins >= majority
+    if self.semi or self.final
+      majority = (self.event.roster_size / 2.0).round
+      return self.team_a if self.team_a_wins >= majority
+      return self.team_b if self.team_b_wins >= majority
+    else
+      if self.no_decisions <= 0
+        return self.team_a if self.team_a_wins > self.team_b_wins
+        return self.team_b if self.team_b_wins > self.team_a_wins
+      end
+    end
   end
 
   def loser
