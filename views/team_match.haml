@@ -29,20 +29,24 @@
               %a{ href: url("/#{CGI::escape @event.url}/team/#{CGI::escape team.name}") } #{team.name}
 
 
-%h3 Team #{@team.name} Matches
+%h3
+  Team #{@team.name} Matches
+  - if @event.semis == 'record'
+    #{format_record @team.record}
 
 .col-lg-6.col-xs-10
   .list-group
     - @team.matches.sort{ |x,y| x.id <=> y.id }.each do |match|
       %a.list-group-item{ href: url("/event/#{@event.id}/matches/team/#{@team.id}/match/#{match.id}") }
-        #{match.desc}
-        #{vs}
-        - if @team.id == match.team_a.id
-          #{match.team_b.name}
-        - else
-          #{match.team_a.name}
-        %strong.record (#{format_record(match.record(@team), color: true)})
-        %span.badge{ data: { toggle: 'tooltip', title: 'Reported matches' } } #{match.games_dataset.where(completed: true).count} / #{match.games.count}
+        %span{ style: 'margin-left: 10px' }
+          #{match.desc}
+          #{vs}
+          - if @team.id == match.team_a.id
+            #{match.team_b.name}
+          - else
+            #{match.team_a.name}
+        %strong.record.pull-right (#{format_record(match.record(@team), color: true)})
+        %span.badge.pull-left{ data: { toggle: 'tooltip', title: 'Reported matches' } } #{match.games_dataset.where(completed: true).count} / #{match.games.count}
 
 .col-lg-3.col-sm-6.col-xs-10
   %h5 Round Robin Wins / Losses / Ties
@@ -53,77 +57,83 @@
 
 .row
   .col-lg-12.col-md-12.col-xs-12.col-sm-12
-    %table.table.table-responsive.table-condensed
-      %thead
-        %tr
-          %th{ colspan: @team.opponents.count + 1 }
-            %h3
-              #{@team.name}
-              %small #{@team.group}
-        %tr
-          %th &nbsp;
-          - @team.matches.each do |match|
-            %th.match_header
-              %span.hidden-xs
-                - if match.desc =~ /Semi/
-                  #{match.desc.gsub(/Match \d/, '')}
-                - else
-                  #{match.desc}
-              %span.hidden-sm.hidden-md.hidden-lg #{match.match_num}
-        %tr
-          %th &nbsp;
-          - @team.opponents.each do |opponent|
-            %th
-              %span.hidden-xs #{opponent.name}
-              %span.hidden-sm.hidden-md.hidden-lg #{opponent.name.slice(0..1)}
-      %tbody
-        - @team.players.each do |player|
+    .table-responsive
+      %table.table.table-condensed
+        %thead
           %tr
-            %th
-              %h5
-                #{player.name}
-                %small #{player.seed}
-            - player.games.each do |game|
-              %td.game_cell
-                %span.hidden-xs #{game.result(player.id)}
-                %span.hidden-sm.hidden-md.hidden-lg #{game.result(player.id, tiny: true)}
-      %tfoot
-        %tr
-          %td &nbsp;
-          - @team.matches.each do |match|
-            %td
-              %span.hidden-xs #{format_record(match.record(@team))}
-              %span.hidden-sm.hidden-md.hidden-lg #{format_record(match.record(@team), tiny: true)}
-        %tr
-          %td
-            %span.hidden-xs Match Points
-            %span.hidden-sm.hidden-md.hidden-lg Pts
-            %span.badge.pull-right #{@team.points}
-          - @team.matches.each do |match|
-            - if match.semi or match.final
-              %td &nbsp;
-            - else
-              %td #{match.points(@team)}
-        %tr
-          %td
-            %span.hidden-xs 1<sup>st</sup> Tiebreak
-            %span.hidden-sm.hidden-md.hidden-lg 1<sup>st</sup>
-            %span.badge.pull-right #{@team.holes_up}
-          - @team.matches.each do |match|
-            - if match.semi or match.final
-              %td &nbsp;
-            - else
-              %td #{match.holes_up(@team)}
-        %tr
-          %td
-            %span.hidden-xs 2<sup>nd</sup> Tiebreak
-            %span.hidden-sm.hidden-md.hidden-lg 2<sup>nd</sup>
-            %span.badge.pull-right #{@team.holes_remaining}
-          - @team.matches.each do |match|
-            - if match.semi or match.final
-              %td &nbsp;
-            - else
-              %td #{match.holes_remaining(@team)}
+            %th{ colspan: @team.opponents.count + 1 }
+              %h3
+                #{@team.name}
+                %small #{@team.group}
+          %tr
+            %th &nbsp;
+            - @team.matches.each do |match|
+              %th.match_header
+                %span.hidden-xs
+                  - if match.desc =~ /Semi/
+                    #{match.desc.gsub(/Match \d/, '')}
+                  - else
+                    #{match.desc}
+                    - if match.winner == @team
+                      #{icon('trophy')}
+                    - elsif match.tie and match.winner.nil?
+                      #{icon('minus')}
+                %span.hidden-sm.hidden-md.hidden-lg #{match.match_num}
+          %tr
+            %th &nbsp;
+            - @team.opponents.each do |opponent|
+              %th
+                %span.hidden-xs #{opponent.name}
+                %span.hidden-sm.hidden-md.hidden-lg #{opponent.name.slice(0..1)}
+        %tbody
+          - @team.players.each do |player|
+            %tr
+              %th
+                %h5
+                  #{player.name}
+                  %small #{player.seed}
+              - player.games.each do |game|
+                %td.game_cell
+                  %span.hidden-xs #{game.result(player.id)}
+                  %span.hidden-sm.hidden-md.hidden-lg #{game.result(player.id, tiny: true)}
+        %tfoot
+          %tr
+            %td &nbsp;
+            - @team.matches.each do |match|
+              %td
+                %span.hidden-xs #{format_record(match.record(@team))}
+                %span.hidden-sm.hidden-md.hidden-lg #{format_record(match.record(@team), tiny: true)}
+          - unless @event.semis == 'record'
+            %tr
+              %td
+                %span.hidden-xs Match Points
+                %span.hidden-sm.hidden-md.hidden-lg Pts
+                %span.badge.pull-right #{@team.points}
+              - @team.matches.each do |match|
+                - if match.semi or match.final
+                  %td &nbsp;
+                - else
+                  %td #{match.points(@team)}
+            %tr
+              %td
+                %span.hidden-xs 1<sup>st</sup> Tiebreak
+                %span.hidden-sm.hidden-md.hidden-lg 1<sup>st</sup>
+                %span.badge.pull-right #{@team.holes_up}
+              - @team.matches.each do |match|
+                - if match.semi or match.final
+                  %td &nbsp;
+                - else
+                  %td #{match.holes_up(@team)}
+            %tr
+              %td
+                %span.hidden-xs 2<sup>nd</sup> Tiebreak
+                %span.hidden-sm.hidden-md.hidden-lg 2<sup>nd</sup>
+                %span.badge.pull-right #{@team.holes_remaining}
+              - @team.matches.each do |match|
+                - if match.semi or match.final
+                  %td &nbsp;
+                - else
+                  %td #{match.holes_remaining(@team)}
 
 
 :javascript

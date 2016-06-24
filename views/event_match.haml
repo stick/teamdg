@@ -58,98 +58,104 @@
     #{@match.when}
     &mdash;
   #{@match.showdown}
-  - if @match.winner
-    #{@match.winner.name} wins!
-  - elsif @match.tie
-    Match tied
 
-%table.table.table-hover.table-responsive.table-condensed
-  %thead
-    %tr
-      - unless @public
-        %th &nbsp;
-      %th &nbsp;
-      %th{ colspan: 2 }
-        %span.hidden-xs Team #{@match.team_a.name}
-        %span.hidden-sm.hidden-md.hidden-lg #{@match.team_a.name}
-        - if @match.group.nil?
-          - if @match.decided
-            %span.text-success #{icon('trophy')}
-        - else @match.group.nil?
-          &mdash; #{@match.team_a_points.to_i} pts
-        - if params[:debug]
-          [ #{@match.team_a.id} ]
-      %th.versus{ style: 'min-width: 0px' } #{vs}
-      %th{ colspan: 2 }
-        %span.hidden-xs Team #{@match.team_b.name}
-        %span.hidden-sm.hidden-md.hidden-lg #{@match.team_b.name}
-        - unless @match.group.nil?
-          &mdash; #{@match.team_b_points.to_i} pts
-        - if params[:debug]
-          [ #{@match.team_b.id} ]
-  %tbody
-    - @match.games.sort{ |x,y| x.id <=> y.id }.each do |game|
-      %tr{ data: { href: url("/event/#{@event.id}/game/#{game.id}") } }
+.table-responsive
+  %table.table.table-hover.table-condensed
+    %thead
+      %tr
         - unless @public
-          %td
-            - if game.completed
-              %i.clickable.fa.fa-fw.fa-flag-checkered.reset_match{ data: { href: url("/event/#{@event.id}/game/#{game.id}/reset") } }
-            - if params[:debug]
-              [ #{game.id} ]
-        %th.seed_column
-          %span.hidden-xs #{game.seed}
-          %span.hidden-sm.hidden-md.hidden-lg
-        %td
-          #{game.player_a.name}
-          - if params[:debug]
-            [ #{game.player_a.id} ]
-        %td
-          %h5
-            %span.hidden-xs #{game.result(game.player_a.id)}
-            %span.hidden-sm.hidden-md.hidden-lg #{game.result(game.player_a.id, tiny: true)}
-        %td.versus
-          - unless @public
-            .btn-group{ role: 'group', data: { toggle: 'tooltip', title: 'Win / Tie / Win' } }
-              %button.game_winner.btn.btn-default{ type: 'button',
-                data: { match_id: @match.id,
-                  game_id: game.id,
-                  game: game.to_hash,
-                  event_id: @event.id,
-                  player_a: game.player_a.to_hash,
-                  player_b: game.player_b.to_hash,
-                  winner: game.player_a.id,
-                  team_a: game.player_a.team.to_hash,
-                  team_b: game.player_b.team.to_hash } }
-                #{icon('gavel', fw: true)}
-              %a.game_tie.btn.btn-default{ type: 'button', href: url("/event/#{@event.id}/game/#{game.id}/tie"), class: game.sudden_death ? 'disabled' : '' }
-                #{icon('balance-scale', fw: true)}
-              %button.game_winner.btn.btn-default{ type: 'button',
-                data: { match_id: @match.id,
-                  game_id: game.id,
-                  game: game.to_hash,
-                  event_id: @event.id,
-                  player_a: game.player_a.to_hash,
-                  player_b: game.player_b.to_hash,
-                  winner: game.player_b.id,
-                  team_a: game.player_a.team.to_hash,
-                  team_b: game.player_b.team.to_hash } }
-                #{icon('gavel', fw: true, ex_classes: 'fa-flip-horizontal')}
-        %td
-          #{game.player_b.name}
-          - if params[:debug]
-            [ #{game.player_b.id} ]
-        %td
-          %h5
-            %span.hidden-xs #{game.result(game.player_b.id)}
-            %span.hidden-sm.hidden-md.hidden-lg #{game.result(game.player_b.id, tiny: true)}
-  %tfoot
-    %tr
-      - unless @public
+          %th &nbsp;
         %th &nbsp;
-      %th &nbsp;
-      %td{ colspan: 2} #{@match.team_a_wins} &mdash; #{@match.team_a_losses} &mdash; #{@match.team_a_ties}
-      %th &nbsp;
-      %td{ colspan: 2} #{@match.team_b_wins} &mdash; #{@match.team_b_losses} &mdash; #{@match.team_b_ties}
+        %th{ colspan: 2 }
+          %span.hidden-xs Team #{@match.team_a.name}
+          %span.hidden-sm.hidden-md.hidden-lg #{@match.team_a.name}
+          - if @match.group.nil? or @event.semis == 'record'
+            - if @match.decided 
+              - if @match.team_a == @match.winner
+                %span.text-success #{icon('trophy')}
+              - elsif @match.tie
+                %span.text-muted #{icon('minus')}
+          - else
+            &mdash; #{@match.team_a_points.to_i} pts
+          - if params[:debug]
+            [ #{@match.team_a.id} ]
+        %th.versus{ style: 'min-width: 0px' } #{vs}
+        %th{ colspan: 2 }
+          %span.hidden-xs Team #{@match.team_b.name}
+          %span.hidden-sm.hidden-md.hidden-lg #{@match.team_b.name}
+          - if @match.group.nil? or @event.semis == 'record'
+            - if @match.decided
+              - if @match.team_b == @match.winner
+                %span.text-success #{icon('trophy')}
+              - elsif @match.tie
+                %span.text-muted #{icon('minus')}
+          - else
+            &mdash; #{@match.team_b_points.to_i} pts
+          - if params[:debug]
+            [ #{@match.team_b.id} ]
+    %tbody
+      - @match.games.sort{ |x,y| x.id <=> y.id }.each do |game|
+        %tr{ data: { href: url("/event/#{@event.id}/game/#{game.id}") } }
+          - unless @public
+            %td
+              - if game.completed
+                %i.clickable.fa.fa-fw.fa-flag-checkered.reset_match{ data: { href: url("/event/#{@event.id}/game/#{game.id}/reset") } }
+              - if params[:debug]
+                [ #{game.id} ]
+          %th.seed_column
+            %span.hidden-xs #{game.seed}
+            %span.hidden-sm.hidden-md.hidden-lg
+          %td
+            #{game.player_a.name}
+            - if params[:debug]
+              [ #{game.player_a.id} ]
+          %td
+            %h5
+              %span.hidden-xs #{game.result(game.player_a.id)}
+              %span.hidden-sm.hidden-md.hidden-lg #{game.result(game.player_a.id, tiny: true)}
+          %td.versus
+            - unless @public
+              .btn-group{ role: 'group', data: { toggle: 'tooltip', title: 'Win / Tie / Win' } }
+                %button.game_winner.btn.btn-default{ type: 'button',
+                  data: { match_id: @match.id,
+                    game_id: game.id,
+                    game: game.to_hash,
+                    event_id: @event.id,
+                    player_a: game.player_a.to_hash,
+                    player_b: game.player_b.to_hash,
+                    winner: game.player_a.id,
+                    team_a: game.player_a.team.to_hash,
+                    team_b: game.player_b.team.to_hash } }
+                  #{icon('gavel', fw: true)}
+                %a.game_tie.btn.btn-default{ type: 'button', href: url("/event/#{@event.id}/game/#{game.id}/tie"), class: game.sudden_death ? 'disabled' : '' }
+                  #{icon('balance-scale', fw: true)}
+                %button.game_winner.btn.btn-default{ type: 'button',
+                  data: { match_id: @match.id,
+                    game_id: game.id,
+                    game: game.to_hash,
+                    event_id: @event.id,
+                    player_a: game.player_a.to_hash,
+                    player_b: game.player_b.to_hash,
+                    winner: game.player_b.id,
+                    team_a: game.player_a.team.to_hash,
+                    team_b: game.player_b.team.to_hash } }
+                  #{icon('gavel', fw: true, ex_classes: 'fa-flip-horizontal')}
+          %td
+            #{game.player_b.name}
+            - if params[:debug]
+              [ #{game.player_b.id} ]
+          %td
+            %h5
+              %span.hidden-xs #{game.result(game.player_b.id)}
+              %span.hidden-sm.hidden-md.hidden-lg #{game.result(game.player_b.id, tiny: true)}
+    %tfoot
+      %tr
+        - unless @public
+          %th &nbsp;
+        %th &nbsp;
+        %td{ colspan: 2} #{@match.team_a_wins} &mdash; #{@match.team_a_losses} &mdash; #{@match.team_a_ties}
+        %th &nbsp;
+        %td{ colspan: 2} #{@match.team_b_wins} &mdash; #{@match.team_b_losses} &mdash; #{@match.team_b_ties}
 
 - if locals.empty?
   = partial(:_event_match_result_modal)

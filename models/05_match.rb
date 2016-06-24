@@ -160,25 +160,39 @@ class Match < Sequel::Model(:matches)
   def result
     if self.completed
       if self.winner
-        1
+        { result: 'winner', winner: self.winner, loser: self.loser, score: "#{self.winner_score} - #{self.loser_score}" }
       elsif self.tie
-        0
+        { result: 'tie', score: "#{self.team_a_wins} - #{self.team_b_wins}" }
       else
-        -1
+        { result: 'problem', score: 'impossible' }
       end
     end
   end
 
   def winner_score
-    majority = (self.event.roster_size / 2.0).round
-    return self.team_a_wins if self.team_a_wins >= majority
-    return self.team_b_wins if self.team_b_wins >= majority
+    if self.semi or self.final
+      majority = (self.event.roster_size / 2.0).round
+      return self.team_a_wins if self.team_a_wins >= majority
+      return self.team_b_wins if self.team_b_wins >= majority
+    else
+      if self.no_decisions <= 0
+        return self.team_a_wins if self.team_a_wins > self.team_b_wins
+        return self.team_b_wins if self.team_b_wins > self.team_a_wins
+      end
+    end
   end
 
   def loser_score
-    majority = (self.event.roster_size / 2.0).round
-    return self.team_b_wins if self.team_a_wins >= majority
-    return self.team_a_wins if self.team_b_wins >= majority
+    if self.semi or self.final
+      majority = (self.event.roster_size / 2.0).round
+      return self.team_b_wins if self.team_a_wins >= majority
+      return self.team_a_wins if self.team_b_wins >= majority
+    else
+      if self.no_decisions <= 0
+        return self.team_b_wins if self.team_a_wins >= self.team_b_wins
+        return self.team_a_wins if self.team_b_wins >= self.team_a_wins
+      end
+    end
   end
 
   def winner
