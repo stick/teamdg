@@ -13,95 +13,108 @@
           %li
             %a{ href: url("/event/#{@event.id}/team/#{team.id}") } #{team.name}
 
-.col-md-4
-  .panel.panel-default
-    %table.table.table-condensed
-      %thead
-        %tr
-          %th{ colspan: 8 }
-            %span.edit_team.clickable#span_name{ data: { id: 'name' } }
-              #{@team.name}
-              %small #{icon('edit', ex_classes: 'pull-right')}
-            %input.form-control.edit_team.hidden#name
-      %tbody
-        %tr
-          %th Captain
-          %td
-            %span.edit_team.clickable#span_captain{ data: { id: 'captain' } }
-              #{@team.captain}
-              %small #{icon('edit', ex_classes: 'pull-right')}
-            %input.form-control.edit_team.hidden#captain
-        %tr
-          %th Email
-          %td
-            %span.edit_team.clickable#span_email_address{ data: { id: 'email_address' } }
-              #{@team.email_address}
-              %small #{icon('edit', ex_classes: 'pull-right')}
-            %input.form-control.edit_team.hidden#email_address
-        %tr
-          %th Mobile
-          %td
-            %span.edit_team.clickable#span_mobile_number{ data: { id: 'mobile_number' } }
-              #{@team.mobile_number}
-              %small #{icon('edit', ex_classes: 'pull-right')}
-            %input.form-control.edit_team.hidden#mobile_number
-        %tr
-          %th Group
-          %td
-            %span#span_group
-              #{@team.group}
+.row
+  .col-md-4
+    .panel.panel-default
+      %table.table.table-condensed
+        %thead
+          %tr
+            %th{ colspan: 8 }
+              %span.edit_team.clickable#span_name{ data: { id: 'name' } }
+                #{@team.name}
+                %small #{icon('edit', ex_classes: 'pull-right')}
+              %input.form-control.edit_team.hidden#name
+        %tbody
+          %tr
+            %th Captain
+            %td
+              %span.edit_team.clickable#span_captain{ data: { id: 'captain' } }
+                #{@team.captain}
+                %small #{icon('edit', ex_classes: 'pull-right')}
+              %input.form-control.edit_team.hidden#captain
+          %tr
+            %th Email
+            %td
+              %span.edit_team.clickable#span_email_address{ data: { id: 'email_address' } }
+                #{@team.email_address}
+                %small #{icon('edit', ex_classes: 'pull-right')}
+              %input.form-control.edit_team.hidden#email_address
+          %tr
+            %th Mobile
+            %td
+              %span.edit_team.clickable#span_mobile_number{ data: { id: 'mobile_number' } }
+                #{@team.mobile_number}
+                %small #{icon('edit', ex_classes: 'pull-right')}
+              %input.form-control.edit_team.hidden#mobile_number
+          %tr
+            %th Exempt
+            %td
+              .pull-right
+                %input#exemptStatus{ data: { size: 'mini', 'on-text': 'yes', 'off-text': 'no' }, type: 'checkbox', name: 'exempt', checked: @team.exempt }
+          %tr
+            %th Group
+            %td
+              %span#span_group
+                #{@team.group}
 
 .row
-%h4 Roster
-%table.table
-  %thead
-    %tr
-      %th Seed
-      %th Player <small>(click to edit)</small>
-  %tbody
-    - @team.players.sort{ |x,y| x.id <=> y.id }.each do |player|
+  %h4 Roster
+  %table.table
+    %thead
       %tr
-        %td #{player.seed.capitalize}
-        %td
-          %span.edit_seed.clickable#span{ id: player.seed, data: { seed: player.seed, playerid: player.id } }
-            #{player.name}
-            %small #{icon('pencil', ex_classes: 'pull-right')}
-          %input.form-control.edit_seed#input{ id: player.seed, name: player.seed, data: { seed: player.seed, playerid: player.id }, class: player.nil? ? '' : 'hidden' }
+        %th Seed
+        %th Player <small>(click to edit)</small>
+    %tbody
+      - @team.players.sort{ |x,y| x.id <=> y.id }.each do |player|
+        %tr
+          %td #{player.seed.capitalize}
+          %td
+            %span.edit_seed.clickable#span{ id: player.seed, data: { seed: player.seed, playerid: player.id } }
+              #{player.name}
+              %small #{icon('pencil', ex_classes: 'pull-right')}
+            %input.form-control.edit_seed#input{ id: player.seed, name: player.seed, data: { seed: player.seed, playerid: player.id }, class: player.nil? ? '' : 'hidden' }
 
 :javascript
-  $('.edit_seed').change(function(e) {
-    var new_name = $(this).val();
-    $.post('/player/' + this.dataset.playerid + '/update', { seed: this.dataset.seed, team_id: #{@team.id}, name: new_name });
-    $(this).addClass('hidden');
-    $('#span_' + this.dataset.seed).removeClass('hidden').html(new_name + '<small><i class="fa fa-pencil pull-right"></i></small>');
-  });
+  $(document).ready(function(){
+    $("[name='exempt']").bootstrapSwitch( {
+      onSwitchChange: function(e, state) {
+        $.post("/team/#{@team.id}/settings/update", { team_id: #{@team.id}, setting: 'exempt', value: state });
+      },
+    });
+    $('.edit_seed').change(function(e) {
+      var new_name = $(this).val();
+      $.post('/player/' + this.dataset.playerid + '/update', { seed: this.dataset.seed, team_id: #{@team.id}, name: new_name });
+      $(this).addClass('hidden');
+      $('#span_' + this.dataset.seed).removeClass('hidden').html(new_name + '<small><i class="fa fa-pencil pull-right"></i></small>');
+    });
 
-  $('.edit_seed').blur(function(e) {
-    $(this).addClass('hidden');
-    $('#span_' + this.dataset.seed).removeClass('hidden');
-  });
+    $('.edit_seed').blur(function(e) {
+      $(this).addClass('hidden');
+      $('#span_' + this.dataset.seed).removeClass('hidden');
+    });
 
-  $('.edit_seed').click(function(e) {
-    console.log(this);
-    $(this).addClass('hidden');
-    $('#input_' + this.dataset.seed).removeClass('hidden').focus();
-  });
+    $('.edit_seed').click(function(e) {
+      console.log(this);
+      $(this).addClass('hidden');
+      $('#input_' + this.dataset.seed).removeClass('hidden').focus();
+    });
 
-  $('.edit_team').click(function(e) {
-    console.log(this);
-    $(this).addClass('hidden');
-    $('#' + this.dataset.id).removeClass('hidden').focus();
-  });
+    $('.edit_team').click(function(e) {
+      console.log(this);
+      $(this).addClass('hidden');
+      $('#' + this.dataset.id).removeClass('hidden').focus();
+    });
 
-  $('.edit_team').blur(function(e) {
-    $('span#span_' + $(this).attr('id')).removeClass('hidden');
-    $(this).addClass('hidden');
-  });
+    $('.edit_team').blur(function(e) {
+      $('span#span_' + $(this).attr('id')).removeClass('hidden');
+      $(this).addClass('hidden');
+    });
 
-  $('.edit_team').change(function(e) {
-    console.log('change: ', this);
-    var myid = $(this).attr('id');
-    $(this).addClass('hidden');
-    $.post("/team/#{@team.id}/settings/update", { team_id: #{@team.id}, setting: myid, value: $(this).val() });
-    $('span#span_' + $(this).attr('id')).removeClass('hidden').html($(this).val() + '<small><i class="fa fa-edit pull-right"></i></small>');
+    $('.edit_team').change(function(e) {
+      console.log('change: ', this);
+      var myid = $(this).attr('id');
+      $(this).addClass('hidden');
+      $.post("/team/#{@team.id}/settings/update", { team_id: #{@team.id}, setting: myid, value: $(this).val() });
+      $('span#span_' + $(this).attr('id')).removeClass('hidden').html($(this).val() + '<small><i class="fa fa-edit pull-right"></i></small>');
+    });
   });

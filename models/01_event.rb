@@ -24,6 +24,7 @@ unless DB.table_exists? (:events)
     String      :url, :unique => true
     String      :group_decider, :null => false, :default => 'points'
     TrueClass   :scheduled, :default => false
+    TrueClass   :elimination_match, :default => false
     String      :semis, :null => false, :default => 'xgrouppoints'
     Date        :startdate
     Date        :enddate

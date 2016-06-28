@@ -54,6 +54,8 @@ class Match < Sequel::Model(:matches)
   one_to_many :games, :order => :games__id
   many_to_one :group
 
+
+
   def showdown(record: false)
     if record
       return "#{self.team_a.name} <strong color='text-success'>#{self.team_a_wins}</strong> <small><em>vs</em></small> #{self.team_b.name} <strong class='text-success'>#{self.team_b_wins}</strong>"

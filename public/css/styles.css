@@ -47,3 +47,7 @@ th.match_header {
 .nowrap {
   white-space: nowrap;
 }
+
+.bootstrap-switch {
+  height: 30px !important;
+}

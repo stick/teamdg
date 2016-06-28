@@ -26,6 +26,7 @@ unless DB.table_exists? (:teams)
     Integer     :match_wins
     Integer     :match_losses
     Integer     :match_ties
+    TrueClass   :exempt, :default => false
     foreign_key :event_id, :events, :on_delete => :cascade, :null => false
     foreign_key :group_id, :groups, :on_delete => :cascade
     unique      [:name, :event_id]
@@ -39,6 +40,24 @@ class Team < Sequel::Model(:teams)
   one_to_one :group
   many_to_many :matches, :order => :matches__id
   many_to_many :games, :order => :games__id
+
+  # this is probably buggy as all get out
+  def has_tiebreaker(team)
+    return nil if team == self
+    self.matches_dataset.where(completed: true, semi: false, final: false).each do |match|
+      match.teams_dataset.exclude(teams__id: self.id).each do |opp|
+        if team == opp
+          if match.result[:winner] == self
+            return true
+          elsif match.result[:winner] == team
+            return false
+          else
+            nil
+          end
+        end
+      end
+    end
+  end
 
   def roster_size
     self.event.roster_size

@@ -36,11 +36,18 @@ class Group < Sequel::Model(:groups)
 
   def rank
     case self.event.semis 
-    when 'xgrouppoints'
-    when 'grouppoints'
-      self.teams_dataset.order(Sequel.expr(:points).desc, Sequel.expr(:holes_up), Sequel.expr(:holes_remaining))
+    when 'xgrouppoints', 'grouppoints'
+      self.teams_dataset.select_append!{ rank{}.over(:order => [
+        Sequel.expr(:points).desc,
+        Sequel.expr(:holes_up).desc,
+        Sequel.expr(:holes_remaining).desc,
+      ]) }
     when 'points'
-      self.event.teams_dataset.order(Sequel.expr(:points).desc, Sequel.expr(:holes_up), Sequel.expr(:holes_remaining))
+      self.event.teams_dataset.select_append!{ rank{}.over(:order => [
+        Sequel.expr(:points).desc,
+        Sequel.expr(:holes_up).desc,
+        Sequel.expr(:holes_remaining).desc,
+      ])}
     when 'record'
       # self.teams_dataset.order(Sequel.expr(:match_wins).desc, Sequel.expr(:match_losses), Sequel.expr(:match_ties).desc)
       self.teams_dataset.select_append!{ rank{}.over(:order => [

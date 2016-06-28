@@ -1,64 +1,83 @@
-%ol.breadcrumb
-  %li.active #{@event.name.upcase}
+.row
+  .col-md-12.col-lg-12.col-sm-12.col-xs-12
+    %ol.breadcrumb
+      %li.active #{@event.name.upcase}
 
-- unless @event.scheduled
-  %p Finalize the settings for your event, then click 'Start Event' when finished.
-%p.help-block Group names can be edited on the 'Group Assignment' page.
-%form.form.form-horizontal{ method: 'POST', onsubmit: 'return false;' }
-  - groups_assigned = @event.teams.select { |t| t.group_id.nil? }
-  %input#groupsAssigned{ type: 'hidden', name: 'groups_assigned', value: groups_assigned.empty? ? 'true' : 'false' }
-  .form-group
-    %label.col-sm-2.control-label Semi Finalists:
-    .col-sm-10
-      %label.radio-inline
-        %input.semis.use_points{ name: 'semis', type: 'radio', value: 'xgrouppoints', checked: @event.semis == 'xgrouppoints' ? true : false } Cross group by points
-      %label.radio-inline
-        %input.semis.use_points{ name: 'semis', type: 'radio', value: 'grouppoints', checked: @event.semis == 'grouppoints' ? true : false } Same group by points.
-      %label.radio-inline
-        %input.semis.use_points{ name: 'semis', type: 'radio', value: 'points', checked: @event.semis == 'points' ? true : false } Pure Points
-      %label.radio-inline
-        %input.semis#semiUseRecord{ name: 'semis', type: 'radio', value: 'record', checked: @event.semis == 'record' ? true : false } Record
-      %i.fa.fa-question-circle.clickable{ data: { container: 'body', toggle: 'popover', placement: 'left', title: 'Group Advance',  content: partial(:_group_advance_info) } }
-  .form-group.points
-    %label.col-sm-2.control-label Points for a win:
-    .col-sm-10
-      %label.radio-inline
-        %input.matchpoints{ name: 'matchpoints', type: 'radio', value: 1, checked: @event.matchpoints == 1 ? true : false} 1
-      %label.radio-inline
-        %input.matchpoints{ name: 'matchpoints', type: 'radio', value: 2, checked: @event.matchpoints == 2 ? true : false} 2
-      %label.radio-inline
-        %input.matchpoints{ name: 'matchpoints', type: 'radio', value: 3, checked: @event.matchpoints == 3 ? true : false } 3
-  .form-group.points
-    %label.col-sm-2.control-label Points for a tie:
-    .col-sm-10
-      %label.radio-inline
-        %input.tiepoints{ name: 'tiepoints', type: 'radio', value: 0, checked: @event.tiepoints == 0 ? true: false } 0
-      %label.radio-inline
-        %input.tiepoints{ name: 'tiepoints', type: 'radio', value: 1, checked: @event.tiepoints == 1 ? true: false } 1
-  .form-group
-    %label.col-sm-2.control-label{ for: "group_advance" } Teams advancing from group stage:
-    .col-sm-2
-      %input.form-control#group_advance{ placeholder: '2', type: 'number', name: "group_advance", value: @event.group_advance }
-  .form-group
-    %label.col-sm-2.control-label{ for: "event_url" }
-      Public URL
-      %a#publicUrlLink{ target: '_blank', href: url("/#{@event.url}") } #{icon('external-link')}
-    .col-sm-4
-      .form-group#urlFormGroup
-        .input-group
-          %span.input-group-addon #{url("/")}
-          %input.form-control#event_url{ placeholder: 'mycoolevent', type: 'text', name: "event_url", 'aria-describedby': 'event_url_addon', value: @event.url.nil? ? false : @event.url }
-          .input-group-btn
-            %button.random_url.btn.btn-primary#event_url_addon{ type: 'button', data: { toggle: 'tooltip', title: 'Generate random url' } } &nbsp;#{icon('random')}&nbsp;
-        %span.help-block#urlHelpBlock
+.row
+  .col-md-12.col-lg-12.col-sm-12.col-xs-12
+    - unless @event.scheduled
+      %p Finalize the settings for your event, then click 'Start Event' when finished.
+    %p.help-block Group names can be edited on the 'Group Assignment' page.
+    %form.form.form-horizontal{ method: 'POST', onsubmit: 'return false;' }
+      - groups_assigned = @event.teams.select { |t| t.group_id.nil? }
+      %input#groupsAssigned{ type: 'hidden', name: 'groups_assigned', value: groups_assigned.empty? ? 'true' : 'false' }
+      .form-group
+        %label.col-sm-2.control-label Semi Finalists:
+        .col-sm-10
+          %label.radio-inline
+            %input.semis.use_points{ name: 'semis', type: 'radio', value: 'xgrouppoints', checked: @event.semis == 'xgrouppoints' ? true : false } Cross group by points
+          %label.radio-inline
+            %input.semis.use_points{ name: 'semis', type: 'radio', value: 'grouppoints', checked: @event.semis == 'grouppoints' ? true : false } Same group by points.
+          %label.radio-inline
+            %input.semis.use_points{ name: 'semis', type: 'radio', value: 'points', checked: @event.semis == 'points' ? true : false } Pure Points
+          %label.radio-inline
+            %input.semis#semiUseRecord{ name: 'semis', type: 'radio', value: 'record', checked: @event.semis == 'record' ? true : false } Record
+          %i.fa.fa-question-circle.clickable{ data: { container: 'body', toggle: 'popover', placement: 'left', title: 'Group Advance',  content: partial(:_group_advance_info) } }
+      .form-group.points
+        %label.col-sm-2.control-label Points for a win:
+        .col-sm-10
+          %label.radio-inline
+            %input.matchpoints{ name: 'matchpoints', type: 'radio', value: 1, checked: @event.matchpoints == 1 ? true : false} 1
+          %label.radio-inline
+            %input.matchpoints{ name: 'matchpoints', type: 'radio', value: 2, checked: @event.matchpoints == 2 ? true : false} 2
+          %label.radio-inline
+            %input.matchpoints{ name: 'matchpoints', type: 'radio', value: 3, checked: @event.matchpoints == 3 ? true : false } 3
+      .form-group.points
+        %label.col-sm-2.control-label Points for a tie:
+        .col-sm-10
+          %label.radio-inline
+            %input.tiepoints{ name: 'tiepoints', type: 'radio', value: 0, checked: @event.tiepoints == 0 ? true: false } 0
+          %label.radio-inline
+            %input.tiepoints{ name: 'tiepoints', type: 'radio', value: 1, checked: @event.tiepoints == 1 ? true: false } 1
+      .form-group
+        %label.col-sm-2.control-label{ for: "group_advance" } Teams advancing from group stage:
+        .col-sm-2
+          %input.form-control#group_advance{ placeholder: '2', type: 'number', name: "group_advance", value: @event.group_advance }
+      .form-group
+        %label.col-sm-2.control-label{ for: "elimination" } Elimination:
+        .col-sm-10
+          %input.form-control{ data: { size: 'mini' }, name: 'elimination', type: 'checkbox', checked: @event.elimination_match }
+        -# %i.fa.fa-question-circle.clickable{ data: { container: 'body', toggle: 'popover', placement: 'left', title: 'Elimination Match',  content: partial(:_elimination_match_info) } }
+      .form-group
+        %label.col-sm-2.control-label{ for: "event_url" }
+          Public URL
+          %a#publicUrlLink{ target: '_blank', href: url("/#{@event.url}") } #{icon('external-link')}
+        .col-sm-4
+          .form-group#urlFormGroup
+            .input-group
+              %span.input-group-addon #{url("/")}
+              %input.form-control#event_url{ placeholder: 'mycoolevent', type: 'text', name: "event_url", 'aria-describedby': 'event_url_addon', value: @event.url.nil? ? false : @event.url }
+              .input-group-btn
+                %button.random_url.btn.btn-primary#event_url_addon{ type: 'button', data: { toggle: 'tooltip', title: 'Generate random url' } } &nbsp;#{icon('random')}&nbsp;
+            %span.help-block#urlHelpBlock
 
 
-- unless @event.scheduled
-  %a.btn.btn-success.disabled#startEvent{ href: url("/event/#{@event.id}/start"), disabled: true } Start Event
-%a.btn.btn-danger{ href: url("/event/#{@event.id}/delete") } Delete Event!
+.row
+  .col-xs-12.col-sm-12.col-md-12.col-lg-12
+    - unless @event.scheduled
+      %a.btn.btn-success.disabled#startEvent{ href: url("/event/#{@event.id}/start"), disabled: true } Start Event
+    %a.btn.btn-danger{ href: url("/event/#{@event.id}/delete") } Delete Event!
 
 :javascript
   $(document).ready(function(){
+    $("[name='elimination']").bootstrapSwitch({
+      onSwitchChange: function(e, state) {
+        $.post("/event/#{@event.id}/update", {
+          update: 'elimination_match',
+          value: state,
+        });
+      },
+    });
     $('[data-toggle="popover"]').popover({ 'trigger': 'hover', 'html': 'true' });
 
     if ($('input#groupsAssigned').val() == 'true') {
@@ -111,6 +130,15 @@
         })
     });
 
+    $('.elimination').change(function(e) {
+      $.post("/event/#{@event.id}/update", {
+        update: 'elimination_match',
+        value: $(this).prop('checked'),
+      })
+      if ($(this).prop('checked')) {
+      }
+    });
+
     $('.matchpoints').change(function(e) {
       $.post("/event/#{@event.id}/update", { update: 'matchpoints', value: $(this).val() });
     });
@@ -124,4 +152,5 @@
       $.post("/event/#{@event.id}/update", { update: 'group_advance', value: $(this).val() });
       $(this).blur();
     });
+
   });

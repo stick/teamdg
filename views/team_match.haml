@@ -90,8 +90,11 @@
             %tr
               %th
                 %h5
-                  #{player.name}
-                  %small #{player.seed}
+                  .hidden-xs
+                    #{player.name}
+                    %small #{player.seed}
+                    %span.precord.pull-right #{player.record}
+                  .hidden-sm.hidden-md.hidden-lg #{player.name.split.shift.slice(0)}. #{player.name.split.pop}
               - player.games.each do |game|
                 %td.game_cell
                   %span.hidden-xs #{game.result(player.id)}
@@ -172,7 +175,7 @@
           hoverable: false,
         },
         legend: {
-          show: true
+          show: false
         },
       }
     );
@@ -195,7 +198,7 @@
           hoverable: false,
         },
         legend: {
-          show: true
+          show: false
         },
       }
     );

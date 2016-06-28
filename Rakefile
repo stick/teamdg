@@ -78,12 +78,20 @@ namespace :sim do
     games_bar.finished
   end
 
+  desc 'simulate matches through specified match'
+  task :matches, [:match] do |t, args|
+    Rake::Task['sim:reset'].invoke
+    (1..args[:match].to_i).each do |mnum|
+      Rake::Task['sim:games'].invoke(mnum)
+      Rake::Task['sim:games'].reenable
+    end
+  end
+
   desc 'simulate games (event.first)'
   task :games, [ :match ] do |t, args|
     event = Event[ENV['event']] or Event.first
     match_count = event.matches_dataset.where(match_num: args[:match]).count
-    puts "simulating games for match #{args[:match]}"
-    puts "match_count: #{match_count}"
+    puts "simulating games for match #{args[:match]} [#{event.name}]"
     progress = RakeProgressbar.new(match_count)
     event.matches_dataset.where(match_num: args[:match]).each do |match|
       match.games.each do |g|
