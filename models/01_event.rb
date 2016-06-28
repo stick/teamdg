@@ -68,16 +68,6 @@ class Event < Sequel::Model(:events)
     self.games_dataset.where(completed: false, sudden_death: false).count
   end
 
-  def matches_by_order
-    # output an array of arrays of the matches by order they are played
-    # 4 matches are played simulataneously for an 8 team RR
-    # something like: [[a v b],[c v d], [e v f],[g v h]]
-  end
-
-  def matches_by_team
-    # output matches by teams
-  end
-
   def semi_matches
     self.matches_dataset.where(semi: true)
   end
@@ -113,8 +103,12 @@ class Event < Sequel::Model(:events)
 
   def final_matches_complete?
     a_results = []
-    self.final_matches.each { |m| a_results.push m.decided }
-    a_results.select{ |x| !x }.empty?
+    if self.final_matches.count > 0
+      self.final_matches.each { |m| a_results.push m.decided }
+      a_results.select{ |x| !x }.empty?
+    else
+      false
+    end
   end
 
   def final_games

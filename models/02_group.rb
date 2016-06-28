@@ -41,20 +41,20 @@ class Group < Sequel::Model(:groups)
         Sequel.expr(:points).desc,
         Sequel.expr(:holes_up).desc,
         Sequel.expr(:holes_remaining).desc,
-      ]) }
+      ]) }.order(:rank)
     when 'points'
       self.event.teams_dataset.select_append!{ rank{}.over(:order => [
         Sequel.expr(:points).desc,
         Sequel.expr(:holes_up).desc,
         Sequel.expr(:holes_remaining).desc,
-      ])}
+      ])}.order(:rank)
     when 'record'
       # self.teams_dataset.order(Sequel.expr(:match_wins).desc, Sequel.expr(:match_losses), Sequel.expr(:match_ties).desc)
       self.teams_dataset.select_append!{ rank{}.over(:order => [
         Sequel.expr(:match_wins).desc,
         Sequel.expr(:match_losses),
         Sequel.expr(:match_ties).desc,
-      ]) }
+      ]) }.order(:rank)
     else
       nil
     end

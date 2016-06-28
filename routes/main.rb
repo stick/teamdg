@@ -363,10 +363,34 @@ class App < Sinatra::Base
       match_num = @event.matches_dataset.max(:match_num) + 1
       m1 = @event.add_match(match_num: match_num, desc: 'Semifinals Match 1', semi: true, day: 0)
       m2 = @event.add_match(match_num: match_num, desc: 'Semifinals Match 2', semi: true, day: 0)
-      m1.add_team(@event.groups.first.winner)
-      m1.add_team(@event.groups.last.runnerup)
-      m2.add_team(@event.groups.last.winner)
-      m2.add_team(@event.groups.first.runnerup)
+      case @event.semis 
+      when 'xgrouppoints'
+        m1.add_team(@event.groups.first.winner)
+        m1.add_team(@event.groups.last.runnerup)
+        m2.add_team(@event.groups.last.winner)
+        m2.add_team(@event.groups.first.runnerup)
+      when 'grouppoints'
+        m1.add_team(@event.groups.first.winner)
+        m1.add_team(@event.groups.first.runnerup)
+        m2.add_team(@event.groups.last.winner)
+        m2.add_team(@event.groups.last.runnerup)
+      when 'points'
+        sorted_teams = @event.group.first.rank.to_a
+        m1.add_team(sorted_teams.shift) # leader
+        m2.add_team(sorted_teams.shift) # runner up
+        m2.add_team(sorted_teams.shift) # 3rd
+        m1.add_team(sorted_team.shift) # 4th
+      when 'record'
+        gr1_sorted_teams = @event.group.first.rank.to_a
+        gr2_sorted_teams = @event.group.last.rank.to_a
+        m1.add_team(gr1_sorted_teams.shift)
+        m1.add_team(gr2_sorted_teams.shift)
+        m2.add_team(gr2_sorted_teams.shift)
+        m2.add_team(gr1_sorted_teams.shift)
+      else
+        haml :invalid_event
+        error 400
+      end
       @event.team_seeds.each do |seed|
         pp "creating game for match 1 - seed #{seed}"
         g1 = m1.add_game( seed: seed, event_id: @event.id, sudden_death: true)
