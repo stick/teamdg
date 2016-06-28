@@ -26,6 +26,7 @@ unless DB.table_exists? (:teams)
     Integer     :match_wins
     Integer     :match_losses
     Integer     :match_ties
+    Integer     :rr_rank
     TrueClass   :exempt, :default => false
     foreign_key :event_id, :events, :on_delete => :cascade, :null => false
     foreign_key :group_id, :groups, :on_delete => :cascade
@@ -37,7 +38,7 @@ class Team < Sequel::Model(:teams)
   # Team Model
   one_to_many :players, :order => :players__id
   many_to_one :event
-  one_to_one :group
+  many_to_one :group
   many_to_many :matches, :order => :matches__id
   many_to_many :games, :order => :games__id
 
@@ -81,14 +82,6 @@ class Team < Sequel::Model(:teams)
     return opp_teams
   end
 
-  def group
-    if self.group_id.nil?
-      nil
-    else
-      Group[self.group_id].name
-    end
-  end
-
   def add_to_group(group)
     Group[group.id].add_team(self)
   end
@@ -126,6 +119,7 @@ class Team < Sequel::Model(:teams)
     self.match_wins = self.matches_dataset.where(completed: true).where(winner_id: self.id).count
     self.match_losses = self.matches_dataset.where(completed: true).exclude(winner_id: self.id).count
     self.match_ties = self.matches_dataset.where(completed: true).exclude(tie: nil).count
+    self.rr_rank = self.group.rank.to_hash[self.id][:rank].to_i
     self.save
   end
 

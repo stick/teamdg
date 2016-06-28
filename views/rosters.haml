@@ -4,17 +4,26 @@
   %li.active Rosters
 
 .row
-  - @event.teams.each do |team|
-    .col-md-3
-      .panel{ class: team.group == @event.groups.first.name ? 'panel-primary' : 'panel-default' }
-        .panel-heading
-          %h3.panel-title
-            #{team.name}
-            - unless team.group.nil?
-              &#47; #{team.group}
-        %table.table
-          %tbody
-            - team.players.sort{ |x,y| x.id <=> y.id }.each do |player|
-              %tr
-                %th #{player.seed}
-                %td #{player.name}
+  .col-xs-12.col-sm-12.col-md-6.col-lg-12
+    %ul.nav.nav-tabs
+      - @event.teams.each do |team|
+        %li{ role: 'presentation' }
+          %a{ href: '#' + team.name.split.join, role: 'tab', data: { toggle: 'tab' } } #{team.name}
+
+.row
+  .tab-content
+    - @event.teams.each do |team|
+      .tab-pane{ id: team.name.split.join, role: 'tabpanel' }
+        .col-xs-12.col-sm-12.col-md-6.col-lg-6
+          .panel{ class: team.group == @event.groups.first.name ? 'panel-primary' : 'panel-default' }
+            .panel-heading
+              %h3.panel-title
+                #{team.name}
+                - unless team.group.nil?
+                  %small #{team.group.name}
+            %table.table
+              %tbody
+                - team.players.sort{ |x,y| x.id <=> y.id }.each do |player|
+                  %tr
+                    %th #{player.seed}
+                    %td #{player.name}

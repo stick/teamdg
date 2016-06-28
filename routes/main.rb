@@ -14,6 +14,7 @@ class App < Sinatra::Base
   end
 
   get '/events/?' do
+    @title = "Events"
     haml :events
   end
 
@@ -24,13 +25,20 @@ class App < Sinatra::Base
 
   post '/event/new/?' do
     pp params
+    group_advance = case params[:event_group_num].to_i
+                    when 4 then 1
+                    when 2 then 2
+                    when 1 then 4
+                    else nil
+                    end
+
     e = Event.create(
       name: params[:event_name],
       event_type: params[:event_type],
       stage_1_format: params[:event_format1],
       stage_2_format: params[:event_format2],
       group_number: params[:event_group_num].to_i,
-      group_advance: params[:event_group_advance].to_i,
+      group_advance: group_advance,
       num_teams: params[:num_teams].to_i,
       roster_size: params[:roster_size].to_i,
       team_seeds: params[:team_seeds].split(/, /),
@@ -117,6 +125,7 @@ class App < Sinatra::Base
 
   get '/event/:event_id/matches/event/?' do
     @event = Event[params[:event_id]]
+    @title= "#{@event.name}:Event Matches"
     haml :event_matches
   end
 
@@ -165,11 +174,13 @@ class App < Sinatra::Base
 
   get '/event/:event_id/team/all?' do
     @event = Event[params[:event_id]]
+    @title = "#{@event.name}:Teams"
     haml :teams
   end
 
   get '/event/:event_id/groups/?' do
     @event = Event[params[:event_id]]
+    @title = "#{@event.name}:Group assignment"
     haml :group_assignment
   end
 
@@ -270,6 +281,7 @@ class App < Sinatra::Base
   get '/event/:event_id/team/:team_id/?' do
     @event = Event[params[:event_id]]
     @team = Team[params[:team_id]]
+    @title = "#{@event.name}:#{@team.name}"
     haml :team
   end
 
@@ -293,6 +305,12 @@ class App < Sinatra::Base
 
   post '/event/:event_id/update/?' do
     e = Event[params[:event_id]]
+    if params[:update] == 'semis'
+      e.group_advance = case params[:value]
+      when 'points', 'record' then 4
+      else 2
+      end
+    end
     e.send("#{params[:update]}=", params[:value])
     e.save
   end
@@ -316,57 +334,67 @@ class App < Sinatra::Base
 
   get '/event/:event_id/rosters/?' do
     @event = Event[params[:event_id]]
+    @title = "#{@event.name}:Rosters"
     haml :rosters
   end
 
   get '/event/:event_id/matches/group/?' do
     @event = Event[params[:event_id]]
+    @title = "#{@event.name}:Group Matches"
     haml :group_matches
   end
 
   get '/event/:event_id/matches/team/?' do
     @event = Event[params[:event_id]]
+    @title = "#{@event.name}:Team Matches"
     haml :team_matches
   end
 
   get '/event/:event_id/matches/team/:team_id/?' do
     @event = Event[params[:event_id]]
     @team = Team[params[:team_id]]
+    @title = "#{@event.name}:Team Matches:#{@team.name}"
     haml :team_match
   end
 
   get '/event/:event_id/matches/player/?' do
     @event = Event[params[:event_id]]
+    @title = "#{@event.name}:Player Matches"
     haml :player_matches
   end
 
   get '/event/:event_id/matches/player/:player_id/?' do
     @event = Event[params[:event_id]]
     @player = Player[params[:player_id]]
+    @title = "#{@event.name}:Player Matches:#{@player.name}"
     haml :player_match
   end
 
   get '/event/:event_id/standings/?' do
     @event = Event[params[:event_id]]
+    @title = "#{@event.name}:Standings"
     haml :event_standings
   end
 
   get '/event/:event_id/matches/games/unreported/?' do
     @event = Event[params[:event_id]]
+    @title = "#{@event.name}:Unreported Matches"
     haml :games_unreported
   end
 
   get '/event/:event_id/semifinals/?' do
     @event = Event[params[:event_id]]
+    @title = "#{@event.name}:Semifinals"
 
     if @event.semi_matches.count < 1 and @event.rr_matches_completed >= 100
       match_num = @event.matches_dataset.max(:match_num) + 1
       m1 = @event.add_match(match_num: match_num, desc: 'Semifinals Match 1', semi: true, day: 0)
       m2 = @event.add_match(match_num: match_num, desc: 'Semifinals Match 2', semi: true, day: 0)
-      case @event.semis 
+      case @event.semis
       when 'xgrouppoints'
         m1.add_team(@event.groups.first.winner)
         m1.add_team(@event.groups.last.runnerup)
+
         m2.add_team(@event.groups.last.winner)
         m2.add_team(@event.groups.first.runnerup)
       when 'grouppoints'
@@ -375,21 +403,34 @@ class App < Sinatra::Base
         m2.add_team(@event.groups.last.winner)
         m2.add_team(@event.groups.last.runnerup)
       when 'points'
-        sorted_teams = @event.group.first.rank.to_a
+        sorted_teams = @event.groups.first.rank.to_a
         m1.add_team(sorted_teams.shift) # leader
         m2.add_team(sorted_teams.shift) # runner up
         m2.add_team(sorted_teams.shift) # 3rd
-        m1.add_team(sorted_team.shift) # 4th
-      when 'record'
-        gr1_sorted_teams = @event.group.first.rank.to_a
-        gr2_sorted_teams = @event.group.last.rank.to_a
+        m1.add_team(sorted_teams.shift) # 4th
+      when 'xgrouprecord'
+        gr1_sorted_teams = @event.groups.first.rank.to_a
+        gr2_sorted_teams = @event.groups.last.rank.to_a
         m1.add_team(gr1_sorted_teams.shift)
-        m1.add_team(gr2_sorted_teams.shift)
         m2.add_team(gr2_sorted_teams.shift)
+        m1.add_team(gr2_sorted_teams.shift)
         m2.add_team(gr1_sorted_teams.shift)
+      when 'grouprecord'
+        gr1_sorted_teams = @event.groups.first.rank.to_a
+        gr2_sorted_teams = @event.groups.last.rank.to_a
+        m1.add_team(gr1_sorted_teams.shift)
+        m1.add_team(gr1_sorted_teams.shift)
+        m2.add_team(gr2_sorted_teams.shift)
+        m2.add_team(gr2_sorted_teams.shift)
+      when 'record'
+        sorted_teams = @event.groups.first.rank.to_a
+        m1.add_team(sorted_teams.shift)
+        m2.add_team(sorted_teams.shift)
+        m2.add_team(sorted_teams.shift)
+        m1.add_team(sorted_teams.shift)
       else
-        haml :invalid_event
-        error 400
+        puts "fallthrough case"
+        halt haml :invalid_event
       end
       @event.team_seeds.each do |seed|
         pp "creating game for match 1 - seed #{seed}"
@@ -419,6 +460,8 @@ class App < Sinatra::Base
 
   get '/event/:event_id/finals/?' do
     @event = Event[params[:event_id]]
+    @title = "#{@event.name}:Finals"
+
     if @event.final_matches.count > 0
       @match = @event.final_matches.first
     else
@@ -468,6 +511,7 @@ class App < Sinatra::Base
   end
 
   get '/:event_slug/?' do
+    puts "WARNING USING PUBLIC SLUG!!!!!"
     @event = Event[url: CGI::unescape(params[:event_slug])]
     @public = true
     haml :event_standings, locals: { hide_breadcrumbs: true }, layout: :layout_no_sidebar

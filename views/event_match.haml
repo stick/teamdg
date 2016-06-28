@@ -69,8 +69,8 @@
         %th{ colspan: 2 }
           %span.hidden-xs Team #{@match.team_a.name}
           %span.hidden-sm.hidden-md.hidden-lg #{@match.team_a.name}
-          - if @match.group.nil? or @event.semis == 'record'
-            - if @match.decided 
+          - if @match.group.nil? or @event.semis =~ /record/
+            - if @match.decided
               - if @match.team_a == @match.winner
                 %span.text-success #{icon('trophy')}
               - elsif @match.tie
@@ -83,7 +83,7 @@
         %th{ colspan: 2 }
           %span.hidden-xs Team #{@match.team_b.name}
           %span.hidden-sm.hidden-md.hidden-lg #{@match.team_b.name}
-          - if @match.group.nil? or @event.semis == 'record'
+          - if @match.group.nil? or @event.semis =~ /record/
             - if @match.decided
               - if @match.team_b == @match.winner
                 %span.text-success #{icon('trophy')}

@@ -4,8 +4,10 @@
   %li.active
     Team matches
 
-%h1 Team Matches
+%h3.page-header Team Matches
 
-.list-group
-  - @event.teams.each do |team|
-    %a.list-group-item{ href: url("/event/#{@event.id}/matches/team/#{team.id}") } #{team.name}
+.row
+  .col-xs-12.col-sm-12.col-md-12.col-lg-12
+    .list-group
+      - @event.teams.each do |team|
+        %a.list-group-item{ href: url("/event/#{@event.id}/matches/team/#{team.id}") } #{team.name}

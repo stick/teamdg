@@ -13,7 +13,7 @@
       %input#groupsAssigned{ type: 'hidden', name: 'groups_assigned', value: groups_assigned.empty? ? 'true' : 'false' }
       .form-group
         %label.col-sm-2.control-label Semi Finalists:
-        .col-sm-10
+        .col-sm-6
           %label.radio-inline
             %input.semis.use_points{ name: 'semis', type: 'radio', value: 'xgrouppoints', checked: @event.semis == 'xgrouppoints' ? true : false } Cross group by points
           %label.radio-inline
@@ -21,8 +21,12 @@
           %label.radio-inline
             %input.semis.use_points{ name: 'semis', type: 'radio', value: 'points', checked: @event.semis == 'points' ? true : false } Pure Points
           %label.radio-inline
-            %input.semis#semiUseRecord{ name: 'semis', type: 'radio', value: 'record', checked: @event.semis == 'record' ? true : false } Record
-          %i.fa.fa-question-circle.clickable{ data: { container: 'body', toggle: 'popover', placement: 'left', title: 'Group Advance',  content: partial(:_group_advance_info) } }
+            %input.semis#semiUseRecord{ name: 'semis', type: 'radio', value: 'xgrouprecord', checked: @event.semis == 'xgrouprecord' ? true : false } Cross group by record
+          %label.radio-inline
+            %input.semis#semiUseRecord{ name: 'semis', type: 'radio', value: 'grouprecord', checked: @event.semis == 'grouprecord' ? true : false } Same group by record
+          %label.radio-inline
+            %input.semis#semiUseRecord{ name: 'semis', type: 'radio', value: 'record', checked: @event.semis == 'record' ? true : false } Pure record
+          %i.fa.fa-question-circle.clickable{ data: { container: 'body', toggle: 'popover', placement: 'auto', title: 'Group Advance',  content: partial(:_group_advance_info), size: 'large' } }
       .form-group.points
         %label.col-sm-2.control-label Points for a win:
         .col-sm-10
@@ -39,10 +43,6 @@
             %input.tiepoints{ name: 'tiepoints', type: 'radio', value: 0, checked: @event.tiepoints == 0 ? true: false } 0
           %label.radio-inline
             %input.tiepoints{ name: 'tiepoints', type: 'radio', value: 1, checked: @event.tiepoints == 1 ? true: false } 1
-      .form-group
-        %label.col-sm-2.control-label{ for: "group_advance" } Teams advancing from group stage:
-        .col-sm-2
-          %input.form-control#group_advance{ placeholder: '2', type: 'number', name: "group_advance", value: @event.group_advance }
       .form-group
         %label.col-sm-2.control-label{ for: "elimination" } Elimination:
         .col-sm-10
@@ -147,10 +147,6 @@
     });
     $('.semis').change(function(e) {
       $.post("/event/#{@event.id}/update", { update: 'semis', value: $(this).val() });
-    });
-    $('#group_advance').change(function(e) {
-      $.post("/event/#{@event.id}/update", { update: 'group_advance', value: $(this).val() });
-      $(this).blur();
     });
 
   });

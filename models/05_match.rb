@@ -50,7 +50,7 @@ end
 
 class Match < Sequel::Model(:matches)
   many_to_one :event
-  many_to_many :teams, :order => :teams__id
+  many_to_many :teams, :order => [ :teams__rr_rank, :teams__id ] 
   one_to_many :games, :order => :games__id
   many_to_one :group
 

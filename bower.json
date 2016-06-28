@@ -13,7 +13,8 @@
     "dragula": "latest",
     "startbootstrap-sb-admin-2": "^1.0.8",
     "bootstrap-list-filter": "^0.3.2",
-    "bootstrap-switch": "^3.3.2"
+    "bootstrap-switch": "^3.3.2",
+    "jquery-stickytabs": "^1.2.1"
   },
   "private": true,
   "authors": [

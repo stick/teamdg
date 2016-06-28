@@ -138,7 +138,11 @@
     %script{ src: '/bower_components/metisMenu/dist/metisMenu.min.js' }
     %script{ src: '/bower_components/bootstrap-list-filter/bootstrap-list-filter.min.js' }
     %script{ src: '/bower_components/bootstrap-switch/dist/js/bootstrap-switch.min.js' }
+    %script{ src: '/bower_components/jquery-stickytabs/jquery.stickytabs.js' }
 
 
 :javascript
-  $('[data-toggle="tooltip"]').tooltip();
+  $(document).ready(function() {
+    $('[data-toggle="tooltip"]').tooltip();
+    $('.nav-tabs').stickyTabs();
+  });

@@ -35,7 +35,7 @@ class Group < Sequel::Model(:groups)
   end
 
   def rank
-    case self.event.semis 
+    case self.event.semis
     when 'xgrouppoints', 'grouppoints'
       self.teams_dataset.select_append!{ rank{}.over(:order => [
         Sequel.expr(:points).desc,
@@ -48,13 +48,23 @@ class Group < Sequel::Model(:groups)
         Sequel.expr(:holes_up).desc,
         Sequel.expr(:holes_remaining).desc,
       ])}.order(:rank)
-    when 'record'
+    when 'xgrouprecord', 'grouprecord'
       # self.teams_dataset.order(Sequel.expr(:match_wins).desc, Sequel.expr(:match_losses), Sequel.expr(:match_ties).desc)
       self.teams_dataset.select_append!{ rank{}.over(:order => [
         Sequel.expr(:match_wins).desc,
         Sequel.expr(:match_losses),
         Sequel.expr(:match_ties).desc,
+        Sequel.expr(:holes_up).desc,
+        Sequel.expr(:holes_remaining).desc,
       ]) }.order(:rank)
+    when 'record'
+      self.event.teams_dataset.select_append!{ rank{}.over(:order => [
+        Sequel.expr(:match_wins).desc,
+        Sequel.expr(:match_losses),
+        Sequel.expr(:match_ties).desc,
+        Sequel.expr(:holes_up).desc,
+        Sequel.expr(:holes_remaining).desc,
+      ])}.order(:rank)
     else
       nil
     end
@@ -75,11 +85,29 @@ class Group < Sequel::Model(:groups)
   end
 
   def winner
-    self.teams_dataset.order(Sequel.expr(:points).desc, Sequel.expr(:holes_up), Sequel.expr(:holes_remaining)).to_a[0]
+    case self.event.semis
+    when 'xgrouppoints', 'grouppoints'
+      self.teams_dataset.order(Sequel.expr(:points).desc, Sequel.expr(:holes_up).desc, Sequel.expr(:holes_remaining).desc).to_a[0]
+    when 'points'
+      self.event.teams_dataset.order(Sequel.expr(:points).desc, Sequel.expr(:holes_up).desc, Sequel.expr(:holes_remaining).desc).to_a[0]
+    when 'record'
+      self.teams_dataset.order( Sequel.expr(:match_wins).desc, Sequel.expr(:match_losses), Sequel.expr(:match_ties).desc ).to_a[0]
+    else
+      nil
+    end
   end
 
   def runnerup
-    self.teams_dataset.order(Sequel.expr(:points).desc, Sequel.expr(:holes_up), Sequel.expr(:holes_remaining)).to_a[1]
+    case self.event.semis
+    when 'xgrouppoints', 'grouppoints'
+      self.teams_dataset.order(Sequel.expr(:points).desc, Sequel.expr(:holes_up).desc, Sequel.expr(:holes_remaining).desc).to_a[1]
+    when 'points'
+      self.event.teams_dataset.order(Sequel.expr(:points).desc, Sequel.expr(:holes_up).desc, Sequel.expr(:holes_remaining).desc).to_a[1]
+    when 'record'
+      self.teams_dataset.order( Sequel.expr(:match_wins).desc, Sequel.expr(:match_losses), Sequel.expr(:match_ties).desc ).to_a[1]
+    else
+      nil
+    end
   end
 
   def size

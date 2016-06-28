@@ -1,12 +1,14 @@
-%h1 Player Matches
+%h3.page-header Player Matches
 
-.form-group
-  %label.sr-only{ for: 'playerSearch' } Player...
-  %input.form-control#playerSearch{ name: 'player_search', placeholder: 'Search players...' }
+.row
+  .col-xs-12.col-sm-12.col-md-12.col-lg-12
+    .form-group
+      %label.sr-only{ for: 'playerSearch' } Player...
+      %input.form-control#playerSearch{ name: 'player_search', placeholder: 'Search players...' }
 
-.list-group#playerList
-  - @event.players.each do |player|
-    %a.list-group-item{ href: url("/event/#{@event.id}/matches/player/#{player.id}") } #{player.name}
+    .list-group#playerList
+      - @event.players.each do |player|
+        %a.list-group-item{ href: url("/event/#{@event.id}/matches/player/#{player.id}") } #{player.name}
 
 :javascript
   $(document).ready(function() {

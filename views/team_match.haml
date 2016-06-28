@@ -31,7 +31,7 @@
 
 %h3
   Team #{@team.name} Matches
-  - if @event.semis == 'record'
+  - if @event.semis =~ /record/
     #{format_record @team.record}
 
 .col-lg-6.col-xs-10
@@ -106,7 +106,7 @@
               %td
                 %span.hidden-xs #{format_record(match.record(@team))}
                 %span.hidden-sm.hidden-md.hidden-lg #{format_record(match.record(@team), tiny: true)}
-          - unless @event.semis == 'record'
+          - unless @event.semis =~ /record/
             %tr
               %td
                 %span.hidden-xs Match Points

@@ -1,0 +1,36 @@
+{
+  "name": "jquery-stickytabs",
+  "version": "1.2.1",
+  "homepage": "https://github.com/aidanlister/jquery-stickytabs",
+  "authors": [
+    "Aidan Lister <aidan@aidanlister.com>"
+  ],
+  "description": "Provides persistant state (back and forward button support) for Bootstrap tabs.",
+  "main": "jquery.stickytabs.js",
+  "keywords": [
+    "bootstrap",
+    "jquery"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": ">= 2.3.0",
+    "jquery": ">= 1.9.0"
+  },
+  "_release": "1.2.1",
+  "_resolution": {
+    "type": "version",
+    "tag": "1.2.1",
+    "commit": "f044103f588aa818cc1ce5e736c003f9d2253b58"
+  },
+  "_source": "https://github.com/aidanlister/jquery-stickytabs.git",
+  "_target": "^1.2.1",
+  "_originalSource": "jquery-stickytabs",
+  "_direct": true
+}
