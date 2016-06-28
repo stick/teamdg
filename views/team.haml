@@ -1,20 +1,21 @@
-%ol.breadcrumb
-  %li
-    %a{ href: url("/event/#{@team.event.id}") } #{@team.event.name.upcase}
-  %li
-    %a{ href: url("/event/#{@team.event.id}/team/") } Teams
-  %li.active.dropdown
-    %a.dropdown-toggle{ href: '#', data: { toggle: 'dropdown' }, role: 'button' }
-      #{@team.name}
-      %span.caret
-    %ul.dropdown-menu
-      - @event.teams.each do |team|
-        - unless team == @team
-          %li
-            %a{ href: url("/event/#{@event.id}/team/#{team.id}") } #{team.name}
+.row
+  %ol.breadcrumb
+    %li
+      %a{ href: url("/event/#{@team.event.id}") } #{@team.event.name.upcase}
+    %li
+      %a{ href: url("/event/#{@team.event.id}/team/") } Teams
+    %li.active.dropdown
+      %a.dropdown-toggle{ href: '#', data: { toggle: 'dropdown' }, role: 'button' }
+        #{@team.name}
+        %span.caret
+      %ul.dropdown-menu
+        - @event.teams.each do |team|
+          - unless team == @team
+            %li
+              %a{ href: url("/event/#{@event.id}/team/#{team.id}") } #{team.name}
 
 .row
-  .col-md-4
+  .col-xs-8.col-sm-8.col-md-4.col-lg-4
     .panel.panel-default
       %table.table.table-condensed
         %thead
@@ -55,24 +56,24 @@
             %th Group
             %td
               %span#span_group
-                #{@team.group}
+                #{@team.group.name}
 
-.row
-  %h4 Roster
-  %table.table
-    %thead
-      %tr
-        %th Seed
-        %th Player <small>(click to edit)</small>
-    %tbody
-      - @team.players.sort{ |x,y| x.id <=> y.id }.each do |player|
+  .col-xs-8.col-sm-8.col-md-4.col-lg-4
+    %h4 Roster
+    %table.table
+      %thead
         %tr
-          %td #{player.seed.capitalize}
-          %td
-            %span.edit_seed.clickable#span{ id: player.seed, data: { seed: player.seed, playerid: player.id } }
-              #{player.name}
-              %small #{icon('pencil', ex_classes: 'pull-right')}
-            %input.form-control.edit_seed#input{ id: player.seed, name: player.seed, data: { seed: player.seed, playerid: player.id }, class: player.nil? ? '' : 'hidden' }
+          %th Seed
+          %th Player <small>(click to edit)</small>
+      %tbody
+        - @team.players.sort{ |x,y| x.id <=> y.id }.each do |player|
+          %tr
+            %td #{player.seed.capitalize}
+            %td
+              %span.edit_seed.clickable#span{ id: player.seed, data: { seed: player.seed, playerid: player.id } }
+                #{player.name}
+                %small #{icon('pencil', ex_classes: 'pull-right')}
+              %input.form-control.edit_seed#input{ id: player.seed, name: player.seed, data: { seed: player.seed, playerid: player.id }, class: player.nil? ? '' : 'hidden' }
 
 :javascript
   $(document).ready(function(){
@@ -94,13 +95,11 @@
     });
 
     $('.edit_seed').click(function(e) {
-      console.log(this);
       $(this).addClass('hidden');
       $('#input_' + this.dataset.seed).removeClass('hidden').focus();
     });
 
     $('.edit_team').click(function(e) {
-      console.log(this);
       $(this).addClass('hidden');
       $('#' + this.dataset.id).removeClass('hidden').focus();
     });
@@ -110,11 +109,14 @@
       $(this).addClass('hidden');
     });
 
-    $('.edit_team').change(function(e) {
-      console.log('change: ', this);
+    $('.edit_seed').change(function(e) {
       var myid = $(this).attr('id');
       $(this).addClass('hidden');
       $.post("/team/#{@team.id}/settings/update", { team_id: #{@team.id}, setting: myid, value: $(this).val() });
       $('span#span_' + $(this).attr('id')).removeClass('hidden').html($(this).val() + '<small><i class="fa fa-edit pull-right"></i></small>');
+    });
+
+    $('.edit_team').keydown(function(e) {
+      console.log(e.which);
     });
   });
