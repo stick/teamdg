@@ -10,6 +10,8 @@ require 'pg'
 require 'sinatra/base'
 require 'sinatra/config_file'
 require 'sinatra/reloader'
+require 'less'
+require 'sinatra/asset_pipeline'
 require 'sinatra/streaming'
 require 'sinatra/flash'
 require 'sequel'
@@ -24,8 +26,10 @@ require_relative 'models/init'
 
 class App < Sinatra::Base
   register Sinatra::ConfigFile
+  register Sinatra::AssetPipeline
   helpers Sinatra::Streaming
   config_file './config.yml'
+
 
   configure :development do
     register Sinatra::Reloader

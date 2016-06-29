@@ -1,5 +1,21 @@
-require_relative 'app'
 require 'rake-progressbar'
+
+task :environment do
+  require './app'
+  require 'sinatra/asset_pipeline/task'
+end
+
+namespace :assets do
+  desc "compile all assets"
+  task :precompile => :environment do
+    raise "Not implemented yet"
+  end
+
+  desc "Remove compiled assets"
+  task :clean => :environment do
+    raise "Not implemented yet"
+  end
+end
 
 desc 'Generate secret session key'
 task :session_secret do

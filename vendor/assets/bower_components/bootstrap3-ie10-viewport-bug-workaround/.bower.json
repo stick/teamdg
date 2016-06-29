@@ -24,7 +24,7 @@
     "tag": "1.0.0",
     "commit": "fee984b556e9e31be922b1774580ba45439c754a"
   },
-  "_source": "git://github.com/Haixing-Hu/bootstrap3-ie10-viewport-bug-workaround.git",
+  "_source": "https://github.com/Haixing-Hu/bootstrap3-ie10-viewport-bug-workaround.git",
   "_target": "*",
   "_originalSource": "bootstrap3-ie10-viewport-bug-workaround"
 }
