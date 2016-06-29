@@ -110,6 +110,9 @@
                               %span.pull-right.badge #{@event.rr_incomplete}
                       %li
                         %a{ href: url("/event/#{@event.id}/standings") } Standings #{icon('bar-chart', ex_classes: 'pull-right', fw: true)}
+                      - if @event.elimination_match
+                        %li
+                          %a{ href: url("/event/#{@event.id}/elimination") } Elimination #{icon('suitcase', ex_classes: 'pull-right', fw: true)}
                       %li
                         %a{ href: url("/event/#{@event.id}/semifinals") } Semifinals #{icon('institution', fw: true, ex_classes: 'pull-right')}
                       %li

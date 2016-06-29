@@ -3,7 +3,7 @@
   %a{ href: url("/event/#{@event.id}/semifinals/delete") }
     #{icon('trash', ex_classes: [ 'header_icon', 'text-danger', 'clickable' ], tooltip: 'Delete Semifinal Matches')}
 
-- if @event.semi_matches.count > 0
+- if @event.semi_matches?
   %ul.nav.nav-tabs{ role: 'tablist' }
     - @event.semi_matches.each_with_index do |match, i|
       %li{ role: 'presentation', class: i < 1 ? 'active' : '' }

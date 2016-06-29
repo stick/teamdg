@@ -193,6 +193,9 @@ class App < Sinatra::Base
       game.holes_up = 0
       game.holes_remaining = 0
     else
+      player = Player[params[:winner_id]]
+      pp player
+      pp player.team
       game.winner_id = params[:winner_id].to_i
       game.holes_up = params[:holes_up].to_i
       game.holes_remaining = params[:holes_remaining].to_i
@@ -382,6 +385,41 @@ class App < Sinatra::Base
     haml :games_unreported
   end
 
+  get '/event/:event_id/elimination/?' do
+    @event = Event[params[:event_id]]
+    @title = "#{@event.name}:Elimination"
+
+    if @event.elim_matches.count < 1 and @event.rr_matches_completed >= 100
+      match_num = @event.matches_dataset.max(:match_num) + 1
+      m = @event.add_match(match_num: match_num, desc: 'Elimination', elim: true, day: 0)
+      bottoms = []
+      @event.groups.each do |group|
+        bottoms.push group.rank.where(exempt: false).reverse.to_a.first
+      end
+      team_a = bottoms.shift
+      team_b = bottoms.shift
+      m.add_team(team_a)
+      m.add_team(team_b)
+      @event.team_seeds.each do |seed|
+        pp "creating game for match 1 - seed #{seed}"
+        g = m.add_game( seed: seed, event_id: @event.id, sudden_death: true)
+        g.add_team(team_a)
+        g.add_team(team_b)
+        g.add_player(team_a.seed(seed))
+        g.add_player(team_b.seed(seed))
+      end
+    else
+      @match = @event.elim_matches.first
+    end
+    haml :event_elimination
+  end
+
+  get '/event/:event_id/elimination/delete/?' do
+    @event = Event[params[:event_id]]
+    @event.elim_matches.each { |m| m.destroy }
+    redirect to("/event/#{@event.id}/standings")
+  end
+
   get '/event/:event_id/semifinals/?' do
     @event = Event[params[:event_id]]
     @title = "#{@event.name}:Semifinals"
@@ -435,6 +473,7 @@ class App < Sinatra::Base
       @event.team_seeds.each do |seed|
         pp "creating game for match 1 - seed #{seed}"
         g1 = m1.add_game( seed: seed, event_id: @event.id, sudden_death: true)
+        # incorrect teams and possibly players for other schemes FIXME
         g1.add_team(@event.groups.first.winner)
         g1.add_team(@event.groups.last.runnerup)
         g1.add_player(@event.groups.first.winner.seed(seed))

@@ -97,6 +97,8 @@ GEM
       builder (>= 2.1.2)
       jwt (~> 1.0)
       multi_json (>= 1.3.0)
+    uglifier (3.0.0)
+      execjs (>= 0.3.0, < 3)
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.7.2)
@@ -119,6 +121,7 @@ DEPENDENCIES
   rest-client
   round_robin_tournament
   rrschedule
+  sass
   sendgrid-ruby
   sequel
   sequel_enum
@@ -130,6 +133,7 @@ DEPENDENCIES
   thin
   tilt
   twilio-ruby
+  uglifier
 
 RUBY VERSION
    ruby 2.3.1p112

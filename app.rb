@@ -64,6 +64,8 @@ class App < Sinatra::Base
   ##use Rack::GoogleAnalytics, :tracker => 'UA-68537168-1'
 
   configure do
+    set :assets_css_compressor, :sass
+    set :assets_js_compressor, :uglifier
   end
 
   register Sinatra::Flash

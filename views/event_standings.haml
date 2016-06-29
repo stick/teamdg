@@ -5,63 +5,85 @@
       %p.lead
         #{match.winner.name} defeats #{match.loser.name} Finals score: #{match.showdown_score}
 
-%h2 #{@event.name} Standings
+%h2.page-header #{@event.name} Standings
 
 - if @event.rr_matches_completed?
-  .row
-    .col-lg-6.col-md-6.col-sm-12.col.xs-12
-      %h3
-        Semifinals
-        - unless @public
-          - if @event.rr_matches_completed? and @event.semi_matches? == false
-            %sup #{icon('plus-square-o', ex_classes: [ 'clickable' ], id: 'createSemis', tooltip: 'create semifinal matches', size: '1')}
-          - else
-            %a{ href: url("/event/#{@event.id}/semifinals/delete") }
-              #{icon('trash', ex_classes: [ 'header_icon', 'text-danger', 'clickable' ], tooltip: 'Delete Semifinal Matches')}
-      - if @event.semi_matches?
-        .list-group
-          - @event.semi_matches.each do |match|
-            %a.list-group-item{ href: @public ? url("/#{CGI::escape @event.url}/match/#{match.id}") : url("/event/#{@event.id}/matches/event/match/#{match.id}") }
-              #{match.desc.gsub('Semifinals ', '')}
-              - if match.decided
-                #{match.winner.name} defeats #{match.loser.name}
-                %strong.pull-right #{match.showdown_score(winner: true)}
-              - else
-                #{match.showdown}
-                %span.pull-right #{match.showdown_score}
-      - else
-        - if @event.rr_matches_completed?
-          %p Semifinal matches not created.
+  .col-lg-4.col-md-4.col-sm-12.col.xs-12
+    %h3
+      Semifinals
+      - unless @public
+        - if @event.rr_matches_completed? and @event.semi_matches? == false
+          %sup #{icon('plus-square-o', ex_classes: [ 'clickable' ], id: 'createSemis', tooltip: 'create semifinal matches', size: '1')}
         - else
-          %p Round robin play not completed.
-
-    .col-lg-6.col-md-6.col-sm-12.col.xs-12
-      %h3
-        Finals
-        - unless @public
-          - if @event.semi_matches? and @event.semi_matches_complete?
-            - if @event.final_matches? == false
-              %sup #{icon('plus-square-o', ex_classes: [ 'clickable' ], id: 'createFinals', tooltip: 'create final matches', size: '1')}
+          %a{ href: url("/event/#{@event.id}/semifinals/delete") }
+            #{icon('trash', ex_classes: [ 'header_icon', 'text-danger', 'clickable' ], tooltip: 'Delete Semifinal Matches')}
+    - if @event.semi_matches?
+      .list-group
+        - @event.semi_matches.each do |match|
+          %a.list-group-item{ href: @public ? url("/#{CGI::escape @event.url}/match/#{match.id}") : url("/event/#{@event.id}/matches/event/match/#{match.id}") }
+            #{match.desc.gsub('Semifinals ', '')}
+            - if match.decided
+              #{match.winner.name} defeats #{match.loser.name}
+              %strong.pull-right #{match.showdown_score(winner: true)}
             - else
-              %a{ href: url("/event/#{@event.id}/finals/delete") }
-                #{icon('trash', ex_classes: [ 'header_icon', 'text-danger', 'clickable' ], tooltip: 'Delete Final Matches')}
-      - if @event.final_matches?
-        .list-group
-          - @event.final_matches.each do |match|
-            %a.list-group-item{ href: @public ? url("/#{CGI::escape @event.url}/match/#{match.id}") : url("/event/#{@event.id}/matches/event/match/#{match.id}") }
-              #{match.desc}
-              - if match.decided
-                #{match.winner.name} defeats #{match.loser.name}
-                %strong.pull-right #{match.showdown_score(winner: true)}
-              - else
-                #{match.showdown}
-                %span.pull-right #{match.showdown_score}
+              #{match.showdown}
+              %span.pull-right #{match.showdown_score}
+    - else
+      - if @event.rr_matches_completed?
+        %p Semifinal matches not created.
       - else
-        - if @event.semi_matches?
+        %p Round robin play not completed.
+
+- if @event.semi_matches?
+  .col-lg-4.col-md-4.col-sm-12.col.xs-12
+    %h3
+      Finals
+      - unless @public
+        - if @event.final_matches? == false
           - if @event.semi_matches_complete?
-            %p Semifinal matches not decided.
+            %sup #{icon('plus-square-o', ex_classes: [ 'clickable' ], id: 'createFinals', tooltip: 'create final matches', size: '1')}
         - else
-          %p Semifinals not started.
+          %a{ href: url("/event/#{@event.id}/finals/delete") }
+            #{icon('trash', ex_classes: [ 'header_icon', 'text-danger', 'clickable' ], tooltip: 'Delete Final Matches')}
+    - if @event.final_matches?
+      .list-group
+        - @event.final_matches.each do |match|
+          %a.list-group-item{ href: @public ? url("/#{CGI::escape @event.url}/match/#{match.id}") : url("/event/#{@event.id}/matches/event/match/#{match.id}") }
+            #{match.desc.gsub('Finals', '')}
+            - if match.decided
+              #{match.winner.name} defeats #{match.loser.name}
+              %strong.pull-right #{match.showdown_score(winner: true)}
+            - else
+              #{match.showdown}
+              %span.pull-right #{match.showdown_score}
+    - else
+      - if @event.semi_matches_complete?
+        %p Final matches not created.
+      - else
+        %p Semifinals not complete.
+
+- if @event.elimination_match
+  .col-lg-4.col-md-4.col-sm-4.col-xs-4
+    %h3
+      Elimation Match
+      - unless @public
+        - if @event.elim_matches_completed? and @event.elim_matches? == false
+          %sup #{icon('plus-square-o', ex_classes: [ 'clickable' ], id: 'createElims', tooltip: 'Create elimination matches', size: '1')}
+        - else
+          %a{ href: url("/event/#{@event.id}/elimination/delete") }
+            #{icon('trash', ex_classes: [ 'header_icon', 'text-danger', 'clickable' ], tooltip: 'Delete elimination matches')}
+    - if @event.elim_matches?
+      .list-group
+        - @event.elim_matches.each do |match|
+          %a.list-group-item{ href: @public ? url("/#{CGI::escape @event.url}/match/#{match.id}") : url("/event/#{@event.id}/matches/event/match/#{match.id}") }
+            #{match.desc.gsub('Elimination', '')}
+            - if match.decided
+              #{match.winner.name} eliminates #{match.loser.name}
+              %strong.pull-right #{match.showdown_score(winner: true)}
+            - else
+              #{match.showdown}
+              %span.pull-right #{match.showdown_score}
+
 
 .row
   .col-lg-12.col-md-12.col-sm-12.col-xs-12
@@ -97,9 +119,9 @@
               %td #{ordinalize team[:rank]}
               %td.team_name
                 - if @public
-                  %a{ href: url("/#{@event.url}/team/#{CGI::escape(team.name)}/") } #{team.name}
+                  %a{ href: url("/#{@event.url}/team/#{CGI::escape(team.name)}/") } #{team.name} #{team.exempt ? icon('lock') : '' }
                 - else
-                  %a{ href: url("/event/#{@event.id}/matches/team/#{team.id}/") } #{team.name}
+                  %a{ href: url("/event/#{@event.id}/matches/team/#{team.id}/") } #{team.name} #{team.exempt ? icon('lock') : '' }
               %td
                 - if @event.semis =~ /record/
                   #{format_record team.record}
@@ -135,9 +157,9 @@
                 %td #{ordinalize team[:rank]}
                 %td.team_name
                   - if @public
-                    %a{ href: url("/#{@event.url}/team/#{CGI::escape(team.name)}/") } #{team.name}
+                    %a{ href: url("/#{@event.url}/team/#{CGI::escape(team.name)}/") } #{team.name} #{team.exempt ? icon('lock') : '' }
                   - else
-                    %a{ href: url("/event/#{@event.id}/matches/team/#{team.id}/") } #{team.name}
+                    %a{ href: url("/event/#{@event.id}/matches/team/#{team.id}/") } #{team.name} #{team.exempt ? icon('lock') : '' }
                 %td
                   - if @event.semis =~ /record/
                     #{format_record team.record}
@@ -209,6 +231,10 @@
 
     $('#createSemis').click(function(e) {
       $.get('/event/#{@event.id}/semifinals');
+      window.location.href = window.location.href;
+    });
+    $('#createElims').click(function(e) {
+      $.get('/event/#{@event.id}/elimination');
       window.location.href = window.location.href;
     });
     $('#createFinals').click(function(e) {

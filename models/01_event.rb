@@ -64,6 +64,20 @@ class Event < Sequel::Model(:events)
     end
   end
 
+  def elim_matches_completed?
+    a_results = []
+    self.elim_matches.each { |m| a_results.push m.decided }
+    a_results.select{ |x| !x }.empty?
+  end
+
+  def elim_matches
+    self.matches_dataset.where(elim: true)
+  end
+
+  def elim_matches?
+    self.elim_matches.count > 0
+  end
+
   def rr_incomplete
     self.games_dataset.where(completed: false, sudden_death: false).count
   end

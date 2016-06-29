@@ -73,7 +73,7 @@
             - if @match.decided
               - if @match.team_a == @match.winner
                 %span.text-success #{icon('trophy')}
-              - elsif @match.tie
+              - elsif @match.tie == 1
                 %span.text-muted #{icon('minus')}
           - else
             &mdash; #{@match.team_a_points.to_i} pts

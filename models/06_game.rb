@@ -52,14 +52,12 @@ class Game < Sequel::Model(:games)
     self.players_dataset.where(id: self.winner_id)
   end
 
-
-
   def player_a
-    self.players.first
+    self.players_dataset.where(team_id: self.match.team_a.id).first
   end
 
   def player_b
-    self.players.last
+    self.players_dataset.where(team_id: self.match.team_b.id).first
   end
 
   def result(id, tiny: false)

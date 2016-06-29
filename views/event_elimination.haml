@@ -1,0 +1,14 @@
+%h1
+  #{@event.name} Elimination
+  %a{ href: url("/event/#{@event.id}/elimination/delete") }
+    #{icon('trash', ex_classes: [ 'header_icon', 'text-danger', 'clickable' ], tooltip: 'Delete elimination matches')}
+
+- if @event.elim_matches?
+  = partial(:event_match, locals: { hide_breadcrumbs: true })
+  = partial(:_event_match_result_modal)
+  = partial(:_event_match_result_js)
+- else
+  %h3
+    No elimination matches available
+    %small Have the round robin matches been completed?
+
