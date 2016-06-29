@@ -13,20 +13,22 @@
       %input#groupsAssigned{ type: 'hidden', name: 'groups_assigned', value: groups_assigned.empty? ? 'true' : 'false' }
       .form-group
         %label.col-sm-2.control-label Semi Finalists:
-        .col-sm-6
-          %label.radio-inline
-            %input.semis.use_points{ name: 'semis', type: 'radio', value: 'xgrouppoints', checked: @event.semis == 'xgrouppoints' ? true : false } Cross group by points
-          %label.radio-inline
-            %input.semis.use_points{ name: 'semis', type: 'radio', value: 'grouppoints', checked: @event.semis == 'grouppoints' ? true : false } Same group by points.
-          %label.radio-inline
-            %input.semis.use_points{ name: 'semis', type: 'radio', value: 'points', checked: @event.semis == 'points' ? true : false } Pure Points
-          %label.radio-inline
-            %input.semis#semiUseRecord{ name: 'semis', type: 'radio', value: 'xgrouprecord', checked: @event.semis == 'xgrouprecord' ? true : false } Cross group by record
-          %label.radio-inline
-            %input.semis#semiUseRecord{ name: 'semis', type: 'radio', value: 'grouprecord', checked: @event.semis == 'grouprecord' ? true : false } Same group by record
-          %label.radio-inline
-            %input.semis#semiUseRecord{ name: 'semis', type: 'radio', value: 'record', checked: @event.semis == 'record' ? true : false } Pure record
-          %i.fa.fa-question-circle.clickable{ data: { container: 'body', toggle: 'popover', placement: 'auto', title: 'Group Advance',  content: partial(:_group_advance_info), size: 'large' } }
+        .col-sm-10
+          .radio
+            %label.radio-inline
+              %input.semis.use_points{ name: 'semis', type: 'radio', value: 'xgrouppoints', checked: @event.semis == 'xgrouppoints' ? true : false } Cross group by points
+            %label.radio-inline
+              %input.semis.use_points{ name: 'semis', type: 'radio', value: 'grouppoints', checked: @event.semis == 'grouppoints' ? true : false } Same group by points.
+            %label.radio-inline
+              %input.semis.use_points{ name: 'semis', type: 'radio', value: 'points', checked: @event.semis == 'points' ? true : false } Pure Points
+          .radio
+            %label.radio-inline
+              %input.semis#semiUseRecord{ name: 'semis', type: 'radio', value: 'xgrouprecord', checked: @event.semis == 'xgrouprecord' ? true : false } Cross group by record
+            %label.radio-inline
+              %input.semis#semiUseRecord{ name: 'semis', type: 'radio', value: 'grouprecord', checked: @event.semis == 'grouprecord' ? true : false } Same group by record
+            %label.radio-inline
+              %input.semis#semiUseRecord{ name: 'semis', type: 'radio', value: 'record', checked: @event.semis == 'record' ? true : false } Pure record
+            %i.fa.fa-question-circle.clickable{ data: { container: 'body', toggle: 'popover', placement: 'auto', title: 'Group Advance',  content: partial(:_group_advance_info), size: 'large' } }
       .form-group.points
         %label.col-sm-2.control-label Points for a win:
         .col-sm-10
