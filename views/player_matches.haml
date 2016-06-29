@@ -6,7 +6,7 @@
       %label.sr-only{ for: 'playerSearch' } Player...
       %input.form-control#playerSearch{ name: 'player_search', placeholder: 'Search players...' }
 
-    .list-group#playerList
+    .list-group#playerList{ style: 'height: 95%; overflow: auto' }
       - @event.players.each do |player|
         %a.list-group-item{ href: url("/event/#{@event.id}/matches/player/#{player.id}") } #{player.name}
 
