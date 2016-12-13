@@ -48,6 +48,13 @@
                 %small #{icon('edit', ex_classes: 'pull-right')}
               %input.form-control.edit_team.hidden#mobile_number
           %tr
+            %th Password
+            %td
+              %span.edit_team.clickable#span_password{ data: { id: 'password' } }
+                #{@team.password}
+                %small #{icon('edit', ex_classes: 'pull-right')}
+              %input.form-control.edit_team.hidden#password
+          %tr
             %th Exempt
             %td
               .pull-right

@@ -27,6 +27,7 @@ unless DB.table_exists? (:teams)
     Integer     :match_losses
     Integer     :match_ties
     Integer     :rr_rank
+    String      :password
     TrueClass   :exempt, :default => false
     foreign_key :event_id, :events, :on_delete => :cascade, :null => false
     foreign_key :group_id, :groups, :on_delete => :cascade

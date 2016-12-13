@@ -6,7 +6,10 @@
 .row
   .col-md-12.col-lg-12.col-sm-12.col-xs-12
     - unless @event.scheduled
-      %p Finalize the settings for your event, then click 'Start Event' when finished.
+      %p
+        Finalize the settings for your event,
+        %a{ href: url("/event/#{@event.id}/groups") } assign teams to groups,
+        then click 'Start Event' when finished.
     %p.help-block Group names can be edited on the 'Group Assignment' page.
     %form.form.form-horizontal{ method: 'POST', onsubmit: 'return false;' }
       - groups_assigned = @event.teams.select { |t| t.group_id.nil? }
