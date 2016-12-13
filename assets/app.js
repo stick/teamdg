@@ -14,3 +14,4 @@
 //= require dragula
 //= require_tree
 //
+console.log('frustrated');
