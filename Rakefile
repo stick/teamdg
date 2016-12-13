@@ -93,7 +93,7 @@ namespace :sim do
     end
   end
 
-  desc 'simulate games (event.first)'
+  desc 'simulate games'
   task :games, [ :match ] do |t, args|
     event = Event[ENV['event']] or Event.first
     match_count = event.matches_dataset.where(match_num: args[:match]).count
@@ -122,12 +122,24 @@ namespace :sim do
 
   desc 'set games completed'
   task :completed, [ :percent ] do |t, args|
-    num_games = Event.first.games.count.to_f
+    event = Event[ENV['event']] || Event.first
+    num_games = event.games.count.to_f
     complete_games = num_games * (args[:percent].to_f / 100)
     puts "num_games: #{num_games}"
     puts "complete_games: #{complete_games}"
-    Event.first.games_dataset.each_with_index do |g, i|
+    event.games_dataset.each_with_index do |g, i|
       if i < complete_games.round
+        if rand(1..10) < 3
+          g.winner_id = nil
+          g.tie = 1
+        else
+          g.tie = nil
+          g.winner_id = g.players.shuffle.first.id
+          game_scores = [ [1,0], [2,0], [2,1], [3,2], [3,1], [4,3], [4,2], [5,4], [5,3], [6,4] ]
+          r = game_scores.shuffle.first
+          g.holes_up = r.shift
+          g.holes_remaining = r.shift
+        end
         g.completed = true
       else
         g.completed = false
