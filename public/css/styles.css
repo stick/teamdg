@@ -51,3 +51,7 @@ th.match_header {
 .bootstrap-switch {
   height: 30px !important;
 }
+
+.team_player_record {
+  vertical-align: middle !important;
+}

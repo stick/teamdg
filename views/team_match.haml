@@ -60,12 +60,13 @@
     .table-responsive
       %table.table.table-condensed
         %thead
-          %tr
-            %th{ colspan: @team.opponents.count + 1 }
+          %tr.team_row
+            %th{ colspan: @team.opponents.count + 2 }
               %h3
                 #{@team.name}
-                %small #{@team.group}
-          %tr
+                %small #{@team.group.name}
+          %tr.match_num_row
+            %th &nbsp;
             %th &nbsp;
             - @team.matches.each do |match|
               %th.match_header
@@ -79,7 +80,8 @@
                     - elsif match.tie and match.winner.nil?
                       #{icon('minus')}
                 %span.hidden-sm.hidden-md.hidden-lg #{match.match_num}
-          %tr
+          %tr.match_opp_row
+            %th &nbsp;
             %th &nbsp;
             - @team.opponents.each do |opponent|
               %th
@@ -87,51 +89,56 @@
                 %span.hidden-sm.hidden-md.hidden-lg #{opponent.name.slice(0..1)}
         %tbody
           - @team.players.each do |player|
-            %tr
-              %th
+            %tr.team_player_row
+              %th.team_player_name
                 %h5
                   .hidden-xs
                     #{player.name}
                     %small #{player.seed}
-                    %span.precord.pull-right #{player.record}
                   .hidden-sm.hidden-md.hidden-lg #{player.name.split.shift.slice(0)}. #{player.name.split.pop}
+              %th.team_player_record
+                %span.precord.pull-right #{player.record}
               - player.games.each do |game|
                 %td.game_cell
                   %span.hidden-xs #{game.result(player.id)}
                   %span.hidden-sm.hidden-md.hidden-lg #{game.result(player.id, tiny: true)}
         %tfoot
-          %tr
+          %tr.match_result_row
+            %td &nbsp;
             %td &nbsp;
             - @team.matches.each do |match|
               %td
                 %span.hidden-xs #{format_record(match.record(@team))}
                 %span.hidden-sm.hidden-md.hidden-lg #{format_record(match.record(@team), tiny: true)}
           - unless @event.semis =~ /record/
-            %tr
+            %tr.match_points_row
               %td
                 %span.hidden-xs Match Points
                 %span.hidden-sm.hidden-md.hidden-lg Pts
-                %span.badge.pull-right #{@team.points}
+              %td
+                %span.badge #{@team.points}
               - @team.matches.each do |match|
                 - if match.semi or match.final
                   %td &nbsp;
                 - else
                   %td #{match.points(@team)}
-            %tr
+            %tr.tiebreaker1_row
               %td
                 %span.hidden-xs 1<sup>st</sup> Tiebreak
                 %span.hidden-sm.hidden-md.hidden-lg 1<sup>st</sup>
-                %span.badge.pull-right #{@team.holes_up}
+              %td
+                %span.badge #{@team.holes_up}
               - @team.matches.each do |match|
                 - if match.semi or match.final
                   %td &nbsp;
                 - else
                   %td #{match.holes_up(@team)}
-            %tr
+            %tr.tiebreaker2_row
               %td
                 %span.hidden-xs 2<sup>nd</sup> Tiebreak
                 %span.hidden-sm.hidden-md.hidden-lg 2<sup>nd</sup>
-                %span.badge.pull-right #{@team.holes_remaining}
+              %td
+                %span.badge #{@team.holes_remaining}
               - @team.matches.each do |match|
                 - if match.semi or match.final
                   %td &nbsp;

@@ -21,6 +21,7 @@
                 #{team.name}
                 - unless team.group.nil?
                   %small #{team.group.name}
+                %a{ href: url("/event/#{@event.id}/team/#{team.id}"), alt: 'Edit Roster' } #{icon('edit', ex_classes: 'pull-right', tooltip: 'Edit Roster')}
             %table.table
               %tbody
                 - team.players.sort{ |x,y| x.id <=> y.id }.each do |player|
