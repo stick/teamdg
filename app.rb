@@ -10,23 +10,23 @@ require 'pg'
 require 'sinatra/base'
 require 'sinatra/config_file'
 require 'sinatra/reloader'
-require 'less'
-require 'sinatra/asset_pipeline'
 require 'sinatra/streaming'
 require 'sinatra/flash'
 require 'sequel'
 require 'haml'
 require 'logger'
-require 'rest-client'
 require 'ostruct'
 require 'rrschedule'
+require 'sinatra/asset_pipeline'
 
 require_relative 'helpers/init'
 require_relative 'models/init'
 
 class App < Sinatra::Base
-  register Sinatra::ConfigFile
+  set :assets_paths, %w(assets/javascripts assets/stylesheets vendor/assets/bower_components/)
   register Sinatra::AssetPipeline
+
+  register Sinatra::ConfigFile
   helpers Sinatra::Streaming
   config_file './config.yml'
 
@@ -46,7 +46,6 @@ class App < Sinatra::Base
 
   configure :production do
     set :force_ssl, false
-    require 'newrelic_rpm'
   end
 
   helpers do
@@ -62,11 +61,6 @@ class App < Sinatra::Base
     secret: ENV['SESSION_SECRET']
 
   ##use Rack::GoogleAnalytics, :tracker => 'UA-68537168-1'
-
-  configure do
-    set :assets_css_compressor, :sass
-    set :assets_js_compressor, :uglifier
-  end
 
   register Sinatra::Flash
 

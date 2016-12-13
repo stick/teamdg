@@ -9,7 +9,7 @@
     %title TeamDG::#{@title}
 
     /= sprockets load all the stylesheets
-    %link{ href: "#{stylesheet_path 'app'}", rel: 'stylesheet' }
+    = stylesheet_tag 'app'
 
     /= Custom css
     %link{ href: '/css/styles.css', rel: 'stylesheet' }
