@@ -7,12 +7,12 @@
       - if @event.semi_matches?
         %li{ role: 'presentation' }
           %a{ href: "#Semifinals", role: 'tab', data: { toggle: 'tab' } } Semifinals
-      - if @event.final_matches?
-        %li{ role: 'presentation' }
-          %a{ href: "#Finals", role: 'tab', data: { toggle: 'tab' } } Finals
       - if @event.elim_matches?
         %li{ role: 'presentation' }
           %a{ href: "#Elimination", role: 'tab', data: { toggle: 'tab' } } Elimination
+      - if @event.final_matches?
+        %li{ role: 'presentation' }
+          %a{ href: "#Finals", role: 'tab', data: { toggle: 'tab' } } Finals
 
 .row
   .tab-content
