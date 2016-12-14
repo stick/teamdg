@@ -4,12 +4,21 @@
       - @event.matches_dataset.to_hash_groups(:match_num).each do |match_num, group_matches|
         %li{ role: 'presentation' }
           %a{ href: "#Match_#{match_num}", role: 'tab', data: { toggle: 'tab' } } Match #{match_num}
+      - if @event.semi_matches?
+        %li{ role: 'presentation' }
+          %a{ href: "#Semifinals", role: 'tab', data: { toggle: 'tab' } } Semifinals
+      - if @event.final_matches?
+        %li{ role: 'presentation' }
+          %a{ href: "#Finals", role: 'tab', data: { toggle: 'tab' } } Finals
+      - if @event.elim_matches?
+        %li{ role: 'presentation' }
+          %a{ href: "#Elimination", role: 'tab', data: { toggle: 'tab' } } Elimination
 
 .row
   .tab-content
     - @event.matches_dataset.to_hash_groups(:match_num).each do |match_num, group_matches|
       .tab-pane{ id: [ 'Match', match_num ], role: 'tabpanel' }
-        .panel{ class: match_num == @event.matches.first.match_num ? 'panel-primary' : 'panel-default' }
+        .panel.panel-default
           %table.table.table-striped.table-condensed.table-bordered
             %thead
               %tr
@@ -28,37 +37,97 @@
                   - group_matches.each do |match|
                     %td #{match.seed_showdown(seed)}
                     - if (match.id % 2 == 0)
-                      %td
-                        %span.edit_team.clickable#span_starthole{ id: [ match.id, seed ], data: { id: "starthole_#{match.id}_#{seed}" } }
-                          #{icon('edit')}
-                        %input.form-control.edit_team.hidden#starthole{ id: [ match.id, seed ] }
+                      %td.edit_team.clickable{ data: { id: "starthole_#{match.id}_#{seed}" } }
+                        %span#span_starthole{ id: [ match.id, seed ] }
+                        %input.form-control.tab_move.hidden#starthole{ id: [ match.id, seed ] }
+    - if @event.semi_matches?
+      .tab-pane#Semifinals{ role: 'tabpanel' }
+        .panel.panel-default
+          %table.table.table-striped.table-consensed.table-bordered
+            %tbody
+              %tr
+                %th Semifinals
+                - @event.semi_matches.each do |match|
+                  %th= match.showdown
+                  - if (match.id % 2 == 0)
+                    %th Hole #{icon('edit')}
+              - @event.team_seeds.each do |seed|
+                %tr
+                  %td #{seed}
+                  - @event.semi_matches.each do |match|
+                    %td #{match.seed_showdown(seed)}
+                    - if (match.id % 2 == 0)
+                      %td.edit_team.clickable{ data: { id: "starthole_#{match.id}_#{seed}" } }
+                        %span#span_starthole{ id: [ match.id, seed ] }
+                        %input.form-control.tab_move.hidden#starthole{ id: [ match.id, seed ] }
+    - if @event.final_matches?
+      .tab-pane#Finals{ role: 'tabpanel' }
+        .panel.panel-default
+          %table.table.table-striped.table-consensed.table-bordered
+            %tbody
+              %tr
+                %th Finals
+                - @event.final_matches.each do |match|
+                  %th= match.showdown
+                  %th Hole #{icon('edit')}
+              - @event.team_seeds.each do |seed|
+                %tr
+                  %td #{seed}
+                  - @event.final_matches.each do |match|
+                    %td #{match.seed_showdown(seed)}
+                    %td.clickable.edit_team{ data: { id: "starthole_#{match.id}_#{seed}" } }
+                      %span#span_starthole{ id: [ match.id, seed ] }
+                      %input.form-control.tab_move.hidden#starthole{ id: [ match.id, seed ] }
+    - if @event.elim_matches?
+      .tab-pane#Elimination{ role: 'tabpanel' }
+        .panel.panel-default
+          %table.table.table-striped.table-consensed.table-bordered
+            %tbody
+              %tr
+                %th Elimination
+                - @event.elim_matches.each do |match|
+                  %th= match.showdown
+                  %th Hole #{icon('edit')}
+              - @event.team_seeds.each do |seed|
+                %tr
+                  %td #{seed}
+                  - @event.elim_matches.each do |match|
+                    %td #{match.seed_showdown(seed)}
+                    %td.clickable.edit_team{ data: { id: "starthole_#{match.id}_#{seed}" } }
+                      %span#span_starthole{ id: [ match.id, seed ] }
+                      %input.form-control.tab_move.hidden#starthole{ id: [ match.id, seed ] }
 
 
 :javascript
-  $('.edit_team').keydown(function(e) {
+  $('.tab_move').keydown(function(e) {
     if (e.which == 9) { // tab
       var inputs = $(this).closest('table').find('input');
       var next_input = inputs.eq( inputs.index(this) + 1 )[0];
       var jq_next_input = $(next_input);
-      console.log(next_input);
-      console.log(jq_next_input.attr('id'));
+      // console.log("next_input: ", next_input);
+      // console.log(jq_next_input.attr('id'));
       $(next_input).removeClass('hidden');
       $('#span_' + jq_next_input.attr('id')).addClass('hidden');
     }
   });
 
   $('.edit_team').click(function(e) {
-    $(this).addClass('hidden');
-    $('#' + this.dataset.id).removeClass('hidden').focus();
+    // console.log("click:", this);
+    $(this).find('span').addClass('hidden');
+    $('input#' + this.dataset.id).removeClass('hidden').focus();
   });
 
-  $('.edit_team').blur(function(e) {
+  $('.tab_move').blur(function(e) {
+    // console.log("blur:", this);
     $('span#span_' + $(this).attr('id')).removeClass('hidden');
     $(this).addClass('hidden');
   });
 
-  $('.edit_team').change(function(e) {
+  $('.tab_move').change(function(e) {
+    // console.log("change:", this);
     var myid = $(this).attr('id');
-    $(this).addClass('hidden');
-    $('span#span_' + $(this).attr('id')).removeClass('hidden').html($(this).val());
+    if (this.nodeName == 'INPUT') {
+      $(this).addClass('hidden');
+      $('span#span_' + $(this).attr('id')).removeClass('hidden').html($(this).val());
+    }
   });
