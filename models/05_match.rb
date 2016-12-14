@@ -26,6 +26,7 @@ unless DB.table_exists? (:matches)
     TrueClass   :semi, :default => false
     TrueClass   :final, :default => false
     TrueClass   :elim, :default => false
+    String      :info
     foreign_key :event_id, :events, :on_delete => :cascade, :null => false
     #unique      [:first_name, :last_name, :email_address]
   end
