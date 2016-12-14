@@ -231,6 +231,14 @@ class Match < Sequel::Model(:matches)
     end
   end
 
+  def seeds
+    self.event.team_seeds
+  end
+
+  def seed_showdown(seed)
+    "#{self.team_a.seed(seed).name} #{vs} #{self.team_b.seed(seed).name}"
+  end
+
   def validate
     super
     validates_presence [:desc]

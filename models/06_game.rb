@@ -108,6 +108,10 @@ class Game < Sequel::Model(:games)
     "#{self.player_a.name} <small>#{self.player_a.team.name}</small> #{vs} #{self.player_b.name} <small>#{self.player_b.team.name}</small>"
   end
 
+  def showdown_players
+    "#{self.player_a.name} #{vs} #{self.player_b.name}"
+  end
+
   def validate
     super
     validates_includes self.event.team_seeds, :seed
