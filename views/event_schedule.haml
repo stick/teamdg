@@ -1,12 +1,64 @@
-%table.table.table-striped
-  %thead
-    %tr
-      %th
-      - @event.groups.each do |group|
-        %th{ colspan: 2 } #{group.name.capitalize}
-  %tbody
-    - @schedule.gamedays.each_with_index do |match, matchnum|
-      %tr
-        %th Match #{matchnum + 1}
-        - match.games.each do |g|
-          %td #{g.team_a.to_s} <strong><small>vs</small></strong> #{g.team_b.to_s}
+.row
+  .col.xs-12.col-sm-12.col-md-12.col-lg-12
+    %ul.nav.nav-tabs
+      - @event.matches_dataset.to_hash_groups(:match_num).each do |match_num, group_matches|
+        %li{ role: 'presentation' }
+          %a{ href: "#Match_#{match_num}", role: 'tab', data: { toggle: 'tab' } } Match #{match_num}
+
+.row
+  .tab-content
+    - @event.matches_dataset.to_hash_groups(:match_num).each do |match_num, group_matches|
+      .tab-pane{ id: [ 'Match', match_num ], role: 'tabpanel' }
+        .panel{ class: match_num == @event.matches.first.match_num ? 'panel-primary' : 'panel-default' }
+          %table.table.table-striped.table-condensed.table-bordered
+            %thead
+              %tr
+                - @event.groups.each do |group|
+                  %th.group_name_heading{ colspan: 4 } #{group.name.capitalize}
+            %tbody
+              %tr
+                %th Match #{match_num}
+                - group_matches.each do |match|
+                  %th= match.showdown
+                  - if (match.id % 2 == 0)
+                    %th Hole
+              - @event.team_seeds.each do |seed|
+                %tr
+                  %td #{seed}
+                  - group_matches.each do |match|
+                    %td #{match.seed_showdown(seed)}
+                    - if (match.id % 2 == 0)
+                      %td
+                        %span.edit_team.clickable#span_starthole{ id: [ match.id, seed ], data: { id: "starthole_#{match.id}_#{seed}" } }
+                          #{icon('edit')}
+                        %input.form-control.edit_team.hidden#starthole{ id: [ match.id, seed ] }
+
+
+:javascript
+  $('.edit_team').keydown(function(e) {
+    if (e.which == 9) { // tab
+      var inputs = $(this).closest('table').find('input');
+      var next_input = inputs.eq( inputs.index(this) + 1 )[0];
+      var jq_next_input = $(next_input);
+      console.log(next_input);
+      console.log(jq_next_input.attr('id'));
+      $(next_input).removeClass('hidden');
+      $('#span_' + jq_next_input.attr('id')).addClass('hidden');
+    }
+  });
+
+  $('.edit_team').click(function(e) {
+    $(this).addClass('hidden');
+    $('#' + this.dataset.id).removeClass('hidden').focus();
+  });
+
+  $('.edit_team').blur(function(e) {
+    $('span#span_' + $(this).attr('id')).removeClass('hidden');
+    $(this).addClass('hidden');
+  });
+
+  $('.edit_team').change(function(e) {
+    var myid = $(this).attr('id');
+    $(this).addClass('hidden');
+    $('span#span_' + $(this).attr('id')).removeClass('hidden').html($(this).val());
+  });
