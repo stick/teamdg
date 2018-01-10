@@ -1,9 +1,13 @@
+- unless @event.scheduled
+  %h4 Event not started, no matches scheduled.
 .row
   .col.xs-12.col-sm-12.col-md-12.col-lg-12
     %ul.nav.nav-tabs
       - @event.matches_dataset.to_hash_groups(:match_num).each do |match_num, group_matches|
-        %li{ role: 'presentation' }
-          %a{ href: "#Match_#{match_num}", role: 'tab', data: { toggle: 'tab' } } Match #{match_num}
+        - match = Match[event_id: @event.id, match_num: match_num]
+        - unless match.elim or match.semi or match.final
+          %li{ role: 'presentation' }
+            %a{ href: "#Match_#{match_num}", role: 'tab', data: { toggle: 'tab' } } Match #{match_num}
       - if @event.semi_matches?
         %li{ role: 'presentation' }
           %a{ href: "#Semifinals", role: 'tab', data: { toggle: 'tab' } } Semifinals

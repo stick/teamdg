@@ -8,6 +8,7 @@
     $('.game_winner').click(function(e) {
       $('#gameResult').attr('action', "/event/#{@event.id}/game/" + this.dataset.gameId);
       // $('#gameResult').validator();
+      // if semis attribute then do this 
       if (e.altKey) {
         console.log('record match winner with no details');
         $.post("/event/#{@event.id}/game/" + this.dataset.gameId,

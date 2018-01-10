@@ -1,8 +1,12 @@
 require 'rake-progressbar'
 require 'sinatra/asset_pipeline/task'
-require './app'
+require 'rubygems'
+require 'bundler/setup'
 
-Sinatra::AssetPipeline::Task.define! App
+#require './app'
+require './console'
+
+#Sinatra::AssetPipeline::Task.define! App
 
 task :environment do
 end
@@ -28,7 +32,7 @@ namespace :db do
     # so fragile, adding new table requires adding here
     # because we have to load them in the right orders
     # [ :player, :score, :round, :total, :teetime, :layout, :projected, :product, :scorelink, :volunteer, :playoff ].each do |f|
-    Dir.glob("./models/*.rb").each do |f|
+    Dir.glob("./models/*.rb").sort.each do |f|
       puts "Loading: #{f}"
       load(f, true)
       #load("./models/#{f}.rb", true)
@@ -59,8 +63,8 @@ namespace :sim do
   desc 'reset games to unplayed'
   task :reset do
     puts "Resetting matches"
-    match_bar = RakeProgressbar.new(Event.first.matches.count)
-    event = Event[ENV['event']] or Event.first
+    event = Event.first
+    match_bar = RakeProgressbar.new(event.matches.count)
     event.matches.each do |m|
       m.team_a_wins = 0
       m.team_a_losses = 0
@@ -95,7 +99,7 @@ namespace :sim do
 
   desc 'simulate games'
   task :games, [ :match ] do |t, args|
-    event = Event[ENV['event']] or Event.first
+    event = Event.first
     match_count = event.matches_dataset.where(match_num: args[:match]).count
     puts "simulating games for match #{args[:match]} [#{event.name}]"
     progress = RakeProgressbar.new(match_count)

@@ -14,14 +14,14 @@ unless DB.table_exists? (:players)
     Bignum      :mobile_number
     String      :email_address
     String      :seed, :null => false
-    Integer     :rr_wins
-    Integer     :rr_losses
-    Integer     :rr_ties
-    Integer     :rr_holes_up
-    Integer     :rr_holes_remaining
-    Integer     :elim_wins
-    Integer     :elim_losses
-    Integer     :elim_ties
+    Integer     :rr_wins, :default => 0
+    Integer     :rr_losses, :default => 0
+    Integer     :rr_ties, :default => 0
+    Integer     :rr_holes_up, :default => 0
+    Integer     :rr_holes_remaining, :default => 0
+    Integer     :elim_wins, :default => 0
+    Integer     :elim_losses, :default => 0
+    Integer     :elim_ties, :default => 0
     foreign_key :team_id, :teams, :on_delete => :cascade, :null => false
     foreign_key :event_id, :events, :on_delete => :cascade, :null => false
     #unique      [:first_name, :last_name, :email_address]
