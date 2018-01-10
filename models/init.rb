@@ -7,10 +7,11 @@ require 'sequel'
 DB = Sequel.connect(ENV['DATABASE_URL'], max_connections: ENV['DB_POOL'] || 4) unless defined?(DB)
 
 DB << "SET CLIENT_ENCODING TO 'UTF8';"
+
 # load postgres specific extensions
 DB.extension :pg_array
-DB.extension :pg_hstore
 DB.extension :pg_enum
+DB.extension :pg_hstore
 
 Sequel.default_timezone = :utc
 Sequel.application_timezone = :local

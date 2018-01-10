@@ -5,7 +5,7 @@
 require 'rubygems'
 require 'sequel'
 
-Sequel::Model.plugin(:schema)
+#Sequel::Model.plugin(:schema)
 
 unless DB.table_exists? (:groupstage)
   DB.create_table :groupstage do

@@ -5,7 +5,7 @@
 require 'rubygems'
 require 'sequel'
 
-Sequel::Model.plugin(:schema)
+#Sequel::Model.plugin(:schema)
 
 unless DB.table_exists? (:players)
   DB.create_table :players do
@@ -23,7 +23,7 @@ unless DB.table_exists? (:players)
     Integer     :elim_losses
     Integer     :elim_ties
     foreign_key :team_id, :teams, :on_delete => :cascade, :null => false
-    foreign_key :event_id, :events, :one_delete => :cascade, :null => false
+    foreign_key :event_id, :events, :on_delete => :cascade, :null => false
     #unique      [:first_name, :last_name, :email_address]
   end
 end
