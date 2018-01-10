@@ -528,6 +528,7 @@ class App < Sinatra::Base
   get '/:event_slug/match/:match_id/?' do
     @event = Event[url: CGI::unescape(params[:event_slug])]
     # @player = @event.players_dataset.where(name: CGI::unescape(params[:player_name])).first
+    @title = @event.name
     @match = Match[params[:match_id]]
     @public = true
     haml :event_match, layout: :layout_no_sidebar, locals: { hide_breadcrumbs: true }
@@ -535,6 +536,7 @@ class App < Sinatra::Base
 
   get '/:event_slug/player/:player_name/?' do
     @event = Event[url: CGI::unescape(params[:event_slug])]
+    @title = @event.name
     @player = @event.players_dataset.where(name: CGI::unescape(params[:player_name])).first
     @public = true
     haml :player_match, layout: :layout_no_sidebar, locals: { hide_breadcrumbs: true }
@@ -543,6 +545,7 @@ class App < Sinatra::Base
   get '/:event_slug/team/:team_name/?' do
     @event = Event[url: CGI::unescape(params[:event_slug])]
     @team = @event.teams_dataset.where(name: CGI::unescape(params[:team_name])).first
+    @title = @event.name
     pp @team
     pp @event
     @public = true
@@ -552,6 +555,7 @@ class App < Sinatra::Base
   get '/:event_slug/?' do
     puts "WARNING USING PUBLIC SLUG!!!!!"
     @event = Event[url: CGI::unescape(params[:event_slug])]
+    @title = @event.name
     @public = true
     haml :event_standings, locals: { hide_breadcrumbs: true }, layout: :layout_no_sidebar
   end
