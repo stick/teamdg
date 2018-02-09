@@ -12,9 +12,9 @@
         %label.col-sm-2.control-label{ for: 'event_startdate' } Dates:
         .col-sm-4
           .input-group
-            %input.form-control#event_name{ type: 'text', name: 'event_startdate', required: true, data: { provide: 'datepicker' } }
+            %input.form-control#event_name{ type: 'text', name: 'event_startdate', required: true, data: { provide: 'datepicker', 'date-format': 'yyyy/mm/dd', 'date-week-start': 1 } }
             %span.input-group-addon to
-            %input.form-control#event_name{ type: 'text', name: 'event_enddate', required: true, data: { provide: 'datepicker' } }
+            %input.form-control#event_name{ type: 'text', name: 'event_enddate', required: true, data: { provide: 'datepicker', 'date-format': 'yyyy/mm/dd', 'date-week-start': 1 } }
       .form-group#event_type
         %label.col-sm-2.control-label{ for: 'event_type' }
           Type:
