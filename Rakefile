@@ -157,7 +157,7 @@ namespace :load do
   desc 'Add Test Team data'
   task :ncti do
     puts "Creating event"
-    e = Event.create( name: 'NCTI', team_seeds: %w(open1 open2 open3 open4 master1 master2 grandmaster women amateur), startdate: '05/05/2015', enddate: '05/06/2015' )
+    e = Event.create( name: 'NCTI', team_seeds: %w(open1 open2 open3 open4 open5 open6 master1 master2 woman1), startdate: '2015/01/01', enddate: '2015/01/02' )
     puts "Creating divisions"
     g1 = e.add_group(name: 'Moon')
     g2 = e.add_group(name: 'Shine')
