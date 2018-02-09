@@ -24,6 +24,7 @@ class App < Sinatra::Base
   end
 
   post '/event/new/?' do
+    pp "New Event Creation: "
     pp params
     group_advance = case params[:event_group_num].to_i
                     when 4 then 1
