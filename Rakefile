@@ -3,10 +3,10 @@ require 'sinatra/asset_pipeline/task'
 require 'rubygems'
 require 'bundler/setup'
 
-#require './app'
+require './app'
 require './console'
 
-#Sinatra::AssetPipeline::Task.define! App
+Sinatra::AssetPipeline::Task.define! App
 
 task :environment do
 end
