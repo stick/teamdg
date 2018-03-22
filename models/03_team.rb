@@ -14,6 +14,7 @@ unless DB.table_exists? (:teams)
     String      :captain
     Bignum      :mobile_number
     String      :email_address
+    TrueClass   :paid, :default => false
     Integer     :points
     Integer     :holes_up
     Integer     :holes_remaining

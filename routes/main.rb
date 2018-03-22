@@ -292,6 +292,7 @@ class App < Sinatra::Base
   post '/team/:team_id/settings/update/?' do
     t = Team[params[:team_id]]
     t.send("#{params[:setting]}=", params[:value])
+    puts "#{params[:setting]}= #{params[:value]}"
     t.save
   end
 

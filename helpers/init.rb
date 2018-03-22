@@ -51,6 +51,14 @@ def format_record(record, tiny: false, color: false)
   end
 end
 
+def format_phone(phone_num)
+  if phone_num.to_s =~ /^(\d{3})(\d{3})(\d{4})$/
+    return "(#{$1}) #{$2}-#{$3}"
+  else
+    "Invalid phone number!"
+  end
+end
+
 def ordinalize(i)
   case i
   when 1

@@ -44,7 +44,7 @@
             %th Mobile
             %td
               %span.edit_team.clickable#span_mobile_number{ data: { id: 'mobile_number' } }
-                #{@team.mobile_number}
+                #{format_phone @team.mobile_number}
                 %small #{icon('edit', ex_classes: 'pull-right')}
               %input.form-control.edit_team.hidden#mobile_number
           %tr
@@ -59,6 +59,11 @@
             %td
               .pull-right
                 %input#exemptStatus{ data: { size: 'mini', 'on-text': 'yes', 'off-text': 'no' }, type: 'checkbox', name: 'exempt', checked: @team.exempt }
+          %tr
+            %th Paid
+            %td
+              .pull-right
+                %input#paidStatus{ data: { size: 'mini', 'on-text': 'yes', 'off-text': 'no' }, type: 'checkbox', name: 'paid', checked: @team.paid }
           %tr
             %th Group
             %td
@@ -86,6 +91,11 @@
 
 :javascript
   $(document).ready(function(){
+    $("[name='paid']").bootstrapSwitch( {
+      onSwitchChange: function(e, state) {
+        $.post("/team/#{@team.id}/settings/update", { team_id: #{@team.id}, setting: 'paid', value: state });
+      },
+    });
     $("[name='exempt']").bootstrapSwitch( {
       onSwitchChange: function(e, state) {
         $.post("/team/#{@team.id}/settings/update", { team_id: #{@team.id}, setting: 'exempt', value: state });
