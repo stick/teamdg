@@ -41,8 +41,14 @@
                   - group_matches.each do |match|
                     %td #{match.seed_showdown(seed)}
                     - if (match.id % 2 == 0)
-                      %td.edit_team.clickable{ data: { id: "starthole_#{match.id}_#{seed}" } }
+                      %td.edit_hole.clickable{ data: { id: "starthole_#{match.id}_#{seed}" } }
+                        - assignment_ref = "starthole_#{match.id}_#{seed}"
                         %span#span_starthole{ id: [ match.id, seed ] }
+                          - assignment = Assignment.where(event_id: @event.id, reference: assignment_ref).first
+                          - if assignment.nil?
+                            &nbsp;
+                          - else
+                            #{assignment.info}
                         %input.form-control.tab_move.hidden#starthole{ id: [ match.id, seed ] }
     - if @event.semi_matches?
       .tab-pane#Semifinals{ role: 'tabpanel' }
@@ -61,7 +67,7 @@
                   - @event.semi_matches.each do |match|
                     %td #{match.seed_showdown(seed)}
                     - if (match.id % 2 == 0)
-                      %td.edit_team.clickable{ data: { id: "starthole_#{match.id}_#{seed}" } }
+                      %td.edit_hole.clickable{ data: { id: "starthole_#{match.id}_#{seed}" } }
                         %span#span_starthole{ id: [ match.id, seed ] }
                         %input.form-control.tab_move.hidden#starthole{ id: [ match.id, seed ] }
     - if @event.final_matches?
@@ -79,7 +85,7 @@
                   %td #{seed}
                   - @event.final_matches.each do |match|
                     %td #{match.seed_showdown(seed)}
-                    %td.clickable.edit_team{ data: { id: "starthole_#{match.id}_#{seed}" } }
+                    %td.clickable.edit_hole{ data: { id: "starthole_#{match.id}_#{seed}" } }
                       %span#span_starthole{ id: [ match.id, seed ] }
                       %input.form-control.tab_move.hidden#starthole{ id: [ match.id, seed ] }
     - if @event.elim_matches?
@@ -97,7 +103,7 @@
                   %td #{seed}
                   - @event.elim_matches.each do |match|
                     %td #{match.seed_showdown(seed)}
-                    %td.clickable.edit_team{ data: { id: "starthole_#{match.id}_#{seed}" } }
+                    %td.clickable.edit_hole{ data: { id: "starthole_#{match.id}_#{seed}" } }
                       %span#span_starthole{ id: [ match.id, seed ] }
                       %input.form-control.tab_move.hidden#starthole{ id: [ match.id, seed ] }
 
@@ -115,7 +121,7 @@
     }
   });
 
-  $('.edit_team').click(function(e) {
+  $('.edit_hole').click(function(e) {
     // console.log("click:", this);
     $(this).find('span').addClass('hidden');
     $('input#' + this.dataset.id).removeClass('hidden').focus();
@@ -131,6 +137,7 @@
     // console.log("change:", this);
     var myid = $(this).attr('id');
     if (this.nodeName == 'INPUT') {
+      $.post('/assignment/#{@event.id}/' + this.id, { info: $(this).val() });
       $(this).addClass('hidden');
       $('span#span_' + $(this).attr('id')).removeClass('hidden').html($(this).val());
     }

@@ -55,3 +55,18 @@ th.match_header {
 .team_player_record {
   vertical-align: middle !important;
 }
+
+.hole_num {
+  max-width: 10px;
+}
+
+.hole_name {
+  max-width: 200px;
+}
+
+.hole_distance {
+  max-width: 10px;
+}
+
+.hole_rule {
+}

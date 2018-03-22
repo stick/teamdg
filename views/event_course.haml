@@ -1,0 +1,59 @@
+- course = @event.course
+%pre= @event.course.to_hash
+%table.table.table-striped.table-condensed.table-bordered
+  %tbody
+    %tr
+      %th.hole_num Hole #{icon('hashtag', fw: true)}
+      %th.hole_name Name
+      %th.hole_distance Distance
+      %th.hole_rule Notes
+    - course.hole_nums.each do |i|
+      - n = i - 1
+      %tr
+        %td.hole_num #{course.hole_nums[n]}
+        %td.hole_name
+          - field = 'name'
+          %span.edit_name.clickable#span{ id: [field, n], data: { id: n, field: field } }
+            #{course.hole_names[n]}
+          %input.form_control.edit_name#input{ id: ['name', n], data: { id: n, name: 'hole_names', courseid: course.id, field: field }, class: 'hidden' }
+        %td.hole_distance
+          - field = 'distance'
+          %span.edit_name.clickable#span{ id: [field, n], data: { id: n, field: field } }
+            #{course.hole_distances[n]}
+          -# %input.form_control.edit_name#input{ id: ['distance', n], data: { id: n, name: 'hole_distances', courseid: course.id, field: field }, class: 'hidden' }
+        %td.hole_rule
+          - field = 'rule'
+          %span.edit_name.clickable#span{ id: [field, n], data: { id: n, field: field } }
+            #{course.hole_rules[n]}
+          -# %input.form_control.edit_name#input{ id: ['rule', n], data: { id: n, name: 'hole_rules', courseid: course.id, field: field }, class: 'hidden' }
+
+:javascript
+  $(document).ready(function(){
+    $('.edit_name').click(function(e) {
+      $(this).addClass('hidden');
+      $('#input_' + this.dataset.field + '_' + this.dataset.id).removeClass('hidden').focus().select();
+    });
+
+    $('.edit_name').blur(function(e) {
+      $(this).addClass('hidden');
+      $('#span_' + this.dataset.field + '_' + this.dataset.id).removeClass('hidden');
+    });
+
+    $('.edit_name').change(function(e) {
+      var new_name = $(this).val();
+      console.log("new_name: ", new_name);
+      $.post('/course/' + this.dataset.courseid + '/update', { column: this.dataset.name, index: this.dataset.id, value: new_name });
+      $(this).addClass('hidden');
+      $('#span_' + this.dataset.field + '_' + this.dataset.id).removeClass('hidden').html(new_name);
+    });
+
+    $('.edit_name').keydown(function(e) {
+      if (e.which == 9) { // tab
+        var inputs = $(this).closest('table').find('input');
+        var next_input = inputs.eq( inputs.index(this) + 1 )[0]
+        console.log(next_input.dataset);
+        $(next_input).removeClass('hidden');
+        $('#span_' + this.dataset.field + "_" + next_input.dataset.id).addClass('hidden');
+      }
+    });
+  });

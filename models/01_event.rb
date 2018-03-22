@@ -40,6 +40,8 @@ class Event < Sequel::Model(:events)
   one_to_many :matches, :order => :matches__id
   one_to_many :games, :order => :games__id
   one_to_many :players, :order => :players__id
+  one_to_one  :course
+  one_to_many :assignments
 
   def validate
     super

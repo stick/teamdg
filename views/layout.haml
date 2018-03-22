@@ -66,6 +66,10 @@
                           Settings
                           %span.pull-right.fa.fa-cogs
                       %li
+                        %a{ href: url("/event/#{@event.id}/course") }
+                          Course
+                          %span.pull-right.fa.fa-map
+                      %li
                         %a{ href: url("/event/#{@event.id}/groups") }
                           Group Assignment
                           %span.pull-right #{icon('shield')}

@@ -27,5 +27,7 @@ require_relative '05_match'
 require_relative '06_game'
 require_relative '07_groupstage'
 require_relative '08_finalstage'
+require_relative '09_course'
+require_relative '10_assignment'
 
 DB.disconnect

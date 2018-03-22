@@ -321,8 +321,51 @@ class App < Sinatra::Base
   end
 
   get '/event/:event_id/schedule/?' do
+    @title = "Schedule"
     @event = Event[params[:event_id]]
     haml :event_schedule
+  end
+
+  get '/event/:event_id/course/?' do
+    @title = "Course"
+    @event = Event[params[:event_id]]
+    haml :event_course
+  end
+
+  post '/course/:course_id/update/?' do
+    course = Course[params[:course_id].to_i]
+    pp params
+    if params[:index]
+      case params[:column]
+      when "hole_names"
+        course.hole_names[params[:index].to_i] = params[:value].to_s
+      when "hole_distances"
+        course.hole_distances[params[:index].to_i] = params[:value].to_i
+      when "hole_rules"
+        course.hole_rules[params[:index].to_i] = params[:value].to_s
+      end
+      course.save
+    end
+  end
+
+  post '/assignment/:event_id/:reference/?' do
+    pp params
+    assignment = Assignment[reference: params[:reference]]
+    event = Event[params[:event_id]]
+    pp assignment
+    if assignment.nil?
+      event.add_assignment(reference: params[:reference], info: params[:info])
+      pp "added assignment"
+    else
+      assignment.info = params[:info]
+      assignment.save
+    end
+  end
+
+  get '/event/:event_id/course/new/?' do
+    @title = "New Course"
+    @event = Event[params[:event_id]]
+    haml :new_event_course
   end
 
   post '/player/:player_id/update/?' do

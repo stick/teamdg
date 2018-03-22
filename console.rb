@@ -14,6 +14,9 @@ require 'logger'
 require 'ostruct'
 require 'rrschedule'
 require 'sinatra/asset_pipeline'
+require 'bond'
 
 require_relative 'helpers/init'
 require_relative 'models/init_console'
+
+Bond.start
