@@ -68,7 +68,13 @@
                     %td #{match.seed_showdown(seed)}
                     - if (match.id % 2 == 0)
                       %td.edit_hole.clickable{ data: { id: "starthole_#{match.id}_#{seed}" } }
+                        - assignment_ref = "starthole_#{match.id}_#{seed}"
                         %span#span_starthole{ id: [ match.id, seed ] }
+                          - assignment = Assignment.where(event_id: @event.id, reference: assignment_ref).first
+                          - if assignment.nil?
+                            &nbsp;
+                          - else
+                            #{assignment.info}
                         %input.form-control.tab_move.hidden#starthole{ id: [ match.id, seed ] }
     - if @event.final_matches?
       .tab-pane#Finals{ role: 'tabpanel' }
@@ -86,7 +92,13 @@
                   - @event.final_matches.each do |match|
                     %td #{match.seed_showdown(seed)}
                     %td.clickable.edit_hole{ data: { id: "starthole_#{match.id}_#{seed}" } }
+                      - assignment_ref = "starthole_#{match.id}_#{seed}"
                       %span#span_starthole{ id: [ match.id, seed ] }
+                        - assignment = Assignment.where(event_id: @event.id, reference: assignment_ref).first
+                        - if assignment.nil?
+                          &nbsp;
+                        - else
+                          #{assignment.info}
                       %input.form-control.tab_move.hidden#starthole{ id: [ match.id, seed ] }
     - if @event.elim_matches?
       .tab-pane#Elimination{ role: 'tabpanel' }
@@ -104,7 +116,13 @@
                   - @event.elim_matches.each do |match|
                     %td #{match.seed_showdown(seed)}
                     %td.clickable.edit_hole{ data: { id: "starthole_#{match.id}_#{seed}" } }
+                      - assignment_ref = "starthole_#{match.id}_#{seed}"
                       %span#span_starthole{ id: [ match.id, seed ] }
+                        - assignment = Assignment.where(event_id: @event.id, reference: assignment_ref).first
+                        - if assignment.nil?
+                          &nbsp;
+                        - else
+                          #{assignment.info}
                       %input.form-control.tab_move.hidden#starthole{ id: [ match.id, seed ] }
 
 
