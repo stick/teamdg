@@ -5,4 +5,8 @@
 
 .list-group
   - @event.teams.each do |team|
-    %a.list-group-item{ href: url("/team/#{team.id}") }= team.name
+    %a.list-group-item{ href: url("/team/#{team.id}") }
+      #{team.name}
+      - if team.paid
+        #{icon('dollar')}
+
