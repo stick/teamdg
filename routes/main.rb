@@ -42,7 +42,7 @@ class App < Sinatra::Base
       group_advance: group_advance,
       num_teams: params[:num_teams].to_i,
       roster_size: params[:roster_size].to_i,
-      team_seeds: params[:team_seeds].split(/, /),
+      team_seeds: params[:team_seeds].strip.split(/, ?/),
       cycles: params[:cycles].to_i || nil,
       startdate: params[:event_startdate],
       enddate: params[:event_enddate],
