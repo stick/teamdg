@@ -1,7 +1,7 @@
 %h3 Incomplete / Unreported Player Matches
 .col-md-8
   %table.table.table-condensed
-    - @event.games_dataset.where(completed: false, sudden_death: false).each do |game|
+    - @event.games_dataset.where(completed: false, sudden_death: false).order(:seed).each do |game|
       %tr
         %td
           Match #{game.match.match_num}

@@ -104,16 +104,16 @@
           %thead
             %tr
               %th &nbsp;
-              %th 
+              %th
               %th
                 %small #{@event.semis.capitalize}
-              %th.hidden-xs
+              %th
                 %small
                   1<sup>st</sup> TB
-              %th.hidden-xs
+              %th
                 %small
                   2<sup>nd</sup> TB
-              %th.hidden-xs &nbsp;
+              %th &nbsp;
           - @event.groups.first.rank.each_with_index do |team, index|
             %tr
               %td #{ordinalize team[:rank]}
@@ -127,11 +127,11 @@
                   #{format_record team.record}
                 - else
                   #{team.points.to_i}
-              %td.hidden-xs
+              %td
                 #{team.holes_up}
-              %td.hidden-xs
+              %td
                 #{team.holes_remaining}
-              %td.advance.hidden-xs.hidden-sm
+              %td.advance
                 - if @event.rr_matches_completed?
                   - if team[:rank] <= @event.group_advance
                     #{icon('trophy')}
@@ -147,11 +147,11 @@
                 %th &nbsp;
                 %th
                   %small Points
-                %th.hidden-xs
+                %th
                   %small{ data: { toggle: 'tooltip', title: 'Holes Up' } } #{ordinalize(1)} TB
-                %th.hidden-xs
+                %th
                   %small{ data: { toggle: 'tooltip', title: 'Holes Remaining' } } #{ordinalize(2)} TB
-                %th.hidden-xs &nbsp;
+                %th &nbsp;
             - group.rank.each_with_index do |team, index|
               %tr
                 %td #{ordinalize team[:rank]}
@@ -165,21 +165,22 @@
                     #{format_record team.record}
                   - else
                     #{team.points.to_i}
-                %td.hidden-xs
+                %td
                   #{team.holes_up}
-                %td.hidden-xs
+                %td
                   #{team.holes_remaining}
-                %td.advance.hidden-xs.hidden-sm
+                %td.advance
                   - if @event.rr_matches_completed?
                     - if team[:rank] <= @event.group_advance
                       #{icon('trophy')}
 
 
+%hr.group_seed_break
 - if @event.rr_matches?
   .row
     .col-lg-12.col-md-12.col-sm-12.col-xs-12
       - @event.groups.each do |group|
-        .panel.panel-primary
+        .panel.panel-primary.group_print_break
           .panel-heading
             #{group.name} Seed Standings
             %i.fa.fa-question-circle.fa-fw{ data: { container: 'body', toggle: 'popover', placement: 'top', title: 'Seed Standings',  content: 'Ranked based on<ol><li>Wins</li><li>Ties</li><li>Losses</li><li>Holes Up</li><li>Holes Remaining</li></ul>' } }
@@ -191,7 +192,7 @@
             .tab-content
               - @event.team_seeds.each_with_index do |seed, i|
                 .tab-pane{ id: [group.name.downcase, seed.capitalize], role: 'tabpanel', class: i == 0 ? 'active' : '' }
-                  %table.table.table-responsive
+                  %table.table.table-responsive.table-condensed
                     %thead
                       %tr
                         %th &nbsp;
@@ -199,8 +200,8 @@
                         %th Wins
                         %th Ties
                         %th Losses
-                        %th.hidden-xs Holes Up
-                        %th.hidden-xs Holes Remaining
+                        %th Holes Up
+                        %th Holes Remaining
                     %tbody
                     -# - group.seed_winner(seed).each do |player|
                     - if group.seed_winners[seed].nil?
@@ -221,8 +222,8 @@
                           %td #{player.rr_wins}
                           %td #{player.rr_ties}
                           %td #{player.rr_losses}
-                          %td.hidden-xs #{player.rr_holes_up}
-                          %td.hidden-xs #{player.rr_holes_remaining}
+                          %td #{player.rr_holes_up}
+                          %td #{player.rr_holes_remaining}
 
 
 :javascript
