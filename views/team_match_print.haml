@@ -1,0 +1,205 @@
+- if locals[:hide_breadcrumbs].nil?
+  %ol.breadcrumb
+    %li
+      %a{ href: url("/event/#{@team.event.id}") } #{@team.event.name.upcase}
+    %li
+      %a{ href: url("/event/#{@team.event.id}/matches/team") } Teams Matches
+    %li.active.dropdown
+      %a.dropdown-toggle{ href: '#', data: { toggle: 'dropdown' }, role: 'button' }
+        #{@team.name}
+        %span.caret
+      %ul.dropdown-menu
+        - @event.teams.each do |team|
+          - unless team == @team
+            %li
+              %a{ href: url("/event/#{@event.id}/matches/team/#{team.id}") } #{team.name}
+
+- if @public
+  %ol.breadcrumb
+    %li
+      %a{ href: url("/#{CGI::escape @event.url}") } #{@event.name.upcase}
+    %li.active.dropdown
+      %a.dropdown-toggle{ href: '#', data: { toggle: 'dropdown' }, role: 'button' }
+        #{@team.name}
+        %span.caret
+      %ul.dropdown-menu
+        - @event.teams.each do |team|
+          - unless team == @team
+            %li
+              %a{ href: url("/#{CGI::escape @event.url}/team/#{CGI::escape team.name}/print") } #{team.name}
+
+
+%h3
+  Team #{@team.name} Matches
+  - if @event.semis =~ /record/
+    #{format_record @team.record}
+
+.col-lg-6.col-xs-10
+  .list-group
+    - @team.matches.sort{ |x,y| x.id <=> y.id }.each do |match|
+      %a.list-group-item{ href: url("/event/#{@event.id}/matches/team/#{@team.id}/match/#{match.id}") }
+        %span{ style: 'margin-left: 10px' }
+          #{match.desc}
+          #{vs}
+          - if @team.id == match.team_a.id
+            #{match.team_b.name}
+          - else
+            #{match.team_a.name}
+        %strong.record.pull-right (#{format_record(match.record(@team), color: true)})
+        %span.badge.pull-left{ data: { toggle: 'tooltip', title: 'Reported matches' } } #{match.games_dataset.where(completed: true).count} / #{match.games.count}
+
+.col-lg-3.col-sm-6.col-xs-10
+  %h5 Round Robin Wins / Losses / Ties
+  .graph#rrgraph{ style: 'width:220px;height:200px' }
+.col-lg-3.col-sm-6.col-xs-10
+  %h5 Elimination Wins / Losses / Ties
+  .graph#elimgraph{ style: 'width:220px;height:200px' }
+
+%hr.group_print_break
+.row
+  .col-lg-12.col-md-12
+    .table-responsive
+      %table.table.table-condensed
+        %thead
+          %tr.team_row
+            %th{ colspan: @team.opponents.count + 2 }
+              %h3
+                #{@team.name}
+                %small #{@team.group.name}
+                (#{format_record @team.record})
+          %tr.match_num_row
+            %th &nbsp;
+            %th &nbsp;
+            - @team.matches.each do |match|
+              %th.match_header
+                %span.myoddclass
+                  - if match.desc =~ /Semi/
+                    #{match.desc.gsub(/Match \d/, '')}
+                  - else
+                    #{match.desc}
+                    - if match.winner == @team
+                      #{icon('trophy')}
+                    - elsif match.tie and match.winner.nil?
+                      #{icon('minus')}
+          %tr.match_opp_row
+            %th &nbsp;
+            %th &nbsp;
+            - @team.opponents.each do |opponent|
+              %th
+                %span.myoddclass #{opponent.name}
+        %tbody
+          - @team.players.each do |player|
+            %tr.team_player_row
+              %th.team_player_name
+                %h5
+                  #{player.name}
+                  %small #{player.seed}
+              %th.team_player_record
+                %span.precord.pull-right #{player.record}
+              - player.games.each do |game|
+                %td.game_cell
+                  %span.myoddclass #{game.result(player.id)}
+        %tfoot
+          %tr.match_result_row
+            %td &nbsp;
+            %td &nbsp;
+            - @team.matches.each do |match|
+              %td
+                %span.myoddclass #{format_record(match.record(@team))}
+          - unless @event.semis =~ /record/
+            %tr.match_points_row
+              %td
+                %span.myoddclass Match Points
+              %td
+                %span.badge #{@team.points}
+              - @team.matches.each do |match|
+                - if match.semi or match.final
+                  %td &nbsp;
+                - else
+                  %td #{match.points(@team)}
+            %tr.tiebreaker1_row
+              %td
+                %span.myoddclass 1<sup>st</sup> Tiebreak
+              %td
+                %span.badge #{@team.holes_up}
+              - @team.matches.each do |match|
+                - if match.semi or match.final
+                  %td &nbsp;
+                - else
+                  %td #{match.holes_up(@team)}
+            %tr.tiebreaker2_row
+              %td
+                %span.myoddclass 2<sup>nd</sup> Tiebreak
+              %td
+                %span.badge #{@team.holes_remaining}
+              - @team.matches.each do |match|
+                - if match.semi or match.final
+                  %td &nbsp;
+                - else
+                  %td #{match.holes_remaining(@team)}
+
+
+:javascript
+  $(document).ready(function(){
+    var rrdata = [
+      { label: 'Wins', data: #{@team.rr_wins.to_i}, color: '#5cb85c' },
+      { label: 'Losses', data: #{@team.rr_losses.to_i}, color: '#d9534f' },
+      { label: 'Ties', data: #{@team.rr_ties.to_i}, color: '#777' },
+    ]
+
+    var elimdata = [
+      { label: 'Wins', data: #{@team.elim_wins.to_i}, color: '#5cb85c' },
+      { label: 'Losses', data: #{@team.elim_losses.to_i}, color: '#d9534f' },
+      { label: 'Ties', data: #{@team.elim_ties.to_i}, color: '#777' },
+    ]
+
+    function labelFormatter(label, series) {
+      return "<div style='font-size:8pt; text-align:center; padding:2px; color:white;'>" + label + "<br/>" + Math.round(series.percent) + "%</div>";
+    }
+
+    $.plot('#rrgraph',
+      rrdata, {
+        series: {
+          pie: {
+            show: true,
+            radius: 1,
+            label: {
+              show: true,
+              radius: 2/3,
+              threshold: 0.1,
+              formatter: labelFormatter,
+            }
+          }
+        },
+        grid: {
+          hoverable: false,
+        },
+        legend: {
+          show: false
+        },
+      }
+    );
+
+    $.plot('#elimgraph',
+      elimdata, {
+        series: {
+          pie: {
+            show: true,
+            radius: 1,
+            label: {
+              show: true,
+              radius: 2/3,
+              threshold: 0.1,
+              formatter: labelFormatter,
+            }
+          }
+        },
+        grid: {
+          hoverable: false,
+        },
+        legend: {
+          show: false
+        },
+      }
+    );
+  });
