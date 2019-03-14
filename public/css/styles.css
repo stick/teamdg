@@ -70,3 +70,41 @@ th.match_header {
 
 .hole_rule {
 }
+
+@media print {
+  a[href]:after {
+    content: none !important;
+  }
+
+  .tab-content > .tab-pane {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    /* page-break-after: always; */
+  }
+
+  body {
+    font: 10px Arial, Helvetica,"Lucida Grande", serif;
+  }
+
+  .nav-tabs {
+    display: none;
+  }
+
+  .group_print_break, .group_seed_break {
+    page-break-after: always;
+  }
+
+    @page {
+    size: letter auto;
+    margin: 0mm;
+  }
+
+  html, body {
+    width: 1024px;
+  }
+
+  body {
+    margin: 0 auto;
+  }
+}
