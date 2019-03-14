@@ -154,6 +154,7 @@ class App < Sinatra::Base
     get path do
       @match = Match[id: params[:match_id], event_id: params[:event_id]]
       @event = Event[params[:event_id]]
+      @title = "Match"
       haml :event_match
     end
   end
@@ -599,6 +600,22 @@ class App < Sinatra::Base
         haml :missing_player, layout: :layout_no_sidebar, locals: { hide_breadcrumbs: true }
       else
         haml :player_match, layout: :layout_no_sidebar, locals: { hide_breadcrumbs: true }
+      end
+    end
+  end
+
+  get '/:event_slug/team/:team_name/print/?' do
+    @event = Event[url: CGI::unescape(params[:event_slug])]
+    if @event.nil?
+      haml :missing_event, layout: :layout_no_sidebar, locals: { hide_breadcrumbs: true }
+    else
+      @team = @event.teams_dataset.where(name: CGI::unescape(params[:team_name])).first
+      @title = @event.name + '::' + @team.name
+      @public = true
+      if @team.nil?
+        haml :missing_team, layout: :layout_no_sidebar, locals: { hide_breadcrumbs: true }
+      else
+        haml :team_match_print, layout: :layout_no_sidebar, locals: { hide_breadcrumbs: true }
       end
     end
   end
