@@ -3,7 +3,7 @@
     - @event.final_matches.each do |match|
       %h1 #{match.winner.name} is the #{@event.name} Champion!
       %p.lead
-        #{match.winner.name} defeats #{match.loser.name} Finals score: #{match.showdown_score}
+        #{match.winner.name} defeats #{match.loser.name} Finals score: #{match.showdown_score(winner: true)}
 
 %h2.page-header #{@event.name} Standings
 
